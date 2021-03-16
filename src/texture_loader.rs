@@ -22,7 +22,7 @@ impl TextureLoader {
         }
     }
 
-    pub fn get_texture<'r>(&'r self, index: i32) -> &'r Texture {
+    pub fn get_texture(&self, index: i32) -> &Texture {
         &*(self.textures[index as usize])
     }
 }

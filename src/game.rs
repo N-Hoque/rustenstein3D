@@ -5,10 +5,12 @@ use rsfml::{
     window::Key,
 };
 
-use crate::event_handler::*;
-use crate::fps::*;
-use crate::game_mode::*;
-use crate::texture_loader::TextureLoader;
+use crate::{
+    event_handler::*,
+    fps::*,
+    game_mode::*,
+    texture_loader::TextureLoader,
+};
 
 pub struct GameLoop<'s> {
     render_window: RenderWindow,

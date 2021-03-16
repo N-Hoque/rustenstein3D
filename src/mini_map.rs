@@ -8,8 +8,10 @@ use rsfml::{
     system::{Vector2f, Vector2i, Vector2u},
 };
 
-use crate::map::*;
-use crate::texture_loader::TextureLoader;
+use crate::{
+    map::*,
+    texture_loader::TextureLoader,
+};
 
 pub struct MiniMap {
     map: Map,

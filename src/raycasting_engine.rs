@@ -6,9 +6,11 @@ use rsfml::{
     window::Key,
 };
 
-use crate::event_handler::EventHandler;
-use crate::map;
-use crate::texture_loader::TextureLoader;
+use crate::{
+    event_handler::EventHandler,
+    map,
+    texture_loader::TextureLoader,
+};
 
 pub struct REngine {
     player_position: Vector2f,
@@ -29,7 +31,7 @@ impl REngine {
             player_position: Vector2f { x: 22., y: 12. },
             vector_direction: Vector2f { x: -1., y: 0. },
             cam_plane: Vector2f { x: 0., y: 0.66 },
-            map: map,
+            map,
             window_size: Vector2f {
                 x: window_size.x,
                 y: window_size.y - 80.,
@@ -38,11 +40,11 @@ impl REngine {
             textures_id: Vec::new(),
             ground: REngine::create_ground_array(window_size),
             sky: REngine::create_ground_array(window_size),
-            noground: noground,
+            noground,
         }
     }
 
-    pub fn update<'r>(&'r mut self, event_handler: &EventHandler) -> () {
+    pub fn update(&mut self, event_handler: &EventHandler) -> () {
         self.textures_id.clear();
         let ray_pos = Vector2f {
             x: self.player_position.x,
@@ -405,7 +407,7 @@ impl REngine {
             old_cam_plane_x * (mouse_move).sin() + self.cam_plane.y * (mouse_move).cos();
     }
 
-    fn create_line_array<'r>(window_size: &'r Vector2f) -> Vec<Box<VertexArray>> {
+    fn create_line_array(window_size: &Vector2f) -> Vec<Box<VertexArray>> {
         let mut i = 0;
         let mut lines: Vec<Box<VertexArray>> = Vec::new();
         while i < window_size.x as i32 {
@@ -417,7 +419,7 @@ impl REngine {
         lines
     }
 
-    fn create_ground_array<'r>(window_size: &'r Vector2f) -> Vec<Box<VertexArray>> {
+    fn create_ground_array(window_size: &Vector2f) -> Vec<Box<VertexArray>> {
         let mut i = 0;
         let mut lines: Vec<Box<VertexArray>> = Vec::new();
         while i < window_size.x as i32 {

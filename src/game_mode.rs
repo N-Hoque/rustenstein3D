@@ -4,13 +4,15 @@ use rsfml::{
     window::Key,
 };
 
-use crate::event_handler::*;
-use crate::hud::HUD;
-use crate::map;
-use crate::mini_map::*;
-use crate::raycasting_engine::REngine;
-use crate::texture_loader::TextureLoader;
-use crate::weapon::Weapon;
+use crate::{
+    event_handler::*,
+    hud::HUD,
+    map,
+    mini_map::*,
+    raycasting_engine::REngine,
+    texture_loader::TextureLoader,
+    weapon::Weapon,
+};
 
 pub struct GameMode<'s> {
     window_size: Vector2u,
