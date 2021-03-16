@@ -70,7 +70,7 @@ impl EventHandler {
         })
     }
 
-    pub fn has_mouse_button_pressed_event(
+    pub fn get_mouse_button_pressed_event(
         &self,
         mouse_button: MouseButton,
     ) -> Option<(MouseButton, i32, i32)> {
@@ -80,7 +80,7 @@ impl EventHandler {
         })
     }
 
-    pub fn has_mouse_button_released_event(
+    pub fn get_mouse_button_released_event(
         &self,
         mouse_button: MouseButton,
     ) -> Option<(MouseButton, i32, i32)> {

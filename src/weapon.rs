@@ -1,7 +1,7 @@
 use rsfml::{
     graphics::{RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::Vector2f,
-    window::{Key, mouse},
+    window::{Key, mouse::Button as MouseButton},
 };
 
 use crate::{
@@ -97,14 +97,14 @@ impl<'s> Weapon<'s> {
         };
 
         if !self.mouse_fire {
-            if let Some(_) = event_handler.has_mouse_button_pressed_event(mouse::Button::LEFT) {
+            if let Some(_) = event_handler.get_mouse_button_pressed_event(MouseButton::LEFT) {
                 self.animations
                     .get_mut(self.current_weapon as usize)
                     .unwrap()
                     .set_state(AnimationState::Play);
                 self.mouse_fire = true
             };
-        } else if let Some(_) = event_handler.has_mouse_button_released_event(mouse::Button::LEFT) {
+        } else if let Some(_) = event_handler.get_mouse_button_released_event(MouseButton::LEFT) {
             self.mouse_fire = false
         } else {
             self.animations
