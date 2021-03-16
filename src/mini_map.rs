@@ -1,15 +1,15 @@
+use std::borrow::BorrowMut;
+
 use rsfml::{
     graphics::{
         Color, FloatRect, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable, View,
     },
-    system::{Vector2f, Vector2i, Vector2u},
     SfBox,
+    system::{Vector2f, Vector2i, Vector2u},
 };
 
 use crate::map::*;
 use crate::texture_loader::TextureLoader;
-
-use std::borrow::BorrowMut;
 
 pub struct MiniMap {
     map: Map,

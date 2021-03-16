@@ -1,7 +1,7 @@
 use rsfml::{
     graphics::{RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::Vector2f,
-    window::{mouse, Key},
+    window::{Key, mouse},
 };
 
 use crate::animation::*;

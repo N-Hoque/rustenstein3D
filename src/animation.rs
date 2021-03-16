@@ -6,6 +6,7 @@ pub enum AnimationState {
     Pause,
     Stop,
 }
+
 #[derive(Clone, Copy)]
 pub enum AnimationPlayMode {
     Once,

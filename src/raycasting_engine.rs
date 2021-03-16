@@ -247,11 +247,11 @@ impl REngine {
         if side == 1 {
             *wall_x = ray_pos.x
                 + ((map_pos.y as f32 - ray_pos.y + (1. - step.y as f32) / 2.) / ray_dir.y)
-                    * ray_dir.x;
+                * ray_dir.x;
         } else {
             *wall_x = ray_pos.y
                 + ((map_pos.x as f32 - ray_pos.x + (1. - step.x as f32) / 2.) / ray_dir.x)
-                    * ray_dir.y;
+                * ray_dir.y;
         }
         *wall_x -= wall_x.floor();
 
