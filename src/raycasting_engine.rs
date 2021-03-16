@@ -22,7 +22,7 @@ pub struct REngine {
     textures_id: Vec<i32>,
     ground: Vec<Box<VertexArray>>,
     sky: Vec<Box<VertexArray>>,
-    noground: bool,
+    no_ground: bool,
 }
 
 impl REngine {
@@ -40,7 +40,7 @@ impl REngine {
             textures_id: Vec::new(),
             ground: REngine::create_ground_array(window_size),
             sky: REngine::create_ground_array(window_size),
-            noground,
+            no_ground: noground,
         }
     }
 
@@ -114,7 +114,7 @@ impl REngine {
                 &mut wall_x,
             );
 
-            if !self.noground {
+            if !self.no_ground {
                 self.calculate_ground(
                     side,
                     &map_pos,
@@ -141,35 +141,33 @@ impl REngine {
         draw_end: &mut i32,
         x: i32,
     ) -> () {
-        let mut floor = Vector2f { x: 0., y: 0. };
-        let dist_player: f32 = 0.;
+        if *draw_end < 0 {
+            *draw_end = self.window_size.y as i32;
+        }
+
+        let mut y: i32 = *draw_end + 1;
+        self.ground.get_mut(x as usize).unwrap().clear();
+        self.sky.get_mut(x as usize).unwrap().clear();
+
+        let mut vertex = Vertex::default();
         let mut current_dist: f32;
         let mut weight: f32;
         let mut current_floor = Vector2f { x: 0., y: 0. };
         let mut tex_coord = Vector2f { x: 0., y: 0. };
-        let mut pos = Vector2f { x: 0., y: 0. };
-        pos.x = x as f32;
-        if side == 0 && ray_dir.x > 0. {
-            floor.x = map_pos.x as f32;
-            floor.y = map_pos.y as f32 + wall_x;
-        } else if side == 0 && ray_dir.x < 0. {
-            floor.x = map_pos.x as f32 + 1.;
-            floor.y = map_pos.y as f32 + wall_x;
-        } else if side == 1 && ray_dir.y > 0. {
-            floor.x = map_pos.x as f32 + wall_x;
-            floor.y = map_pos.y as f32;
-        } else {
-            floor.x = map_pos.x as f32 + wall_x;
-            floor.y = map_pos.y as f32 + 1.;
-        }
+        let mut pos = Vector2f { x: x as f32, y: 0. };
+        let dist_player: f32 = 0.;
 
-        if *draw_end < 0 {
-            *draw_end = self.window_size.y as i32;
-        }
-        let mut y: i32 = *draw_end + 1;
-        self.ground.get_mut(x as usize).unwrap().clear();
-        self.sky.get_mut(x as usize).unwrap().clear();
-        let mut vertex = Vertex::default();
+        let (map_pos_x, map_pos_y) = (map_pos.x as f32, map_pos.y as f32);
+        let floor = if side == 0 && ray_dir.x > 0. {
+            Vector2f { x: map_pos_x, y: map_pos_y + wall_x }
+        } else if side == 0 && ray_dir.x < 0. {
+            Vector2f { x: map_pos_x + 1., y: map_pos_y + wall_x }
+        } else if side == 1 && ray_dir.y > 0. {
+            Vector2f { x: map_pos_x + wall_x, y: map_pos_y }
+        } else {
+            Vector2f { x: map_pos_x + wall_x, y: map_pos_y + 1. }
+        };
+
         while y < self.window_size.y as i32 {
             current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
             weight = (current_dist - dist_player) / (perp_wall_dist - dist_player);
@@ -207,13 +205,12 @@ impl REngine {
         step: &Vector2i,
         perp_wall_dist: &mut f32,
     ) -> () {
-        if side == 0 {
-            *perp_wall_dist =
-                ((map_pos.x as f32 - ray_pos.x + (1 - step.x) as f32 / 2.) / ray_dir.x).abs();
+        *perp_wall_dist = if side == 0 {
+            ((map_pos.x as f32 - ray_pos.x + (1 - step.x) as f32 / 2.) / ray_dir.x).abs()
         } else {
-            *perp_wall_dist =
-                ((map_pos.y as f32 - ray_pos.y + (1 - step.y) as f32 / 2.) / ray_dir.y).abs();
-        }
+            ((map_pos.y as f32 - ray_pos.y + (1 - step.y) as f32 / 2.) / ray_dir.y).abs()
+        };
+
         let line_height: i32 = if *perp_wall_dist as i32 == 0 {
             self.window_size.y as i32
         } else {
@@ -246,15 +243,15 @@ impl REngine {
             .get_block(map_pos)
             .expect("Error on raycasting_engine line 87.");
 
-        if side == 1 {
-            *wall_x = ray_pos.x
+        *wall_x = if side == 1 {
+            ray_pos.x
                 + ((map_pos.y as f32 - ray_pos.y + (1. - step.y as f32) / 2.) / ray_dir.y)
-                * ray_dir.x;
+                * ray_dir.x
         } else {
-            *wall_x = ray_pos.y
+            ray_pos.y
                 + ((map_pos.x as f32 - ray_pos.x + (1. - step.x as f32) / 2.) / ray_dir.x)
-                * ray_dir.y;
-        }
+                * ray_dir.y
+        };
         *wall_x -= wall_x.floor();
 
         let mut texture_x = (*wall_x * 128.) as i32;
@@ -323,7 +320,7 @@ impl REngine {
         side: &mut i32,
     ) -> () {
         let mut hit: bool = false;
-        while hit == false {
+        while !hit {
             if side_dist.x < side_dist.y {
                 side_dist.x += delta_dist.x;
                 map_pos.x += step.x;
@@ -333,12 +330,9 @@ impl REngine {
                 map_pos.y += step.y;
                 *side = 1;
             }
-            match self.map.get_block(map_pos) {
-                Some(block) => match block {
-                    0 => hit = false,
-                    _ => hit = true,
-                },
-                None => hit = true,
+            hit = match self.map.get_block(map_pos) {
+                Some(block) if block == 0 => false,
+                _ => true
             };
         }
     }
@@ -390,7 +384,7 @@ impl REngine {
             }
         }
 
-        let mouse_move: f32 = match event_handler.has_mouse_moved_event() {
+        let mouse_move = match event_handler.has_mouse_moved_event() {
             Some((x, _)) => x as f32 - (self.window_size.x / 2.) as f32,
             None => 0.,
         } / -250.;
@@ -400,6 +394,7 @@ impl REngine {
             - self.vector_direction.y * (mouse_move).sin();
         self.vector_direction.y =
             old_dir_x * (mouse_move).sin() + self.vector_direction.y * (mouse_move).cos();
+
         let old_cam_plane_x = self.cam_plane.x;
         self.cam_plane.x =
             self.cam_plane.x * (mouse_move).cos() - self.cam_plane.y * (mouse_move).sin();

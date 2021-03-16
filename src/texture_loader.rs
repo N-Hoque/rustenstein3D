@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+
 use rsfml::{graphics::Texture, SfBox};
 
 pub struct TextureLoader {
@@ -23,6 +25,6 @@ impl TextureLoader {
     }
 
     pub fn get_texture(&self, index: i32) -> &Texture {
-        &*(self.textures[index as usize])
+        self.textures[index as usize].borrow()
     }
 }
