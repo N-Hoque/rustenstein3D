@@ -1,38 +1,31 @@
-#![license = "MIT"]
 #![crate_type = "bin"]
-
-#![feature(globs)]
-#![feature(managed_boxes)]
 #![allow(non_camel_case_types)]
-#![allow(visible_private_types)]
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
 extern crate native;
 extern crate rsfml;
 
-use rsfml::graphics::{RenderWindow, Font};
-use rsfml::window::{VideoMode, ContextSettings};
+use rsfml::graphics::{Font, RenderWindow};
 use rsfml::system::Vector2i;
-use rsfml::window::Close;
+use rsfml::window::Style;
+use rsfml::window::{ContextSettings, VideoMode};
 
-use std::os;
-use std::from_str::*;
+use std::str::FromStr;
 
-pub mod FPS;
+pub mod animation;
 pub mod event_handler;
+pub mod fps;
+pub mod game;
 pub mod game_mode;
+pub mod hud;
 pub mod map;
 pub mod mini_map;
 pub mod raycasting_engine;
 pub mod texture_loader;
-pub mod hud;
-pub mod animation;
 pub mod weapon;
-pub mod game;
 
-
-#[cfg(target_os="macos")]
+#[cfg(target_os = "macos")]
 #[start]
 fn start(argc: int, argv: *const *const u8) -> int {
     native::start(argc, argv, main)
@@ -89,43 +82,49 @@ fn load_texture() -> texture_loader::TextureLoader {
        texture_loader.load_texture("../resources/weapons/cut_shadow.png".to_string()) == false || // 39
        texture_loader.load_texture("../resources/face1.png".to_string()) == false || //40
        texture_loader.load_texture("../resources/face2.png".to_string()) == false || //41
-       texture_loader.load_texture("../resources/face3.png".to_string()) == false { //42
-        fail!("Error : Cannot load texture.");
+       texture_loader.load_texture("../resources/face3.png".to_string()) == false
+    {
+        //42
+        panic!("Error : Cannot load texture.");
     }
     texture_loader
 }
 
 fn main() -> () {
     // Check if a custom width is set.
-    let args = os::args();
-    let mut width : uint = 768;
-    let mut height : uint = 480;
-    let mut noground : bool = false;
+    let args = std::env::args().collect::<Vec<String>>();
+    let mut width: u32 = 768;
+    let mut height: u32 = 480;
+    let mut noground: bool = false;
     let mut i_args = 1;
 
     while i_args < args.len() {
-        match args[i_args].as_slice() {
-            "--help"       => { display_help(); return; },
-            "--noground"   => noground = true,
-            "-w"           => {
-                if i_args + 2 >= args.len() { fail!("Error missing arguments for -w option."); }
-                width = from_str::<uint>(args[i_args + 1].as_slice()).expect("Error the first parameter after -w argument is not a width!");
-                height = from_str::<uint>(args[i_args + 2].as_slice()).expect("Error the second parameter after -w argument is not a width!");
+        match args[i_args].as_str() {
+            "--help" => {
+                display_help();
+                return;
+            }
+            "--noground" => noground = true,
+            "-w" => {
+                if i_args + 2 >= args.len() {
+                    panic!("Error missing arguments for -w option.");
+                }
+                width = u32::from_str(args[i_args + 1].as_str())
+                    .expect("Error the first parameter after -w argument is not a width!");
+                height = u32::from_str(args[i_args + 2].as_str())
+                    .expect("Error the second parameter after -w argument is not a width!");
                 i_args += 2;
-            },
-            _              => fail!("Error unknown argument."),
+            }
+            _ => panic!("Error unknown argument."),
         }
         i_args += 1;
     }
 
     // Create the render_window.
     let settings = ContextSettings::default();
-    let video_mode = VideoMode::new_init(width, height, 32);
+    let video_mode = VideoMode::new(width, height, 32);
     // let video_mode = VideoMode::new_init(512, 384, 32);
-    let mut render_window = RenderWindow::new(video_mode,
-                                              "Rustenstein3D",
-                                              Close,
-                                              &settings).expect("Error : Cannot create a render_window!");
+    let mut render_window = RenderWindow::new(video_mode, "Rustenstein3D", Style::CLOSE, &settings);
 
     // set the framerate limit to 30 fps.
     render_window.set_framerate_limit(40);
@@ -134,20 +133,17 @@ fn main() -> () {
     render_window.set_mouse_cursor_visible(false);
 
     // set the mouse positon on the center of the window
-    render_window.set_mouse_position(&Vector2i {x : width as i32 / 2,
-                                                y : height as i32 / 2});
+    render_window.set_mouse_position(Vector2i::new(width as i32 / 2, height as i32 / 2));
 
     // Create the font for the FPS_handler.
-    let font = Font::new_from_file("../resources/sansation.ttf")
-        .expect("Error : Cannot load font, font resources/sansation.ttf doesn.t exist!");
+    let font = Font::from_file("../resources/sansation.ttf")
+        .expect("ERROR: Cannot load font, font resources/sansation.ttf doesn't exist!");
 
     // Create the texture loader and load textures
     let texture_loader = load_texture();
 
     // Create the game_loop and activate the fps handler.
-    let mut game_loop = game::GameLoop::new(render_window,
-                                            &texture_loader,
-                                            noground);
+    let mut game_loop = game::GameLoop::new(render_window, &texture_loader, noground);
     game_loop.activate_FPS(&font);
 
     game_loop.run();
