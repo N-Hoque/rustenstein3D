@@ -51,28 +51,28 @@ impl<'s> Weapon<'s> {
         animations.push(Animation::new(
             vec![12, 13, 14, 15, 16, 17],
             AnimationState::Stop,
-            AnimationMode::PlayOnce,
+            AnimationPlayMode::Once,
             0.07,
             3,
         ));
         animations.push(Animation::new(
             vec![19, 20, 21, 22, 23, 24],
             AnimationState::Stop,
-            AnimationMode::PlayOnce,
+            AnimationPlayMode::Once,
             0.07,
             3,
         ));
         animations.push(Animation::new(
             vec![26, 27, 28, 29, 30, 31],
             AnimationState::Stop,
-            AnimationMode::PlayOnce,
+            AnimationPlayMode::Once,
             0.07,
             3,
         ));
         animations.push(Animation::new(
             vec![33, 34, 35, 36, 37, 38],
             AnimationState::Stop,
-            AnimationMode::PlayOnce,
+            AnimationPlayMode::Once,
             0.07,
             3,
         ));

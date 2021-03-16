@@ -7,9 +7,9 @@ pub enum AnimationState {
     Stop,
 }
 #[derive(Clone, Copy)]
-pub enum AnimationMode {
-    PlayOnce,
-    PlayInfinite,
+pub enum AnimationPlayMode {
+    Once,
+    Infinite,
 }
 
 pub struct Animation {
@@ -18,7 +18,7 @@ pub struct Animation {
     offset: u32,
     texture_ids: Vec<i32>,
     state: AnimationState,
-    mode: AnimationMode,
+    mode: AnimationPlayMode,
     lag: f32,
     current_texture: u32,
     clock: Clock,
@@ -28,7 +28,7 @@ impl Animation {
     pub fn new(
         texture_ids: Vec<i32>,
         state: AnimationState,
-        mode: AnimationMode,
+        mode: AnimationPlayMode,
         lag: f32,
         offset: u32,
     ) -> Animation {
@@ -60,7 +60,7 @@ impl Animation {
         }
     }
 
-    pub fn set_mode(&mut self, new_mode: AnimationMode) -> () {
+    pub fn set_mode(&mut self, new_mode: AnimationPlayMode) -> () {
         self.mode = new_mode;
     }
 
@@ -68,7 +68,7 @@ impl Animation {
         self.state
     }
 
-    pub fn get_mode(&self) -> AnimationMode {
+    pub fn get_mode(&self) -> AnimationPlayMode {
         self.mode
     }
 
@@ -96,7 +96,7 @@ impl Animation {
                     self.current_texture += 1;
                 } else {
                     self.current_texture = 0;
-                    if let AnimationMode::PlayOnce = self.mode {
+                    if let AnimationPlayMode::Once = self.mode {
                         self.state = AnimationState::Stop
                     }
                 }

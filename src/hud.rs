@@ -33,7 +33,7 @@ impl<'s> HUD<'s> {
             face_animation: Animation::new(
                 vec![40, 41, 42],
                 AnimationState::Play,
-                AnimationMode::PlayOnce,
+                AnimationPlayMode::Once,
                 1.,
                 0,
             ),
