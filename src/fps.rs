@@ -4,11 +4,12 @@
 * This class display the current fps in the left bottom of the window.
 *
 */
-
 #![allow(non_snake_case)]
 
-use rsfml::graphics::{Color, Font, RenderTarget, RenderWindow, Text, Transformable};
-use rsfml::system::{Clock, Vector2f};
+use rsfml::{
+    graphics::{Color, Font, RenderTarget, RenderWindow, Text, Transformable},
+    system::{Clock, Vector2f},
+};
 
 /// Definition of class FPSHandler
 pub struct FPSHandler<'s> {

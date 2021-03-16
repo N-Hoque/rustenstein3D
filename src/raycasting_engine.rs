@@ -1,12 +1,14 @@
-use rsfml::graphics::{
-    Color, PrimitiveType, RenderStates, RenderTarget, RenderWindow, Vertex, VertexArray,
+use rsfml::{
+    graphics::{
+        Color, PrimitiveType, RenderStates, RenderTarget, RenderWindow, Vertex, VertexArray,
+    },
+    system::{Vector2f, Vector2i},
+    window::Key,
 };
-use rsfml::system::{Vector2f, Vector2i};
-use rsfml::window::Key;
 
-use event_handler::EventHandler;
-use map;
-use texture_loader::TextureLoader;
+use crate::event_handler::EventHandler;
+use crate::map;
+use crate::texture_loader::TextureLoader;
 
 pub struct REngine {
     player_position: Vector2f,

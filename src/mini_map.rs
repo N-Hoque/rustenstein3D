@@ -1,16 +1,15 @@
-use std::rc::Rc;
-use std::{borrow::BorrowMut, cell::RefCell};
-
-use rsfml::system::{Vector2f, Vector2i, Vector2u};
 use rsfml::{
     graphics::{
         Color, FloatRect, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable, View,
     },
+    system::{Vector2f, Vector2i, Vector2u},
     SfBox,
 };
 
-use map::*;
-use texture_loader::TextureLoader;
+use crate::map::*;
+use crate::texture_loader::TextureLoader;
+
+use std::borrow::BorrowMut;
 
 pub struct MiniMap {
     map: Map,
@@ -39,11 +38,8 @@ impl MiniMap {
         }
     }
 
-    pub fn set_active(&mut self) -> bool {
-        self.active = match self.active {
-            true => false,
-            false => true,
-        };
+    pub fn toggle_active(&mut self) -> bool {
+        self.active = !self.active;
         self.active
     }
 

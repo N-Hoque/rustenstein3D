@@ -1,14 +1,16 @@
-use rsfml::graphics::{Color, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable};
-use rsfml::system::{Vector2f, Vector2i, Vector2u};
-use rsfml::window::Key;
+use rsfml::{
+    graphics::{Color, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
+    system::{Vector2f, Vector2i, Vector2u},
+    window::Key,
+};
 
-use event_handler::*;
-use hud::HUD;
-use map;
-use mini_map::*;
-use raycasting_engine::REngine;
-use texture_loader::TextureLoader;
-use weapon::Weapon;
+use crate::event_handler::*;
+use crate::hud::HUD;
+use crate::map;
+use crate::mini_map::*;
+use crate::raycasting_engine::REngine;
+use crate::texture_loader::TextureLoader;
+use crate::weapon::Weapon;
 
 pub struct GameMode<'s> {
     window_size: Vector2u,
@@ -100,7 +102,7 @@ impl<'s> GameMode<'s> {
             rotation = 5.25;
         }
         match event_handler.has_key_pressed_event(Key::M) {
-            Some((_, _, _, _, _)) => self.mini_map.set_active(),
+            Some(_) => self.mini_map.toggle_active(),
             None => true,
         };
         self.r_engine.update(event_handler);

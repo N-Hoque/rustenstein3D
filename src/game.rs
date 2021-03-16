@@ -1,12 +1,14 @@
 #![allow(non_snake_case)]
 
-use event_handler::*;
-use fps::*;
-use game_mode::*;
-use texture_loader::TextureLoader;
+use crate::event_handler::*;
+use crate::fps::*;
+use crate::game_mode::*;
+use crate::texture_loader::TextureLoader;
 
-use rsfml::graphics::{Color, Font, RenderTarget, RenderWindow};
-use rsfml::window::Key;
+use rsfml::{
+    graphics::{Color, Font, RenderTarget, RenderWindow},
+    window::Key,
+};
 
 pub struct GameLoop<'s> {
     render_window: RenderWindow,
@@ -25,26 +27,26 @@ impl<'s> GameLoop<'s> {
     ) -> GameLoop<'s> {
         let tmp_size = render_window.size();
         GameLoop {
-            render_window: render_window,
+            render_window,
             fps_handler: None,
             event_handler: EventHandler::new(),
             clear_color: Color::rgb(3, 64, 59),
             game_mode: GameMode::new(tmp_size, texture_loader, noground),
-            texture_loader: texture_loader,
+            texture_loader,
         }
     }
 
     pub fn activate_FPS(&mut self, font: &'s Font) -> () {
-        match self.fps_handler {
-            Some(_) => (),
-            None => self.fps_handler = Some(FPSHandler::new(font)),
+        if let Some(_) = self.fps_handler {
+            ()
+        } else {
+            self.fps_handler = Some(FPSHandler::new(font))
         }
     }
 
     pub fn deactivate_FPS(&mut self) -> () {
-        match self.fps_handler {
-            Some(_) => self.fps_handler = None,
-            None => (),
+        if let Some(_) = self.fps_handler {
+            self.fps_handler = None
         }
     }
 
@@ -67,13 +69,11 @@ impl<'s> GameLoop<'s> {
     pub fn draw(&mut self) -> () {
         self.render_window.clear(self.clear_color);
         self.game_mode.draw(&mut self.render_window);
-        match self.fps_handler {
-            Some(_) => self
-                .fps_handler
+        if let Some(_) = self.fps_handler {
+            self.fps_handler
                 .as_mut()
                 .unwrap()
-                .draw(&mut self.render_window),
-            None => {}
+                .draw(&mut self.render_window)
         };
         self.render_window.display();
     }

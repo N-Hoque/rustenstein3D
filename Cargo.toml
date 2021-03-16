@@ -1,8 +1,12 @@
 [package]
 name = "rustenstein3D"
 version = "0.1.0"
+edition = "2018"
 authors = ["Jeremy Letang <letang.jeremy@gmail.com>", "Naimul Hoque <Naimul_Hoque@outlook.com>"]
+license = "MIT"
+repository = "https://github.com/N-Hoque/rustenstein3D"
 
 [dependencies]
 rsfml = { git = "https://github.com/jeremyletang/rust-sfml.git", package = "sfml" }
 native = "0.1.0"
+

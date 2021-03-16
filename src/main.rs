@@ -6,10 +6,11 @@
 extern crate native;
 extern crate rsfml;
 
-use rsfml::graphics::{Font, RenderWindow};
-use rsfml::system::Vector2i;
-use rsfml::window::Style;
-use rsfml::window::{ContextSettings, VideoMode};
+use rsfml::{
+    graphics::{Font, RenderWindow},
+    system::Vector2i,
+    window::{ContextSettings, Style, VideoMode},
+};
 
 use std::str::FromStr;
 

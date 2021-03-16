@@ -1,7 +1,7 @@
-use rsfml::graphics::RenderWindow;
-use rsfml::window::mouse::Button as MouseButton;
-use rsfml::window::Event;
-use rsfml::window::Key;
+use rsfml::{
+    graphics::RenderWindow,
+    window::{mouse::Button as MouseButton, Event, Key},
+};
 
 pub struct EventHandler {
     pub events: Vec<Event>,
@@ -98,9 +98,12 @@ impl EventHandler {
     pub fn has_mouse_wheel_moved_event(&self) -> Option<(i32, i32, i32)> {
         for ev in self.events.iter() {
             match *ev {
-                Event::MouseWheelScrolled { wheel, delta, x, y } => {
-                    return Some((delta as i32, x, y))
-                }
+                Event::MouseWheelScrolled {
+                    wheel: _,
+                    delta,
+                    x,
+                    y,
+                } => return Some((delta as i32, x, y)),
                 _ => {}
             }
         }

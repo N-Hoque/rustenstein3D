@@ -1,10 +1,12 @@
-use rsfml::graphics::{RectangleShape, RenderTarget, RenderWindow, Shape, Transformable};
-use rsfml::system::Vector2f;
-use rsfml::window::{mouse, Key};
+use rsfml::{
+    graphics::{RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
+    system::Vector2f,
+    window::{mouse, Key},
+};
 
-use animation::*;
-use event_handler::EventHandler;
-use texture_loader::TextureLoader;
+use crate::animation::*;
+use crate::event_handler::EventHandler;
+use crate::texture_loader::TextureLoader;
 
 pub struct Weapon<'s> {
     weapons: RectangleShape<'s>,
@@ -21,7 +23,7 @@ impl<'s> Weapon<'s> {
         Weapon {
             weapons: Weapon::initialize_weapons(window_size),
             animations: Weapon::initialize_animation(),
-            texture_loader: texture_loader,
+            texture_loader,
             shadows: Weapon::initialize_shadows(window_size),
             shadows_id: vec![18, 25, 32, 39],
             current_weapon: 0,
@@ -79,44 +81,35 @@ impl<'s> Weapon<'s> {
     }
 
     pub fn update<'r>(&'r mut self, event_handler: &'r EventHandler) -> () {
-        match event_handler.has_key_pressed_event(Key::NUM1) {
-            Some(_) => self.current_weapon = 0,
-            None => {}
+        if let Some(_) = event_handler.has_key_pressed_event(Key::NUM1) {
+            self.current_weapon = 0
         };
-        match event_handler.has_key_pressed_event(Key::NUM2) {
-            Some(_) => self.current_weapon = 1,
-            None => {}
+        if let Some(_) = event_handler.has_key_pressed_event(Key::NUM2) {
+            self.current_weapon = 1
         };
-        match event_handler.has_key_pressed_event(Key::NUM3) {
-            Some(_) => self.current_weapon = 2,
-            None => {}
+        if let Some(_) = event_handler.has_key_pressed_event(Key::NUM3) {
+            self.current_weapon = 2
         };
-        match event_handler.has_key_pressed_event(Key::NUM4) {
-            Some(_) => self.current_weapon = 3,
-            None => {}
+        if let Some(_) = event_handler.has_key_pressed_event(Key::NUM4) {
+            self.current_weapon = 3
         };
 
-        if self.mouse_fire == false {
-            match event_handler.has_mouse_button_pressed_event(mouse::Button::LEFT) {
-                Some(_) => {
-                    self.animations
-                        .get_mut(self.current_weapon as usize)
-                        .unwrap()
-                        .set_state(AnimationState::Play);
-                    self.mouse_fire = true
-                }
-                None => {}
-            };
-        } else {
-            match event_handler.has_mouse_button_released_event(mouse::Button::LEFT) {
-                Some(_) => self.mouse_fire = false,
-                None => self
-                    .animations
+        if !self.mouse_fire {
+            if let Some(_) = event_handler.has_mouse_button_pressed_event(mouse::Button::LEFT) {
+                self.animations
                     .get_mut(self.current_weapon as usize)
                     .unwrap()
-                    .set_state(AnimationState::Play),
+                    .set_state(AnimationState::Play);
+                self.mouse_fire = true
             };
-        }
+        } else if let Some(_) = event_handler.has_mouse_button_released_event(mouse::Button::LEFT) {
+            self.mouse_fire = false
+        } else {
+            self.animations
+                .get_mut(self.current_weapon as usize)
+                .unwrap()
+                .set_state(AnimationState::Play)
+        };
 
         if event_handler.is_key_pressed(Key::E) {
             self.animations
