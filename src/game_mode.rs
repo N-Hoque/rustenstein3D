@@ -55,7 +55,7 @@ impl<'s> GameMode<'s> {
                 &Vector2f::new(window_size.x as f32, window_size.y as f32),
                 no_ground,
             ),
-            texture_loader: texture_loader,
+            texture_loader,
             hud: HUD::new(
                 &Vector2f::new(window_size.x as f32, window_size.y as f32),
                 texture_loader,
@@ -64,8 +64,8 @@ impl<'s> GameMode<'s> {
                 &Vector2f::new(window_size.x as f32, window_size.y as f32),
                 texture_loader,
             ),
-            sky: sky,
-            ground: ground,
+            sky,
+            ground,
         }
     }
 
@@ -95,7 +95,7 @@ impl<'s> GameMode<'s> {
         map::Map::new(map_i32, &Vector2f::new(24., 24.))
     }
 
-    pub fn update<'r>(&mut self, event_handler: &'r EventHandler) -> () {
+    pub fn update(&mut self, event_handler: &EventHandler) -> () {
         let mut rotation: f32 = 0.;
         if event_handler.is_key_pressed(Key::LEFT) {
             rotation = -5.25;
@@ -116,7 +116,7 @@ impl<'s> GameMode<'s> {
         self.weapon.update(event_handler);
     }
 
-    pub fn draw<'r>(&mut self, render_window: &'r mut RenderWindow) -> () {
+    pub fn draw(&mut self, render_window: &mut RenderWindow) -> () {
         render_window.draw(&self.sky);
         render_window.draw(&self.ground);
         self.r_engine.draw(render_window, self.texture_loader);

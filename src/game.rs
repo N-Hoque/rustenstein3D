@@ -39,9 +39,7 @@ impl<'s> GameLoop<'s> {
     }
 
     pub fn activate_FPS(&mut self, font: &'s Font) -> () {
-        if let Some(_) = self.fps_handler {
-            ()
-        } else {
+        if let None = self.fps_handler {
             self.fps_handler = Some(FPSHandler::new(font))
         }
     }
