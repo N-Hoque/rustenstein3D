@@ -25,7 +25,7 @@ impl<'s> GameLoop<'s> {
     pub fn new(
         render_window: RenderWindow,
         texture_loader: &'s TextureLoader,
-        noground: bool,
+        no_ground: bool,
     ) -> GameLoop<'s> {
         let tmp_size = render_window.size();
         GameLoop {
@@ -33,7 +33,7 @@ impl<'s> GameLoop<'s> {
             fps_handler: None,
             event_handler: EventHandler::new(),
             clear_color: Color::rgb(3, 64, 59),
-            game_mode: GameMode::new(tmp_size, texture_loader, noground),
+            game_mode: GameMode::new(tmp_size, texture_loader, no_ground),
             texture_loader,
         }
     }

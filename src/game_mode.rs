@@ -31,7 +31,7 @@ impl<'s> GameMode<'s> {
     pub fn new(
         window_size: Vector2u,
         texture_loader: &'s TextureLoader,
-        noground: bool,
+        no_ground: bool,
     ) -> GameMode<'s> {
         let map = GameMode::get_map();
         let mut sky = RectangleShape::with_size(Vector2f::new(
@@ -53,7 +53,7 @@ impl<'s> GameMode<'s> {
             r_engine: REngine::new(
                 map,
                 &Vector2f::new(window_size.x as f32, window_size.y as f32),
-                noground,
+                no_ground,
             ),
             texture_loader: texture_loader,
             hud: HUD::new(

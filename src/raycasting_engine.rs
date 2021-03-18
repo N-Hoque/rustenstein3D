@@ -26,7 +26,7 @@ pub struct REngine {
 }
 
 impl REngine {
-    pub fn new(map: map::Map, window_size: &Vector2f, noground: bool) -> REngine {
+    pub fn new(map: Map, window_size: &Vector2f, no_ground: bool) -> REngine {
         REngine {
             player_position: Vector2f { x: 22., y: 12. },
             vector_direction: Vector2f { x: -1., y: 0. },
@@ -40,7 +40,7 @@ impl REngine {
             textures_id: Vec::new(),
             ground: REngine::create_ground_array(window_size),
             sky: REngine::create_ground_array(window_size),
-            no_ground: noground,
+            no_ground,
         }
     }
 
@@ -60,7 +60,7 @@ impl REngine {
         let mut camera_x: f32;
         let mut side: i32;
         let mut x: i32 = 0;
-        let mut perp_wall_dist: f32 = 0.;
+        let mut perpendicular_wall_dist: f32 = 0.;
         let mut wall_x: f32 = 0.;
         while x < self.window_size.x as i32 {
             // initialize
@@ -99,7 +99,7 @@ impl REngine {
                 &ray_pos,
                 &ray_dir,
                 &step,
-                &mut perp_wall_dist,
+                &mut perpendicular_wall_dist,
             );
 
             self.calculate_wall_texture(
@@ -120,7 +120,7 @@ impl REngine {
                     &map_pos,
                     wall_x,
                     &ray_dir,
-                    perp_wall_dist,
+                    perpendicular_wall_dist,
                     &mut draw_end,
                     x,
                 );
@@ -137,7 +137,7 @@ impl REngine {
         map_pos: &Vector2i,
         wall_x: f32,
         ray_dir: &Vector2f,
-        perp_wall_dist: f32,
+        perpendicular_wall_dist: f32,
         draw_end: &mut i32,
         x: i32,
     ) -> () {
@@ -170,7 +170,7 @@ impl REngine {
 
         while y < self.window_size.y as i32 {
             current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
-            weight = (current_dist - dist_player) / (perp_wall_dist - dist_player);
+            weight = (current_dist - dist_player) / (perpendicular_wall_dist - dist_player);
             current_floor.x = weight * floor.x + (1. - weight) * self.player_position.x;
             current_floor.y = weight * floor.y + (1. - weight) * self.player_position.y;
 
@@ -203,18 +203,18 @@ impl REngine {
         ray_pos: &Vector2f,
         ray_dir: &Vector2f,
         step: &Vector2i,
-        perp_wall_dist: &mut f32,
+        perpendicular_wall_dist: &mut f32,
     ) -> () {
-        *perp_wall_dist = if side == 0 {
+        *perpendicular_wall_dist = if side == 0 {
             ((map_pos.x as f32 - ray_pos.x + (1 - step.x) as f32 / 2.) / ray_dir.x).abs()
         } else {
             ((map_pos.y as f32 - ray_pos.y + (1 - step.y) as f32 / 2.) / ray_dir.y).abs()
         };
 
-        let line_height: i32 = if *perp_wall_dist as i32 == 0 {
+        let line_height: i32 = if *perpendicular_wall_dist as i32 == 0 {
             self.window_size.y as i32
         } else {
-            ((self.window_size.y / *perp_wall_dist) as i32).abs()
+            ((self.window_size.y / *perpendicular_wall_dist) as i32).abs()
         };
         *draw_start = (self.window_size.y as i32 / 2) - (line_height / 2);
         if *draw_start < 0 {
