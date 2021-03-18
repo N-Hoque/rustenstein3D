@@ -8,7 +8,7 @@ use rsfml::{
 
 use crate::{
     event_handler::EventHandler,
-    map,
+    map::Map,
     texture_loader::TextureLoader,
 };
 
@@ -16,7 +16,7 @@ pub struct REngine {
     player_position: Vector2f,
     vector_direction: Vector2f,
     cam_plane: Vector2f,
-    map: map::Map,
+    map: Map,
     window_size: Vector2f,
     vertex_array: Vec<Box<VertexArray>>,
     textures_id: Vec<i32>,
