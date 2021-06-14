@@ -1,3 +1,4 @@
+//! Module for the world map data
 use rsfml::system::{Vector2f, Vector2i};
 
 #[derive(Clone)]

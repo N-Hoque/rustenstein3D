@@ -1,3 +1,5 @@
+//! Module for loading textures
+
 use rsfml::{graphics::Texture, system::SfBox};
 
 pub struct TextureLoader {

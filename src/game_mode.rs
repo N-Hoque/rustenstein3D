@@ -1,3 +1,5 @@
+//! Module for configuration of selected game mode
+
 use rsfml::{
     graphics::{Color, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::{Vector2f, Vector2i, Vector2u},
@@ -5,17 +7,17 @@ use rsfml::{
 };
 
 use crate::{
-    event_handler::*, hud::HUD, map, mini_map::*, raycasting_engine::REngine,
+    event_handler::*, hud::HUD, map::Map, mini_map::*, raycasting_engine::REngine,
     texture_loader::TextureLoader, weapon::Weapon,
 };
 
 pub struct GameMode<'s> {
-    window_size: Vector2u,
-    map: map::Map,
-    mini_map: MiniMap,
-    player_position: Vector2f,
     r_engine: REngine,
     texture_loader: &'s TextureLoader,
+    window_size: Vector2u,
+    map: Map,
+    mini_map: MiniMap,
+    player_position: Vector2f,
     hud: HUD<'s>,
     weapon: Weapon<'s>,
     sky: RectangleShape<'s>,
@@ -64,7 +66,7 @@ impl<'s> GameMode<'s> {
         }
     }
 
-    pub fn get_map() -> map::Map {
+    pub fn get_map() -> Map {
         let map_i32: Vec<i32> = vec![
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -87,10 +89,10 @@ impl<'s> GameMode<'s> {
             0, 0, 0, 0, 0, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         ];
-        map::Map::new(map_i32, &Vector2f::new(24., 24.))
+        Map::new(map_i32, &Vector2f::new(24., 24.))
     }
 
-    pub fn update(&mut self, event_handler: &EventHandler) -> () {
+    pub fn update(&mut self, event_handler: &EventHandler) {
         let mut rotation: f32 = 0.;
         if event_handler.is_key_pressed(Key::Left) {
             rotation = -5.25;
@@ -110,7 +112,7 @@ impl<'s> GameMode<'s> {
         self.weapon.update(event_handler);
     }
 
-    pub fn draw(&mut self, render_window: &mut RenderWindow) -> () {
+    pub fn draw(&mut self, render_window: &mut RenderWindow) {
         render_window.draw(&self.sky);
         render_window.draw(&self.ground);
         self.r_engine.draw(render_window, self.texture_loader);

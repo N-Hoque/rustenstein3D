@@ -30,6 +30,8 @@ use rsfml::{
 
 use texture_loader::TextureLoader;
 
+const RESOURCES_BASE_PATH: &'static str = "resources";
+
 #[cfg(target_os = "macos")]
 #[start]
 fn start(argc: int, argv: *const *const u8) -> int {
@@ -71,7 +73,7 @@ fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Er
 
 fn load_texture() -> Result<TextureLoader, Box<dyn Error>> {
     let mut texture_loader = TextureLoader::new();
-    let resources = get_resources_list("../../resources")?;
+    let resources = get_resources_list(RESOURCES_BASE_PATH)?;
     for resource in resources {
         if !texture_loader.load_texture(&resource) {
             panic!("ERROR: Cannot load texture ({}).", resource);
@@ -130,9 +132,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     render_window.set_mouse_position(Vector2i::new(width as i32 / 2, height as i32 / 2));
 
     // Create the font for the FPS_handler.
-    let font = Font::from_file("../../resources/sansation.ttf")
-        .ok_or("ERROR: Cannot load font! Font (resources/sansation.ttf) does not exist!")
-        .expect("The font has been loaded?");
+    let font = Font::from_file(&format!("{}/sansation.ttf", RESOURCES_BASE_PATH))
+        .ok_or("ERROR: Cannot load font! Font (resources/sansation.ttf) does not exist!")?;
 
     // Create the texture loader and load textures
     let texture_loader = load_texture()?;

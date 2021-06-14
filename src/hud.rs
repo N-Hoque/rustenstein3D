@@ -1,3 +1,5 @@
+//! Module for configuring and displaying the Heads-Up Display (HUD)
+
 use rsfml::{
     graphics::{
         Color, PrimitiveType, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable,
@@ -7,6 +9,9 @@ use rsfml::{
 };
 
 use crate::{animation::*, texture_loader::TextureLoader};
+
+struct Line2D(f32, f32, f32, f32);
+struct Line3D(f32, f32, f32, f32, f32, f32);
 
 pub struct HUD<'s> {
     window_size: Vector2f,
@@ -41,7 +46,7 @@ impl<'s> HUD<'s> {
         }
     }
 
-    pub fn update(&mut self) -> () {
+    pub fn update(&mut self) {
         self.background
             .set_size(Vector2f::new(self.window_size.x - 21., 59.));
         self.background.set_fill_color(Color::rgb(6, 1, 162));
@@ -59,101 +64,95 @@ impl<'s> HUD<'s> {
         }
     }
 
-    fn draw_line(
-        &mut self,
-        x1: f32,
-        x2: f32,
-        y1: f32,
-        y2: f32,
-        color: &Color,
-        render_window: &mut RenderWindow,
-    ) -> () {
+    fn draw_line(&mut self, line_coords: Line2D, color: &Color, render_window: &mut RenderWindow) {
         self.hud_vertex_array.clear();
-        self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x1, y1), *color));
-        self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x2, y2), *color));
+        self.hud_vertex_array.append(&Vertex::with_pos_color(
+            Vector2f::new(line_coords.0, line_coords.1),
+            *color,
+        ));
+        self.hud_vertex_array.append(&Vertex::with_pos_color(
+            Vector2f::new(line_coords.2, line_coords.3),
+            *color,
+        ));
         render_window.draw(&self.hud_vertex_array);
     }
 
-    fn draw_2line(
-        &mut self,
-        x1: f32,
-        x2: f32,
-        x3: f32,
-        y1: f32,
-        y2: f32,
-        y3: f32,
-        color: &Color,
-        render_window: &mut RenderWindow,
-    ) -> () {
+    fn draw_2line(&mut self, line_coords: Line3D, color: &Color, render_window: &mut RenderWindow) {
         self.hud_vertex_array.clear();
-        self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x1, y1), *color));
-        self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x2, y2), *color));
-        self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x3, y3), *color));
+        self.hud_vertex_array.append(&Vertex::with_pos_color(
+            Vector2f::new(line_coords.0, line_coords.1),
+            *color,
+        ));
+        self.hud_vertex_array.append(&Vertex::with_pos_color(
+            Vector2f::new(line_coords.2, line_coords.3),
+            *color,
+        ));
+        self.hud_vertex_array.append(&Vertex::with_pos_color(
+            Vector2f::new(line_coords.4, line_coords.5),
+            *color,
+        ));
         render_window.draw(&self.hud_vertex_array);
     }
 
-    pub fn draw(&mut self, render_window: &mut RenderWindow) -> () {
+    pub fn draw(&mut self, render_window: &mut RenderWindow) {
         render_window.draw(&self.background);
         let window_x = self.window_size.x;
         let window_y = self.window_size.y;
         self.draw_2line(
-            window_x - 9.,
-            window_x - 9.,
-            9.,
-            window_y - 70.,
-            window_y - 10.,
-            window_y - 10.,
+            Line3D(
+                window_x - 9.,
+                window_x - 9.,
+                9.,
+                window_y - 70.,
+                window_y - 10.,
+                window_y - 10.,
+            ),
             &Color::rgba(255, 255, 255, 75),
             render_window,
         );
         self.draw_2line(
-            window_x - 11.,
-            window_x - 11.,
-            11.,
-            window_y - 70.,
-            window_y - 12.,
-            window_y - 12.,
+            Line3D(
+                window_x - 11.,
+                window_x - 11.,
+                11.,
+                window_y - 70.,
+                window_y - 12.,
+                window_y - 12.,
+            ),
             &Color::BLACK,
             render_window,
         );
         self.draw_2line(
-            9.,
-            9.,
-            window_x - 9.,
-            window_y - 12.,
-            window_y - 71.,
-            window_y - 71.,
+            Line3D(
+                9.,
+                9.,
+                window_x - 9.,
+                window_y - 12.,
+                window_y - 71.,
+                window_y - 71.,
+            ),
             &Color::BLACK,
             render_window,
         );
         self.draw_2line(
-            11.,
-            11.,
-            window_x - 11.,
-            window_y - 11.,
-            window_y - 69.,
-            window_y - 69.,
+            Line3D(
+                11.,
+                11.,
+                window_x - 11.,
+                window_y - 11.,
+                window_y - 69.,
+                window_y - 69.,
+            ),
             &Color::rgba(255, 255, 255, 75),
             render_window,
         );
         self.draw_line(
-            window_x,
-            0.,
-            window_y - 80.,
-            window_y - 80.,
+            Line2D(window_x, 0., window_y - 80., window_y - 80.),
             &Color::rgba(255, 255, 255, 50),
             render_window,
         );
         self.draw_line(
-            window_x,
-            0.,
-            window_y - 79.,
-            window_y - 79.,
+            Line2D(window_x, 0., window_y - 79., window_y - 79.),
             &Color::rgba(255, 255, 255, 75),
             render_window,
         );

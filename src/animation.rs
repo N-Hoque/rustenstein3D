@@ -1,3 +1,5 @@
+//! Module for animation management
+
 use rsfml::system::Clock;
 
 #[derive(PartialEq, Eq, Clone, Copy)]

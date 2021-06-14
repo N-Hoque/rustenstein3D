@@ -1,3 +1,5 @@
+//! Module for performing the raycasting calculations and rendering
+
 use rsfml::{
     graphics::{
         Color, PrimitiveType, RenderStates, RenderTarget, RenderWindow, Vertex, VertexArray,

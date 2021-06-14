@@ -1,3 +1,5 @@
+//! Module for drawing weapons
+
 use rsfml::{
     graphics::{RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::Vector2f,

@@ -1,3 +1,5 @@
+//! Module for event handling
+
 use rsfml::{
     graphics::RenderWindow,
     window::{mouse::Button as MouseButton, Event, Key},

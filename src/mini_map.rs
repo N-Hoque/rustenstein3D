@@ -1,3 +1,5 @@
+//! Module for displaying the mini-map
+
 use std::borrow::BorrowMut;
 
 use rsfml::{
