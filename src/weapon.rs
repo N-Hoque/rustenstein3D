@@ -1,5 +1,7 @@
 //! Module for drawing weapons
 
+use std::ops::Range;
+
 use rsfml::{
     graphics::{RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::Vector2f,
@@ -46,54 +48,52 @@ impl<'s> Weapon<'s> {
         tmp_shadow
     }
 
+    fn create_animation_by_range(texture_id_range: Range<i32>) -> Animation {
+        Animation::new(
+            texture_id_range.collect(),
+            AnimationState::Stop,
+            AnimationPlayMode::Once,
+            0.07,
+            3,
+        )
+    }
+
     fn initialize_animation() -> Vec<Animation> {
         let mut animations = Vec::new();
-        animations.push(Animation::new(
-            vec![12, 13, 14, 15, 16, 17],
-            AnimationState::Stop,
-            AnimationPlayMode::Once,
-            0.07,
-            3,
-        ));
-        animations.push(Animation::new(
-            vec![19, 20, 21, 22, 23, 24],
-            AnimationState::Stop,
-            AnimationPlayMode::Once,
-            0.07,
-            3,
-        ));
-        animations.push(Animation::new(
-            vec![26, 27, 28, 29, 30, 31],
-            AnimationState::Stop,
-            AnimationPlayMode::Once,
-            0.07,
-            3,
-        ));
-        animations.push(Animation::new(
-            vec![33, 34, 35, 36, 37, 38],
-            AnimationState::Stop,
-            AnimationPlayMode::Once,
-            0.07,
-            3,
-        ));
-
+        animations.push(Weapon::create_animation_by_range(12..18));
+        animations.push(Weapon::create_animation_by_range(19..25));
+        animations.push(Weapon::create_animation_by_range(26..32));
+        animations.push(Weapon::create_animation_by_range(33..39));
         animations
     }
 
     pub fn update<'r>(&'r mut self, event_handler: &'r EventHandler) -> () {
-        if let Some(_) = event_handler.has_key_pressed_event(Key::Num1) {
-            self.current_weapon = 0
-        };
-        if let Some(_) = event_handler.has_key_pressed_event(Key::Num2) {
-            self.current_weapon = 1
-        };
-        if let Some(_) = event_handler.has_key_pressed_event(Key::Num3) {
-            self.current_weapon = 2
-        };
-        if let Some(_) = event_handler.has_key_pressed_event(Key::Num4) {
-            self.current_weapon = 3
-        };
+        self.update_selection(event_handler);
 
+        self.update_action(event_handler);
+
+        self.update_reload(event_handler);
+
+        self.update_animations();
+    }
+
+    fn update_animations<'r>(&'r mut self) {
+        self.animations
+            .get_mut(self.current_weapon as usize)
+            .unwrap()
+            .update();
+    }
+
+    fn update_reload<'r>(&'r mut self, event_handler: &EventHandler) {
+        if event_handler.is_key_pressed(Key::E) {
+            self.animations
+                .get_mut(self.current_weapon as usize)
+                .unwrap()
+                .set_state(AnimationState::Play);
+        }
+    }
+
+    fn update_action<'r>(&'r mut self, event_handler: &EventHandler) {
         if !self.mouse_fire {
             if let Some(_) = event_handler.get_mouse_button_pressed_event(MouseButton::Left) {
                 self.animations
@@ -110,17 +110,21 @@ impl<'s> Weapon<'s> {
                 .unwrap()
                 .set_state(AnimationState::Play)
         };
+    }
 
-        if event_handler.is_key_pressed(Key::E) {
-            self.animations
-                .get_mut(self.current_weapon as usize)
-                .unwrap()
-                .set_state(AnimationState::Play);
-        }
-        self.animations
-            .get_mut(self.current_weapon as usize)
-            .unwrap()
-            .update();
+    fn update_selection<'r>(&'r mut self, event_handler: &EventHandler) {
+        if let Some(_) = event_handler.has_key_pressed_event(Key::Num1) {
+            self.current_weapon = 0
+        };
+        if let Some(_) = event_handler.has_key_pressed_event(Key::Num2) {
+            self.current_weapon = 1
+        };
+        if let Some(_) = event_handler.has_key_pressed_event(Key::Num3) {
+            self.current_weapon = 2
+        };
+        if let Some(_) = event_handler.has_key_pressed_event(Key::Num4) {
+            self.current_weapon = 3
+        };
     }
 
     pub fn draw<'r>(&'r mut self, render_window: &'r mut RenderWindow) -> () {
