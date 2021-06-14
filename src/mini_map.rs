@@ -4,14 +4,11 @@ use rsfml::{
     graphics::{
         Color, FloatRect, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable, View,
     },
-    SfBox,
     system::{Vector2f, Vector2i, Vector2u},
+    SfBox,
 };
 
-use crate::{
-    map::*,
-    texture_loader::TextureLoader,
-};
+use crate::{map::*, texture_loader::TextureLoader};
 
 pub struct MiniMap {
     map: Map,
@@ -30,9 +27,7 @@ impl MiniMap {
         (*tmp_view)
             .borrow_mut()
             .set_viewport(&FloatRect::new(0.70, 0.05, 0.25, 0.25));
-        (*tmp_view)
-            .borrow_mut()
-            .set_rotation(-90.);
+        (*tmp_view).borrow_mut().set_rotation(-90.);
         MiniMap {
             map,
             active: true,

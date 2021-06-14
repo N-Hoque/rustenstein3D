@@ -6,11 +6,7 @@ use rsfml::{
     window::Key,
 };
 
-use crate::{
-    event_handler::EventHandler,
-    map::Map,
-    texture_loader::TextureLoader,
-};
+use crate::{event_handler::EventHandler, map::Map, texture_loader::TextureLoader};
 
 pub struct REngine {
     player_position: Vector2f,
@@ -159,13 +155,25 @@ impl REngine {
 
         let (map_pos_x, map_pos_y) = (map_pos.x as f32, map_pos.y as f32);
         let floor = if side == 0 && ray_dir.x > 0. {
-            Vector2f { x: map_pos_x, y: map_pos_y + wall_x }
+            Vector2f {
+                x: map_pos_x,
+                y: map_pos_y + wall_x,
+            }
         } else if side == 0 && ray_dir.x < 0. {
-            Vector2f { x: map_pos_x + 1., y: map_pos_y + wall_x }
+            Vector2f {
+                x: map_pos_x + 1.,
+                y: map_pos_y + wall_x,
+            }
         } else if side == 1 && ray_dir.y > 0. {
-            Vector2f { x: map_pos_x + wall_x, y: map_pos_y }
+            Vector2f {
+                x: map_pos_x + wall_x,
+                y: map_pos_y,
+            }
         } else {
-            Vector2f { x: map_pos_x + wall_x, y: map_pos_y + 1. }
+            Vector2f {
+                x: map_pos_x + wall_x,
+                y: map_pos_y + 1.,
+            }
         };
 
         while y < self.window_size.y as i32 {
@@ -246,11 +254,11 @@ impl REngine {
         *wall_x = if side == 1 {
             ray_pos.x
                 + ((map_pos.y as f32 - ray_pos.y + (1. - step.y as f32) / 2.) / ray_dir.y)
-                * ray_dir.x
+                    * ray_dir.x
         } else {
             ray_pos.y
                 + ((map_pos.x as f32 - ray_pos.x + (1. - step.x as f32) / 2.) / ray_dir.x)
-                * ray_dir.y
+                    * ray_dir.y
         };
         *wall_x -= wall_x.floor();
 
@@ -332,7 +340,7 @@ impl REngine {
             }
             hit = match self.map.get_block(map_pos) {
                 Some(block) if block == 0 => false,
-                _ => true
+                _ => true,
             };
         }
     }

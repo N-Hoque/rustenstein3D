@@ -1,6 +1,6 @@
 use rsfml::{
     graphics::RenderWindow,
-    window::{Event, Key, mouse::Button as MouseButton},
+    window::{mouse::Button as MouseButton, Event, Key},
 };
 
 pub struct EventHandler {
@@ -31,7 +31,7 @@ impl EventHandler {
     pub fn has_text_entered(&self) -> Option<char> {
         self.events.iter().find_map(|ev| match *ev {
             Event::TextEntered { unicode } => Some(unicode),
-            _ => None
+            _ => None,
         })
     }
 
@@ -42,8 +42,9 @@ impl EventHandler {
                 alt,
                 ctrl,
                 shift,
-                system, } if code == key => Some((code, alt, ctrl, shift, system)),
-            _ => None
+                system,
+            } if code == key => Some((code, alt, ctrl, shift, system)),
+            _ => None,
         })
     }
 
@@ -54,8 +55,9 @@ impl EventHandler {
                 alt,
                 ctrl,
                 shift,
-                system, } if code == key => Some((code, alt, ctrl, shift, system)),
-            _ => None
+                system,
+            } if code == key => Some((code, alt, ctrl, shift, system)),
+            _ => None,
         })
     }
 
@@ -65,8 +67,9 @@ impl EventHandler {
                 wheel: _,
                 delta,
                 x,
-                y, } => Some((delta as i32, x, y)),
-            _ => None
+                y,
+            } => Some((delta as i32, x, y)),
+            _ => None,
         })
     }
 
@@ -75,8 +78,10 @@ impl EventHandler {
         mouse_button: MouseButton,
     ) -> Option<(MouseButton, i32, i32)> {
         self.events.iter().find_map(|ev| match *ev {
-            Event::MouseButtonPressed { button, x, y } if mouse_button == button => Some((button, x, y)),
-            _ => None
+            Event::MouseButtonPressed { button, x, y } if mouse_button == button => {
+                Some((button, x, y))
+            }
+            _ => None,
         })
     }
 
@@ -85,15 +90,17 @@ impl EventHandler {
         mouse_button: MouseButton,
     ) -> Option<(MouseButton, i32, i32)> {
         self.events.iter().find_map(|ev| match *ev {
-            Event::MouseButtonReleased { button, x, y } if mouse_button == button => Some((button, x, y)),
-            _ => None
+            Event::MouseButtonReleased { button, x, y } if mouse_button == button => {
+                Some((button, x, y))
+            }
+            _ => None,
         })
     }
 
     pub fn has_mouse_moved_event(&self) -> Option<(i32, i32)> {
         self.events.iter().find_map(|ev| match *ev {
             Event::MouseMoved { x, y } => Some((x, y)),
-            _ => None
+            _ => None,
         })
     }
 

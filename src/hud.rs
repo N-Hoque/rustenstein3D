@@ -6,10 +6,7 @@ use rsfml::{
     system::{Clock, Vector2f},
 };
 
-use crate::{
-    animation::*,
-    texture_loader::TextureLoader,
-};
+use crate::{animation::*, texture_loader::TextureLoader};
 
 pub struct HUD<'s> {
     window_size: Vector2f,

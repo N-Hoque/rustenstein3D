@@ -46,8 +46,11 @@ impl Map {
     }
 
     pub fn get_block(&self, position: &Vector2i) -> Option<i32> {
-        return if position.x >= 0 && position.x <= self.map_size.x &&
-            position.y >= 0 && position.y <= self.map_size.y {
+        return if position.x >= 0
+            && position.x <= self.map_size.x
+            && position.y >= 0
+            && position.y <= self.map_size.y
+        {
             Some(self.map[(position.y * self.map_size.x + position.x) as usize])
         } else {
             None
@@ -59,6 +62,12 @@ impl Map {
     }
 
     fn handle_orientation(&self, position: &Vector2i, x_offset: i32, y_offset: i32) -> Option<i32> {
-        self.get_block(&(*position + Vector2i { x: x_offset, y: y_offset }))
+        self.get_block(
+            &(*position
+                + Vector2i {
+                    x: x_offset,
+                    y: y_offset,
+                }),
+        )
     }
 }

@@ -5,13 +5,8 @@ use rsfml::{
 };
 
 use crate::{
-    event_handler::*,
-    hud::HUD,
-    map,
-    mini_map::*,
-    raycasting_engine::REngine,
-    texture_loader::TextureLoader,
-    weapon::Weapon,
+    event_handler::*, hud::HUD, map, mini_map::*, raycasting_engine::REngine,
+    texture_loader::TextureLoader, weapon::Weapon,
 };
 
 pub struct GameMode<'s> {

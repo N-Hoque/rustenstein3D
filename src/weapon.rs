@@ -1,14 +1,10 @@
 use rsfml::{
     graphics::{RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::Vector2f,
-    window::{Key, mouse::Button as MouseButton},
+    window::{mouse::Button as MouseButton, Key},
 };
 
-use crate::{
-    animation::*,
-    event_handler::EventHandler,
-    texture_loader::TextureLoader,
-};
+use crate::{animation::*, event_handler::EventHandler, texture_loader::TextureLoader};
 
 pub struct Weapon<'s> {
     weapons: RectangleShape<'s>,
