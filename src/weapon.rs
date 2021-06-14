@@ -21,6 +21,12 @@ pub struct Weapon<'s> {
 }
 
 impl<'s> Weapon<'s> {
+    /// Instantiates a new Weapon.
+    ///
+    /// # Arguments
+    /// `window_size` - The size of the window to draw the weapons onto
+    ///
+    /// `texture_loader` - A [TextureLoader] to obtain weapon textures from
     pub fn new(window_size: &Vector2f, texture_loader: &'s TextureLoader) -> Weapon<'s> {
         Weapon {
             weapons: Weapon::initialize_weapons(window_size),
@@ -65,16 +71,6 @@ impl<'s> Weapon<'s> {
         animations.push(Weapon::create_animation_by_range(26..32));
         animations.push(Weapon::create_animation_by_range(33..39));
         animations
-    }
-
-    pub fn update<'r>(&'r mut self, event_handler: &'r EventHandler) -> () {
-        self.update_selection(event_handler);
-
-        self.update_action(event_handler);
-
-        self.update_reload(event_handler);
-
-        self.update_animations();
     }
 
     fn update_animations<'r>(&'r mut self) {
@@ -127,6 +123,24 @@ impl<'s> Weapon<'s> {
         };
     }
 
+    /// Updates the weapon state
+    ///
+    /// # Arguments
+    /// `event_handler` - The event handler to read input from to update state
+    pub fn update<'r>(&'r mut self, event_handler: &'r EventHandler) -> () {
+        self.update_selection(event_handler);
+
+        self.update_action(event_handler);
+
+        self.update_reload(event_handler);
+
+        self.update_animations();
+    }
+
+    /// Updates the weapon animation on the next frame
+    ///
+    /// # Arguments
+    /// `render_window` - The window to draw the weapon onto
     pub fn draw<'r>(&'r mut self, render_window: &'r mut RenderWindow) -> () {
         self.weapons.set_texture(
             self.texture_loader.get_texture(
