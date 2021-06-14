@@ -1,13 +1,13 @@
 use rsfml::system::Clock;
 
-#[derive(Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum AnimationState {
     Play,
     Pause,
     Stop,
 }
 
-#[derive(Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum AnimationPlayMode {
     Once,
     Infinite,
@@ -91,18 +91,23 @@ impl Animation {
     }
 
     pub fn update(&mut self) -> () {
-        if let AnimationState::Play = &self.state {
-            if self.clock.elapsed_time().as_seconds() >= self.lag {
-                if self.current_texture != self.texture_ids.len() as u32 - 1 {
-                    self.current_texture += 1;
-                } else {
-                    self.current_texture = 0;
-                    if let AnimationPlayMode::Once = self.mode {
-                        self.state = AnimationState::Stop
-                    }
-                }
-                self.clock.restart();
+        if self.state != AnimationState::Play {
+            return;
+        }
+
+        if self.clock.elapsed_time().as_seconds() < self.lag {
+            return;
+        }
+
+        if self.current_texture != self.texture_ids.len() as u32 - 1 {
+            self.current_texture += 1;
+        } else {
+            self.current_texture = 0;
+            if let AnimationPlayMode::Once = self.mode {
+                self.state = AnimationState::Stop
             }
         }
+
+        self.clock.restart();
     }
 }
