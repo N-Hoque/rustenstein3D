@@ -6,14 +6,6 @@
 extern crate native;
 extern crate rsfml;
 
-use std::str::FromStr;
-
-use rsfml::{
-    graphics::{Font, RenderWindow},
-    system::Vector2i,
-    window::{ContextSettings, Style, VideoMode},
-};
-
 pub mod animation;
 pub mod event_handler;
 pub mod fps;
@@ -25,6 +17,18 @@ pub mod mini_map;
 pub mod raycasting_engine;
 pub mod texture_loader;
 pub mod weapon;
+
+use std::error::Error;
+use std::fs;
+use std::path::Path;
+
+use rsfml::{
+    graphics::{Font, RenderWindow},
+    system::Vector2i,
+    window::{ContextSettings, Style, VideoMode},
+};
+
+use texture_loader::TextureLoader;
 
 #[cfg(target_os = "macos")]
 #[start]
@@ -39,84 +43,72 @@ fn display_help() -> () {
     println!("\t--help : display this help.");
 }
 
-fn load_texture() -> texture_loader::TextureLoader {
-    let mut texture_loader = texture_loader::TextureLoader::new();
-    if texture_loader.load_texture("../resources/ground.tga".to_string()) == false || // 0
-        texture_loader.load_texture("../resources/1.tga".to_string()) == false || // 1
-        texture_loader.load_texture("../resources/2.tga".to_string()) == false || // 2
-        texture_loader.load_texture("../resources/3.tga".to_string()) == false || // 3
-        texture_loader.load_texture("../resources/4.tga".to_string()) == false || // 4
-        texture_loader.load_texture("../resources/5.tga".to_string()) == false || // 5
-        texture_loader.load_texture("../resources/6.tga".to_string()) == false || // 6
-        texture_loader.load_texture("../resources/7.tga".to_string()) == false || // 7
-        texture_loader.load_texture("../resources/8.tga".to_string()) == false || // 8
-        texture_loader.load_texture("../resources/9.tga".to_string()) == false || // 9
-        texture_loader.load_texture("../resources/10.tga".to_string()) == false || // 10
-        texture_loader.load_texture("../resources/sky.tga".to_string()) == false || // 11
-        texture_loader.load_texture("../resources/weapons/gun_1.png".to_string()) == false || // 12
-        texture_loader.load_texture("../resources/weapons/gun_2.png".to_string()) == false || // 13
-        texture_loader.load_texture("../resources/weapons/gun_3.png".to_string()) == false || // 14
-        texture_loader.load_texture("../resources/weapons/gun_4.png".to_string()) == false || // 15
-        texture_loader.load_texture("../resources/weapons/gun_5.png".to_string()) == false || // 16
-        texture_loader.load_texture("../resources/weapons/gun_6.png".to_string()) == false || // 17
-        texture_loader.load_texture("../resources/weapons/gun_shadow.png".to_string()) == false || // 18
-        texture_loader.load_texture("../resources/weapons/gun2_1.png".to_string()) == false || // 19
-        texture_loader.load_texture("../resources/weapons/gun2_2.png".to_string()) == false || // 20
-        texture_loader.load_texture("../resources/weapons/gun2_3.png".to_string()) == false || // 21
-        texture_loader.load_texture("../resources/weapons/gun2_4.png".to_string()) == false || // 22
-        texture_loader.load_texture("../resources/weapons/gun2_5.png".to_string()) == false || // 23
-        texture_loader.load_texture("../resources/weapons/gun2_6.png".to_string()) == false || // 24
-        texture_loader.load_texture("../resources/weapons/gun2_shadow.png".to_string()) == false || // 25
-        texture_loader.load_texture("../resources/weapons/gun3_1.png".to_string()) == false || // 26
-        texture_loader.load_texture("../resources/weapons/gun3_2.png".to_string()) == false || // 27
-        texture_loader.load_texture("../resources/weapons/gun3_3.png".to_string()) == false || // 28
-        texture_loader.load_texture("../resources/weapons/gun3_4.png".to_string()) == false || // 29
-        texture_loader.load_texture("../resources/weapons/gun3_5.png".to_string()) == false || // 30
-        texture_loader.load_texture("../resources/weapons/gun3_6.png".to_string()) == false || // 31
-        texture_loader.load_texture("../resources/weapons/gun3_shadow.png".to_string()) == false || // 32
-        texture_loader.load_texture("../resources/weapons/cut_1.png".to_string()) == false || // 33
-        texture_loader.load_texture("../resources/weapons/cut_2.png".to_string()) == false || // 34
-        texture_loader.load_texture("../resources/weapons/cut_3.png".to_string()) == false || // 35
-        texture_loader.load_texture("../resources/weapons/cut_4.png".to_string()) == false || // 36
-        texture_loader.load_texture("../resources/weapons/cut_5.png".to_string()) == false || // 37
-        texture_loader.load_texture("../resources/weapons/cut_6.png".to_string()) == false || //38
-        texture_loader.load_texture("../resources/weapons/cut_shadow.png".to_string()) == false || // 39
-        texture_loader.load_texture("../resources/face1.png".to_string()) == false || //40
-        texture_loader.load_texture("../resources/face2.png".to_string()) == false || //41
-        texture_loader.load_texture("../resources/face3.png".to_string()) == false
-    {
-        //42
-        panic!("Error : Cannot load texture.");
+fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Error>> {
+    let paths = fs::read_dir(path)?;
+
+    let mut resource_list = Vec::new();
+
+    for path in paths {
+        let path_name = path?.path();
+        if path_name.ends_with(".ttf") {
+            continue;
+        }
+
+        if !path_name.is_dir() {
+            resource_list.push(
+                path_name
+                    .to_str()
+                    .ok_or("Cannot convert path to string")?
+                    .to_string(),
+            )
+        } else {
+            resource_list.append(&mut get_resources_list(path_name.as_path())?);
+        }
     }
-    texture_loader
+
+    Ok(resource_list)
 }
 
-fn main() -> () {
+fn load_texture() -> Result<TextureLoader, Box<dyn Error>> {
+    let mut texture_loader = TextureLoader::new();
+    let resources = get_resources_list("../resources")?;
+    for resource in resources {
+        if !texture_loader.load_texture(resource.clone()) {
+            panic!("ERROR: Cannot load texture ({}).", resource);
+        }
+    }
+    Ok(texture_loader)
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
     // Check if a custom width is set.
     let args = std::env::args().collect::<Vec<String>>();
+    let arg_length = args.len();
     let mut width: u32 = 768;
     let mut height: u32 = 480;
     let mut noground: bool = false;
     let mut i_args = 1;
 
-    while i_args < args.len() {
-        match args[i_args].as_str() {
+    for arg in &args {
+        match arg.as_str() {
             "--help" => {
                 display_help();
-                return;
+                return Ok(());
             }
             "--noground" => noground = true,
             "-w" => {
-                if i_args + 2 >= args.len() {
+                if i_args + 2 >= arg_length {
                     panic!("Error missing arguments for -w option.");
                 }
-                width = u32::from_str(args[i_args + 1].as_str())
+                width = args[i_args + 1]
+                    .parse()
                     .expect("Error the first parameter after -w argument is not a width!");
-                height = u32::from_str(args[i_args + 2].as_str())
+                height = args[i_args + 2]
+                    .parse()
                     .expect("Error the second parameter after -w argument is not a width!");
                 i_args += 2;
             }
-            _ => panic!("Error unknown argument."),
+            _ => panic!("Error unknown argument ({}).", arg),
         }
         i_args += 1;
     }
@@ -138,14 +130,15 @@ fn main() -> () {
 
     // Create the font for the FPS_handler.
     let font = Font::from_file("../resources/sansation.ttf")
-        .expect("ERROR: Cannot load font, font resources/sansation.ttf doesn't exist!");
+        .ok_or("ERROR: Cannot load font, font resources/sansation.ttf doesn't exist!")?;
 
     // Create the texture loader and load textures
-    let texture_loader = load_texture();
+    let texture_loader = load_texture()?;
 
     // Create the game_loop and activate the fps handler.
     let mut game_loop = game::GameLoop::new(render_window, &texture_loader, noground);
     game_loop.activate_FPS(&font);
 
     game_loop.run();
+    Ok(())
 }
