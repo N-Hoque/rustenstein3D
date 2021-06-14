@@ -15,13 +15,13 @@ impl TextureLoader {
 
     pub fn load_texture(&mut self, texture_path: &str) -> bool {
         let texture = Texture::from_file(texture_path);
-        match texture {
-            Some(tex) => {
-                self.textures.push(tex);
-                true
-            }
-            None => false,
+        let successfully_loaded = texture.is_some();
+
+        if let Some(tex) = texture {
+            self.textures.push(tex)
         }
+
+        successfully_loaded
     }
 
     pub fn get_texture(&self, index: i32) -> &Texture {

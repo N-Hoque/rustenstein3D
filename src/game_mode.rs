@@ -7,12 +7,12 @@ use rsfml::{
 };
 
 use crate::{
-    event_handler::*, hud::HUD, map::Map, mini_map::*, raycasting_engine::REngine,
+    event_handler::*, hud::HUD, map::Map, mini_map::*, raycasting_engine::RaycastEngine,
     texture_loader::TextureLoader, weapon::Weapon,
 };
 
 pub struct GameMode<'s> {
-    r_engine: REngine,
+    r_engine: RaycastEngine,
     texture_loader: &'s TextureLoader,
     window_size: Vector2u,
     map: Map,
@@ -47,7 +47,7 @@ impl<'s> GameMode<'s> {
             map: map.clone(),
             mini_map: MiniMap::new(map.clone(), &window_size),
             player_position: Vector2f { x: 4., y: 1. },
-            r_engine: REngine::new(
+            r_engine: RaycastEngine::new(
                 map,
                 &Vector2f::new(window_size.x as f32, window_size.y as f32),
                 no_ground,

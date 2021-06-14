@@ -10,7 +10,7 @@ use rsfml::{
 
 use crate::{event_handler::EventHandler, map::Map, texture_loader::TextureLoader};
 
-pub struct REngine {
+pub struct RaycastEngine {
     player_position: Vector2f,
     vector_direction: Vector2f,
     cam_plane: Vector2f,
@@ -23,9 +23,9 @@ pub struct REngine {
     no_ground: bool,
 }
 
-impl REngine {
-    pub fn new(map: Map, window_size: &Vector2f, no_ground: bool) -> REngine {
-        REngine {
+impl RaycastEngine {
+    pub fn new(map: Map, window_size: &Vector2f, no_ground: bool) -> RaycastEngine {
+        RaycastEngine {
             player_position: Vector2f { x: 22., y: 12. },
             vector_direction: Vector2f { x: -1., y: 0. },
             cam_plane: Vector2f { x: 0., y: 0.66 },
@@ -34,10 +34,10 @@ impl REngine {
                 x: window_size.x,
                 y: window_size.y - 80.,
             },
-            vertex_array: REngine::create_line_array(window_size),
+            vertex_array: RaycastEngine::create_line_array(window_size),
             textures_id: Vec::new(),
-            ground: REngine::create_ground_array(window_size),
-            sky: REngine::create_ground_array(window_size),
+            ground: RaycastEngine::create_ground_array(window_size),
+            sky: RaycastEngine::create_ground_array(window_size),
             no_ground,
         }
     }
