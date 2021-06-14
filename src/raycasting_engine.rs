@@ -42,12 +42,9 @@ impl RaycastEngine {
         }
     }
 
-    pub fn update(&mut self, event_handler: &EventHandler) -> () {
+    pub fn update(&mut self, event_handler: &EventHandler) {
         self.textures_id.clear();
-        let ray_pos = Vector2f {
-            x: self.player_position.x,
-            y: self.player_position.y,
-        };
+        let ray_pos = self.player_position.clone();
         let mut ray_dir = Vector2f { x: 0., y: 0. };
         let mut map_pos = Vector2i { x: 0, y: 0 };
         let mut side_dist = Vector2f { x: 0., y: 0. };
@@ -57,10 +54,9 @@ impl RaycastEngine {
         let mut draw_end: i32 = 0;
         let mut camera_x: f32;
         let mut side: i32;
-        let mut x: i32 = 0;
         let mut perpendicular_wall_dist: f32 = 0.;
         let mut wall_x: f32 = 0.;
-        while x < self.window_size.x as i32 {
+        for x in 0..(self.window_size.x as i32) {
             // initialize
             camera_x = 2. * x as f32 / self.window_size.x - 1.;
             ray_dir.x = self.vector_direction.x + self.cam_plane.x * camera_x;
@@ -123,8 +119,6 @@ impl RaycastEngine {
                     x,
                 );
             }
-
-            x += 1;
         }
         self.update_events(event_handler);
     }
@@ -138,12 +132,11 @@ impl RaycastEngine {
         perpendicular_wall_dist: f32,
         draw_end: &mut i32,
         x: i32,
-    ) -> () {
+    ) {
         if *draw_end < 0 {
             *draw_end = self.window_size.y as i32;
         }
 
-        let mut y: i32 = *draw_end + 1;
         self.ground.get_mut(x as usize).unwrap().clear();
         self.sky.get_mut(x as usize).unwrap().clear();
 
@@ -178,7 +171,7 @@ impl RaycastEngine {
             }
         };
 
-        while y < self.window_size.y as i32 {
+        for y in (*draw_end + 1)..(self.window_size.y as i32) {
             current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
             weight = (current_dist - dist_player) / (perpendicular_wall_dist - dist_player);
             current_floor.x = weight * floor.x + (1. - weight) * self.player_position.x;
@@ -193,14 +186,13 @@ impl RaycastEngine {
             vertex.tex_coords.x = tex_coord.x;
             vertex.tex_coords.y = tex_coord.y;
             self.ground.get_mut(x as usize).unwrap().append(&vertex);
+
             pos.y = self.window_size.y - y as f32;
             vertex.position.x = pos.x;
             vertex.position.y = pos.y;
             vertex.tex_coords.x = tex_coord.x;
             vertex.tex_coords.y = tex_coord.y;
             self.sky.get_mut(x as usize).unwrap().append(&vertex);
-
-            y += 1;
         }
     }
 
@@ -214,12 +206,13 @@ impl RaycastEngine {
         ray_dir: &Vector2f,
         step: &Vector2i,
         perpendicular_wall_dist: &mut f32,
-    ) -> () {
+    ) {
         *perpendicular_wall_dist = if side == 0 {
-            ((map_pos.x as f32 - ray_pos.x + (1 - step.x) as f32 / 2.) / ray_dir.x).abs()
+            (map_pos.x as f32 - ray_pos.x + (1 - step.x) as f32 / 2.) / ray_dir.x
         } else {
-            ((map_pos.y as f32 - ray_pos.y + (1 - step.y) as f32 / 2.) / ray_dir.y).abs()
-        };
+            (map_pos.y as f32 - ray_pos.y + (1 - step.y) as f32 / 2.) / ray_dir.y
+        }
+        .abs();
 
         let line_height: i32 = if *perpendicular_wall_dist as i32 == 0 {
             self.window_size.y as i32
@@ -247,11 +240,11 @@ impl RaycastEngine {
         draw_end: i32,
         draw_start: i32,
         wall_x: &mut f32,
-    ) -> () {
+    ) {
         let mut texture_id = self
             .map
             .get_block(map_pos)
-            .expect("Error on raycasting_engine line 87.");
+            .expect(&format!("ERROR: Cannot get block ID {:?}", map_pos));
 
         *wall_x = if side == 1 {
             ray_pos.x
@@ -304,7 +297,7 @@ impl RaycastEngine {
         map_pos: &Vector2i,
         delta_dist: &Vector2f,
         side_dist: &mut Vector2f,
-    ) -> () {
+    ) {
         if ray_dir.x < 0. {
             step.x = -1;
             side_dist.x = (ray_pos.x - map_pos.x as f32) * delta_dist.x;
@@ -328,7 +321,7 @@ impl RaycastEngine {
         step: &mut Vector2i,
         delta_dist: &mut Vector2f,
         side: &mut i32,
-    ) -> () {
+    ) {
         let mut hit: bool = false;
         while !hit {
             if side_dist.x < side_dist.y {
@@ -347,7 +340,7 @@ impl RaycastEngine {
         }
     }
 
-    fn update_events(&mut self, event_handler: &EventHandler) -> () {
+    fn update_events(&mut self, event_handler: &EventHandler) {
         let mut pos = Vector2i { x: 0, y: 0 };
         if event_handler.is_key_pressed(Key::W) {
             pos.x = (self.player_position.x + (self.vector_direction.x * 0.1)) as i32;
@@ -355,7 +348,7 @@ impl RaycastEngine {
             if self
                 .map
                 .get_block(&pos)
-                .expect("Error on getting block (raycasting_engine.rs line 265)")
+                .expect(&format!("ERROR: Cannot get block ID {:?}", &pos))
                 == 0
             {
                 self.player_position.x += self.vector_direction.x * 0.1;
@@ -365,7 +358,7 @@ impl RaycastEngine {
             if self
                 .map
                 .get_block(&pos)
-                .expect("Error on getting block (raycasting_engine.rs line 268)")
+                .expect(&format!("ERROR: Cannot get block ID {:?}", &pos))
                 == 0
             {
                 self.player_position.y += self.vector_direction.y * 0.1;
@@ -377,7 +370,7 @@ impl RaycastEngine {
             if self
                 .map
                 .get_block(&pos)
-                .expect("Error on getting block (raycasting_engine.rs line 276)")
+                .expect(&format!("ERROR: Cannot get block ID {:?}", &pos))
                 == 0
             {
                 self.player_position.x -= self.vector_direction.x * 0.1;
@@ -387,7 +380,7 @@ impl RaycastEngine {
             if self
                 .map
                 .get_block(&pos)
-                .expect("Error on getting block (raycasting_engine.rs line 281)")
+                .expect(&format!("ERROR: Cannot get block ID {:?}", &pos))
                 == 0
             {
                 self.player_position.y -= self.vector_direction.y * 0.1;
@@ -413,24 +406,20 @@ impl RaycastEngine {
     }
 
     fn create_line_array(window_size: &Vector2f) -> Vec<Box<VertexArray>> {
-        let mut i = 0;
         let mut lines: Vec<Box<VertexArray>> = Vec::new();
-        while i < window_size.x as i32 {
+        for _ in 0..(window_size.x as i32) {
             let mut line: Box<VertexArray> = Box::new(VertexArray::default());
             line.set_primitive_type(PrimitiveType::Lines);
             lines.push(line);
-            i += 1;
         }
         lines
     }
 
     fn create_ground_array(window_size: &Vector2f) -> Vec<Box<VertexArray>> {
-        let mut i = 0;
         let mut lines: Vec<Box<VertexArray>> = Vec::new();
-        while i < window_size.x as i32 {
+        for _ in 0..(window_size.x as i32) {
             let line: Box<VertexArray> = Box::new(VertexArray::default());
             lines.push(line);
-            i += 1;
         }
         lines
     }
@@ -439,17 +428,12 @@ impl RaycastEngine {
         self.player_position.clone()
     }
 
-    pub fn draw<'r>(
-        &self,
-        render_window: &'r mut RenderWindow,
-        texture_loader: &'r TextureLoader,
-    ) -> () {
-        let mut i: i32 = 0;
+    pub fn draw<'r>(&self, render_window: &'r mut RenderWindow, texture_loader: &'r TextureLoader) {
         let mut render_states = RenderStates::default();
-        for line in self.vertex_array.iter() {
-            render_states.texture = Some(texture_loader.get_texture(self.textures_id[i as usize]));
+        for (line_idx, line) in self.vertex_array.iter().enumerate() {
+            render_states.texture =
+                Some(texture_loader.get_texture(self.textures_id[line_idx as usize]));
             render_window.draw_with_renderstates(&*(*line), render_states);
-            i += 1;
         }
 
         render_states.texture = Some(texture_loader.get_texture(0));
