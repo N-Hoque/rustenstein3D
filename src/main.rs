@@ -50,7 +50,7 @@ fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Er
 
     for path in paths {
         let path_name = path?.path();
-        if path_name.ends_with(".ttf") {
+        if !path_name.ends_with(".png") && !path_name.ends_with(".tga") {
             continue;
         }
 
@@ -71,7 +71,7 @@ fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Er
 
 fn load_texture() -> Result<TextureLoader, Box<dyn Error>> {
     let mut texture_loader = TextureLoader::new();
-    let resources = get_resources_list("../resources")?;
+    let resources = get_resources_list("../../resources")?;
     for resource in resources {
         if !texture_loader.load_texture(resource.clone()) {
             panic!("ERROR: Cannot load texture ({}).", resource);
@@ -89,7 +89,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut noground: bool = false;
     let mut i_args = 1;
 
-    for arg in &args {
+    while i_args < arg_length {
+        let arg = &args[i_args];
         match arg.as_str() {
             "--help" => {
                 display_help();
@@ -129,8 +130,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     render_window.set_mouse_position(Vector2i::new(width as i32 / 2, height as i32 / 2));
 
     // Create the font for the FPS_handler.
-    let font = Font::from_file("../resources/sansation.ttf")
-        .ok_or("ERROR: Cannot load font, font resources/sansation.ttf doesn't exist!")?;
+    let font = Font::from_file("../../resources/sansation.ttf")
+        .ok_or("ERROR: Cannot load font! Font (resources/sansation.ttf) does not exist!")
+        .expect("The font has been loaded?");
 
     // Create the texture loader and load textures
     let texture_loader = load_texture()?;

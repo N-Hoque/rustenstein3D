@@ -415,7 +415,7 @@ impl REngine {
         let mut lines: Vec<Box<VertexArray>> = Vec::new();
         while i < window_size.x as i32 {
             let mut line: Box<VertexArray> = Box::new(VertexArray::default());
-            line.set_primitive_type(PrimitiveType::LINES);
+            line.set_primitive_type(PrimitiveType::Lines);
             lines.push(line);
             i += 1;
         }
@@ -445,21 +445,19 @@ impl REngine {
         let mut i: i32 = 0;
         let mut render_states = RenderStates::default();
         for line in self.vertex_array.iter() {
-            render_states.set_texture(Some(
-                texture_loader.get_texture(self.textures_id[i as usize]),
-            ));
-            render_window.draw_with_renderstates(&*(*line), &mut render_states);
+            render_states.texture = Some(texture_loader.get_texture(self.textures_id[i as usize]));
+            render_window.draw_with_renderstates(&*(*line), render_states);
             i += 1;
         }
 
-        render_states.set_texture(Some(texture_loader.get_texture(0)));
+        render_states.texture = Some(texture_loader.get_texture(0));
         for gr in self.ground.iter() {
-            render_window.draw_with_renderstates(&*(*gr), &mut render_states);
+            render_window.draw_with_renderstates(&*(*gr), render_states);
         }
 
-        render_states.set_texture(Some(texture_loader.get_texture(11)));
+        render_states.texture = Some(texture_loader.get_texture(11));
         for sky in self.sky.iter() {
-            render_window.draw_with_renderstates(&*(*sky), &mut render_states);
+            render_window.draw_with_renderstates(&*(*sky), render_states);
         }
     }
 }

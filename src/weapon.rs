@@ -79,28 +79,28 @@ impl<'s> Weapon<'s> {
     }
 
     pub fn update<'r>(&'r mut self, event_handler: &'r EventHandler) -> () {
-        if let Some(_) = event_handler.has_key_pressed_event(Key::NUM1) {
+        if let Some(_) = event_handler.has_key_pressed_event(Key::Num1) {
             self.current_weapon = 0
         };
-        if let Some(_) = event_handler.has_key_pressed_event(Key::NUM2) {
+        if let Some(_) = event_handler.has_key_pressed_event(Key::Num2) {
             self.current_weapon = 1
         };
-        if let Some(_) = event_handler.has_key_pressed_event(Key::NUM3) {
+        if let Some(_) = event_handler.has_key_pressed_event(Key::Num3) {
             self.current_weapon = 2
         };
-        if let Some(_) = event_handler.has_key_pressed_event(Key::NUM4) {
+        if let Some(_) = event_handler.has_key_pressed_event(Key::Num4) {
             self.current_weapon = 3
         };
 
         if !self.mouse_fire {
-            if let Some(_) = event_handler.get_mouse_button_pressed_event(MouseButton::LEFT) {
+            if let Some(_) = event_handler.get_mouse_button_pressed_event(MouseButton::Left) {
                 self.animations
                     .get_mut(self.current_weapon as usize)
                     .unwrap()
                     .set_state(AnimationState::Play);
                 self.mouse_fire = true
             };
-        } else if let Some(_) = event_handler.get_mouse_button_released_event(MouseButton::LEFT) {
+        } else if let Some(_) = event_handler.get_mouse_button_released_event(MouseButton::Left) {
             self.mouse_fire = false
         } else {
             self.animations

@@ -4,8 +4,7 @@ use rsfml::{
     graphics::{
         Color, FloatRect, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable, View,
     },
-    system::{Vector2f, Vector2i, Vector2u},
-    SfBox,
+    system::{SfBox, Vector2f, Vector2i, Vector2u},
 };
 
 use crate::{map::*, texture_loader::TextureLoader};

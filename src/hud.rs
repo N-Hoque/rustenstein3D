@@ -21,7 +21,7 @@ pub struct HUD<'s> {
 impl<'s> HUD<'s> {
     pub fn new(window_size: &Vector2f, texture_loader: &'s TextureLoader) -> HUD<'s> {
         let mut array = VertexArray::default();
-        array.set_primitive_type(PrimitiveType::LINE_STRIP);
+        array.set_primitive_type(PrimitiveType::LineStrip);
         let mut tmp_face = RectangleShape::with_size(Vector2f::new(43., 58.));
         tmp_face.set_position(Vector2f::new(window_size.x / 2. - 21., window_size.y - 71.));
         HUD {
