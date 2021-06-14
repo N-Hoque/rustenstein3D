@@ -73,7 +73,7 @@ fn load_texture() -> Result<TextureLoader, Box<dyn Error>> {
     let mut texture_loader = TextureLoader::new();
     let resources = get_resources_list("../../resources")?;
     for resource in resources {
-        if !texture_loader.load_texture(resource.clone()) {
+        if !texture_loader.load_texture(&resource) {
             panic!("ERROR: Cannot load texture ({}).", resource);
         }
     }
