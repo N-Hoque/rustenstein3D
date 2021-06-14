@@ -1,7 +1,5 @@
 //! Module for displaying the mini-map
 
-use std::borrow::BorrowMut;
-
 use rsfml::{
     graphics::{
         Color, FloatRect, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable, View,
@@ -22,13 +20,10 @@ pub struct MiniMap {
 impl MiniMap {
     pub fn new(map: Map, window_size: &Vector2u) -> MiniMap {
         let mut tmp_view = View::new(Vector2f::default(), Vector2f::default());
-        (*tmp_view)
-            .borrow_mut()
-            .set_size(Vector2f::new(window_size.x as f32, window_size.y as f32));
-        (*tmp_view)
-            .borrow_mut()
-            .set_viewport(&FloatRect::new(0.70, 0.05, 0.25, 0.25));
-        (*tmp_view).borrow_mut().set_rotation(-90.);
+        let borrowed_view = &mut (*tmp_view);
+        borrowed_view.set_size(Vector2f::new(window_size.x as f32, window_size.y as f32));
+        borrowed_view.set_viewport(&FloatRect::new(0.70, 0.05, 0.25, 0.25));
+        borrowed_view.set_rotation(-90.);
         MiniMap {
             map,
             active: true,
@@ -49,8 +44,9 @@ impl MiniMap {
 
     pub fn update(&mut self, player_position: Vector2f, new_rotation: f32) -> () {
         self.player_pos = player_position;
-        (*self.mini_map_view).borrow_mut().rotate(new_rotation);
-        (*self.mini_map_view).borrow_mut().set_center(Vector2f::new(
+        let borrowed_mini_map_view = &mut (*self.mini_map_view);
+        borrowed_mini_map_view.rotate(new_rotation);
+        borrowed_mini_map_view.set_center(Vector2f::new(
             self.player_pos.x * 80.,
             self.player_pos.y * 80.,
         ));
@@ -69,16 +65,13 @@ impl MiniMap {
                 block = self
                     .map
                     .get_block(&pos)
-                    .expect("Cannot get block in minimap.");
-                match block {
-                    0 => {
-                        rect.set_texture(texture_loader.get_texture(block), false);
-                        rect.set_position(Vector2f::new(pos.x as f32 * 80., pos.y as f32 * 80.));
-                    }
-                    _ => {
-                        rect.set_texture(texture_loader.get_texture(block), false);
-                        rect.set_position(Vector2f::new(pos.x as f32 * 80., pos.y as f32 * 80.));
-                    }
+                    .expect("ERROR: Cannot get block in minimap.");
+                if block == 0 {
+                    rect.set_texture(texture_loader.get_texture(block), false);
+                    rect.set_position(Vector2f::new(pos.x as f32 * 80., pos.y as f32 * 80.));
+                } else {
+                    rect.set_texture(texture_loader.get_texture(block), false);
+                    rect.set_position(Vector2f::new(pos.x as f32 * 80., pos.y as f32 * 80.));
                 }
                 render_window.draw(&mut rect);
                 pos.y += 1;
