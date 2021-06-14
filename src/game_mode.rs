@@ -15,9 +15,7 @@ pub struct GameMode<'s> {
     r_engine: RaycastEngine,
     texture_loader: &'s TextureLoader,
     window_size: Vector2u,
-    map: Map,
     mini_map: MiniMap,
-    player_position: Vector2f,
     hud: HUD<'s>,
     weapon: Weapon<'s>,
     sky: RectangleShape<'s>,
@@ -44,9 +42,7 @@ impl<'s> GameMode<'s> {
         ground.set_position(Vector2f::new(0., window_size.y as f32 / 2. - 40.));
         GameMode {
             window_size,
-            map: map.clone(),
             mini_map: MiniMap::new(map.clone(), &window_size),
-            player_position: Vector2f { x: 4., y: 1. },
             r_engine: RaycastEngine::new(
                 map,
                 &Vector2f::new(window_size.x as f32, window_size.y as f32),

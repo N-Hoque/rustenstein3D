@@ -1,3 +1,5 @@
+//! Module for game state management
+
 #![allow(non_snake_case)]
 
 use rsfml::{
@@ -13,7 +15,6 @@ pub struct GameLoop<'s> {
     event_handler: EventHandler,
     clear_color: Color,
     game_mode: GameMode<'s>,
-    texture_loader: &'s TextureLoader,
 }
 
 impl<'s> GameLoop<'s> {
@@ -29,7 +30,6 @@ impl<'s> GameLoop<'s> {
             event_handler: EventHandler::new(),
             clear_color: Color::rgb(3, 64, 59),
             game_mode: GameMode::new(tmp_size, texture_loader, no_ground),
-            texture_loader,
         }
     }
 
