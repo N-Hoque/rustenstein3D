@@ -98,10 +98,9 @@ impl<'s> GameMode<'s> {
         if event_handler.is_key_pressed(Key::RIGHT) {
             rotation = 5.25;
         }
-        match event_handler.has_key_pressed_event(Key::M) {
-            Some(_) => self.mini_map.toggle_active(),
-            None => true,
-        };
+        if let Some(_) = event_handler.has_key_pressed_event(Key::M) {
+            self.mini_map.toggle_active();
+        }
         self.r_engine.update(event_handler);
         if self.mini_map.is_active() {
             self.mini_map
