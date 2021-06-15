@@ -1,4 +1,4 @@
-use rsfml::{graphics::Texture, system::SfBox};
+use rsfml::{graphics::Texture, SfBox};
 
 pub struct TextureLoader {
     textures: Vec<SfBox<Texture>>,

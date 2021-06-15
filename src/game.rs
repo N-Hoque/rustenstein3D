@@ -59,7 +59,7 @@ impl<'s> GameLoop<'s> {
 
     pub fn update(&mut self) -> () {
         self.event_handler.update_events(&mut self.render_window);
-        if self.event_handler.has_closed_event() || self.event_handler.is_key_pressed(Key::Escape) {
+        if self.event_handler.has_closed_event() || self.event_handler.is_key_pressed(Key::ESCAPE) {
             self.render_window.close();
         }
         self.game_mode.update(&self.event_handler);

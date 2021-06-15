@@ -81,10 +81,10 @@ impl<'s> GameMode<'s> {
 
     pub fn update<'r>(&mut self, event_handler: &'r EventHandler) -> () {
         let mut rotation: f32 = 0.;
-        if event_handler.is_key_pressed(Key::Left) {
+        if event_handler.is_key_pressed(Key::LEFT) {
             rotation = -5.25;
         }
-        if event_handler.is_key_pressed(Key::Right) {
+        if event_handler.is_key_pressed(Key::RIGHT) {
             rotation = 5.25;
         }
         match event_handler.has_key_pressed_event(Key::M) {

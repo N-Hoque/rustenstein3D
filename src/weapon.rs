@@ -79,25 +79,25 @@ impl<'s> Weapon<'s> {
     }
 
     pub fn update<'r>(&'r mut self, event_handler: &'r EventHandler) -> () {
-        match event_handler.has_key_pressed_event(Key::Num1) {
+        match event_handler.has_key_pressed_event(Key::NUM1) {
             Some(_) => self.current_weapon = 0,
             None => {}
         };
-        match event_handler.has_key_pressed_event(Key::Num2) {
+        match event_handler.has_key_pressed_event(Key::NUM2) {
             Some(_) => self.current_weapon = 1,
             None => {}
         };
-        match event_handler.has_key_pressed_event(Key::Num3) {
+        match event_handler.has_key_pressed_event(Key::NUM3) {
             Some(_) => self.current_weapon = 2,
             None => {}
         };
-        match event_handler.has_key_pressed_event(Key::Num4) {
+        match event_handler.has_key_pressed_event(Key::NUM4) {
             Some(_) => self.current_weapon = 3,
             None => {}
         };
 
         if self.mouse_fire == false {
-            match event_handler.has_mouse_button_pressed_event(mouse::Button::Left) {
+            match event_handler.has_mouse_button_pressed_event(mouse::Button::LEFT) {
                 Some(_) => {
                     self.animations
                         .get_mut(self.current_weapon as usize)
@@ -108,7 +108,7 @@ impl<'s> Weapon<'s> {
                 None => {}
             };
         } else {
-            match event_handler.has_mouse_button_released_event(mouse::Button::Left) {
+            match event_handler.has_mouse_button_released_event(mouse::Button::LEFT) {
                 Some(_) => self.mouse_fire = false,
                 None => self
                     .animations

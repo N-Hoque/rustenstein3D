@@ -4,8 +4,8 @@ use std::rc::Rc;
 use rsfml::graphics::Shape;
 use rsfml::graphics::Transformable;
 use rsfml::graphics::{Color, FloatRect, RectangleShape, RenderTarget, RenderWindow, View};
-use rsfml::system::SfBox;
 use rsfml::system::{Vector2f, Vector2i, Vector2u};
+use rsfml::SfBox;
 
 use map::*;
 use texture_loader::TextureLoader;

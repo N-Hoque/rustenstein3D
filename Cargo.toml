@@ -9,5 +9,5 @@ name = "rustenstein3D"
 path = "src/rustenstein3D.rs"
 
 [dependencies]
-rsfml = { version = "0.15.1", package = "sfml" }
+rsfml = { version = "0.16.0", package = "sfml" }
 native = "0.1.0"
