@@ -23,9 +23,9 @@ pub const RESOURCES_BASE_PATH: &'static str = "resources";
 fn display_help() -> () {
     println!("Arguments available for Rustenstein3D:");
     println!("\t-w [window_width] [window_height] : Specify a new size for the window.");
-    println!("\t--noground : Disable the ground texturing (improve performance).");
     println!("\t-f, --framerate [framerate_value] : Set the framerate of the game.");
-    println!("\t--help : Display this help.");
+    println!("\t--noground\t\t\t  : Disable the ground texturing (improve performance).");
+    println!("\t--help\t\t\t\t  : Display this help.");
 }
 
 fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Error>> {
@@ -66,9 +66,9 @@ pub fn load_texture() -> Result<TextureLoader, Box<dyn Error>> {
 }
 
 pub struct Arguments {
-    window_dimensions: (u32, u32),
-    no_ground: bool,
-    framerate_limit: u32,
+    pub window_dimensions: (u32, u32),
+    pub no_ground: bool,
+    pub framerate_limit: u32,
 }
 
 pub fn parse_arguments() -> Result<Arguments, Result<(), Box<dyn Error>>> {
