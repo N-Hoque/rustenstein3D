@@ -20,6 +20,18 @@ use texture_loader::TextureLoader;
 
 pub const RESOURCES_BASE_PATH: &'static str = "resources";
 
+pub struct Arguments {
+    pub window_dimensions: (u32, u32),
+    pub no_ground: bool,
+    pub framerate_limit: u32,
+}
+
+pub enum ParsedResult {
+    Success,
+    Parsed(Arguments),
+    Failure(String),
+}
+
 fn display_help() -> () {
     println!("Arguments available for Rustenstein3D:");
     println!("\t-w [window_width] [window_height] : Specify a new size for the window.");
@@ -35,19 +47,16 @@ fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Er
 
     for path in paths {
         let path_name = path?.path();
-        if !path_name.ends_with(".png") && !path_name.ends_with(".tga") {
-            continue;
-        }
-
         if path_name.is_dir() {
-            resource_list.append(&mut get_resources_list(path_name.as_path())?);
+            let mut sub_resources = get_resources_list(path_name)?;
+            resource_list.append(&mut sub_resources);
         } else {
-            resource_list.push(
-                path_name
-                    .to_str()
-                    .ok_or("Cannot convert path to string")?
-                    .to_string(),
-            )
+            let extension = path_name
+                .extension()
+                .expect("ERROR: Cannot get file extension.");
+            if extension == "png" || extension == "tga" || extension == "bmp" {
+                resource_list.push(path_name.display().to_string());
+            }
         }
     }
 
@@ -57,24 +66,12 @@ fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Er
 pub fn load_texture() -> Result<TextureLoader, Box<dyn Error>> {
     let mut texture_loader = TextureLoader::new();
     let resources = get_resources_list(RESOURCES_BASE_PATH)?;
-    for resource in resources {
-        if !texture_loader.load_texture(&resource) {
+    for resource in &resources {
+        if !texture_loader.load_texture(resource) {
             panic!("ERROR: Cannot load texture ({}).", resource);
         }
     }
     Ok(texture_loader)
-}
-
-pub struct Arguments {
-    pub window_dimensions: (u32, u32),
-    pub no_ground: bool,
-    pub framerate_limit: u32,
-}
-
-pub enum ParsedResult {
-    Success,
-    Parsed(Arguments),
-    Failure(String),
 }
 
 pub fn parse_arguments() -> ParsedResult {

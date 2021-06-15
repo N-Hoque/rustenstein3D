@@ -18,7 +18,7 @@ impl TextureLoader {
         let successfully_loaded = texture.is_some();
 
         if let Some(tex) = texture {
-            self.textures.push(tex)
+            self.textures.push(tex);
         }
 
         successfully_loaded
