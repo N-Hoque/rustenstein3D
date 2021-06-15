@@ -1,8 +1,5 @@
 #![allow(non_snake_case)]
 
-extern crate native;
-extern crate rsfml;
-
 use rsfml::{
     graphics::{Font, RenderWindow},
     system::Vector2i,
