@@ -71,7 +71,13 @@ pub struct Arguments {
     pub framerate_limit: u32,
 }
 
-pub fn parse_arguments() -> Result<Arguments, Result<(), Box<dyn Error>>> {
+pub enum ParsedResult {
+    Success,
+    Parsed(Arguments),
+    Failure(String),
+}
+
+pub fn parse_arguments() -> ParsedResult {
     let args = std::env::args().collect::<Vec<String>>();
     let arg_length = args.len();
 
@@ -87,7 +93,7 @@ pub fn parse_arguments() -> Result<Arguments, Result<(), Box<dyn Error>>> {
         match arg.as_str() {
             "--help" => {
                 display_help();
-                return Err(Ok(()));
+                return ParsedResult::Success;
             }
             "--noground" => arguments.no_ground = true,
             "-f" | "--framerate" => {
@@ -95,27 +101,43 @@ pub fn parse_arguments() -> Result<Arguments, Result<(), Box<dyn Error>>> {
                     panic!("ERROR: Missing argument for --framerate option.");
                 }
                 let framerate_value = &args[i_args + 1];
-                arguments.framerate_limit = framerate_value.parse().expect(&format!(
-                    "ERROR: Unable to parse value for --framerate ({})",
-                    framerate_value
-                ))
+                match framerate_value.parse() {
+                    Ok(res) => arguments.framerate_limit = res,
+                    Err(_) => {
+                        return ParsedResult::Failure(format!(
+                            "ERROR: Unable to parse value for --framerate ({})",
+                            framerate_value
+                        ))
+                    }
+                };
+                i_args += 1;
             }
             "-w" | "--width" => {
                 if i_args + 2 >= arg_length {
                     panic!("Error missing arguments for -w option.");
                 }
                 let (width_arg, height_arg) = (&args[i_args + 1], &args[i_args + 2]);
-                arguments.window_dimensions.0 = width_arg
-                    .parse()
-                    .expect("ERROR: First parameter after -w argument is not a width!");
-                arguments.window_dimensions.1 = height_arg
-                    .parse()
-                    .expect("ERROR: Second parameter after -w argument is not a height!");
+                match width_arg.parse() {
+                    Ok(res) => arguments.window_dimensions.0 = res,
+                    Err(_) => {
+                        return ParsedResult::Failure(String::from(
+                            "ERROR: First parameter after -w argument is not a width!",
+                        ))
+                    }
+                };
+                match height_arg.parse() {
+                    Ok(res) => arguments.window_dimensions.1 = res,
+                    Err(_) => {
+                        return ParsedResult::Failure(String::from(
+                            "ERROR: Second parameter after -w argument is not a height!",
+                        ))
+                    }
+                };
                 i_args += 2;
             }
             _ => panic!("Error unknown argument ({}).", arg),
         }
         i_args += 1;
     }
-    Ok(arguments)
+    ParsedResult::Parsed(arguments)
 }
