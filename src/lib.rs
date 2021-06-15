@@ -40,6 +40,7 @@ fn display_help() -> () {
     println!("\t--help\t\t\t\t  : Display this help.");
 }
 
+// TODO: Use this over the giant texture loading block
 fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Error>> {
     let paths = fs::read_dir(path)?;
 
@@ -65,8 +66,54 @@ fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Er
 
 pub fn load_texture() -> Result<TextureLoader, Box<dyn Error>> {
     let mut texture_loader = TextureLoader::new();
-    for resource in &get_resources_list(RESOURCES_BASE_PATH)? {
-        texture_loader.load_texture(resource)?
+    if texture_loader.load_texture("resources/ground.tga").is_err() || // 0
+       texture_loader.load_texture("resources/1.tga").is_err() || // 1
+       texture_loader.load_texture("resources/2.tga").is_err() || // 2
+       texture_loader.load_texture("resources/3.tga").is_err() || // 3
+       texture_loader.load_texture("resources/4.tga").is_err() || // 4
+       texture_loader.load_texture("resources/5.tga").is_err() || // 5
+       texture_loader.load_texture("resources/6.tga").is_err() || // 6
+       texture_loader.load_texture("resources/7.tga").is_err() || // 7
+       texture_loader.load_texture("resources/8.tga").is_err() || // 8
+       texture_loader.load_texture("resources/9.tga").is_err() || // 9
+       texture_loader.load_texture("resources/10.tga").is_err() || // 10
+       texture_loader.load_texture("resources/sky.tga").is_err() || // 11
+       texture_loader.load_texture("resources/weapons/gun_1.png").is_err() || // 12
+       texture_loader.load_texture("resources/weapons/gun_2.png").is_err() || // 13
+       texture_loader.load_texture("resources/weapons/gun_3.png").is_err() || // 14
+       texture_loader.load_texture("resources/weapons/gun_4.png").is_err() || // 15
+       texture_loader.load_texture("resources/weapons/gun_5.png").is_err() || // 16
+       texture_loader.load_texture("resources/weapons/gun_6.png").is_err() || // 17
+       texture_loader.load_texture("resources/weapons/gun_shadow.png").is_err() || // 18
+       texture_loader.load_texture("resources/weapons/gun2_1.png").is_err() || // 19
+       texture_loader.load_texture("resources/weapons/gun2_2.png").is_err() || // 20
+       texture_loader.load_texture("resources/weapons/gun2_3.png").is_err() || // 21
+       texture_loader.load_texture("resources/weapons/gun2_4.png").is_err() || // 22
+       texture_loader.load_texture("resources/weapons/gun2_5.png").is_err() || // 23
+       texture_loader.load_texture("resources/weapons/gun2_6.png").is_err() || // 24
+       texture_loader.load_texture("resources/weapons/gun2_shadow.png").is_err() || // 25
+       texture_loader.load_texture("resources/weapons/gun3_1.png").is_err() || // 26
+       texture_loader.load_texture("resources/weapons/gun3_2.png").is_err() || // 27
+       texture_loader.load_texture("resources/weapons/gun3_3.png").is_err() || // 28
+       texture_loader.load_texture("resources/weapons/gun3_4.png").is_err() || // 29
+       texture_loader.load_texture("resources/weapons/gun3_2.png").is_err() || // 27
+       texture_loader.load_texture("resources/weapons/gun3_3.png").is_err() || // 28
+       texture_loader.load_texture("resources/weapons/gun3_4.png").is_err() || // 29
+       texture_loader.load_texture("resources/weapons/gun3_5.png").is_err() || // 30
+       texture_loader.load_texture("resources/weapons/gun3_6.png").is_err() || // 31
+       texture_loader.load_texture("resources/weapons/gun3_shadow.png").is_err() || // 32
+       texture_loader.load_texture("resources/weapons/cut_1.png").is_err() || // 33
+       texture_loader.load_texture("resources/weapons/cut_2.png").is_err() || // 34
+       texture_loader.load_texture("resources/weapons/cut_3.png").is_err() || // 35
+       texture_loader.load_texture("resources/weapons/cut_4.png").is_err() || // 36
+       texture_loader.load_texture("resources/weapons/cut_5.png").is_err() || // 37
+       texture_loader.load_texture("resources/weapons/cut_6.png").is_err() || //38
+       texture_loader.load_texture("resources/weapons/cut_shadow.png").is_err() || // 39
+       texture_loader.load_texture("resources/face1.png").is_err() || //40
+       texture_loader.load_texture("resources/face2.png").is_err() || //41
+       texture_loader.load_texture("resources/face3.png").is_err()
+    {
+        panic!("Failed to load textures");
     }
     Ok(texture_loader)
 }
