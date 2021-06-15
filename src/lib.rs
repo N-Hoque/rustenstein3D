@@ -54,7 +54,7 @@ fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Er
             let extension = path_name
                 .extension()
                 .expect("ERROR: Cannot get file extension.");
-            if extension == "png" || extension == "tga" || extension == "bmp" {
+            if extension != "wav" && extension != "ttf" {
                 resource_list.push(path_name.display().to_string());
             }
         }
@@ -65,11 +65,8 @@ fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Er
 
 pub fn load_texture() -> Result<TextureLoader, Box<dyn Error>> {
     let mut texture_loader = TextureLoader::new();
-    let resources = get_resources_list(RESOURCES_BASE_PATH)?;
-    for resource in &resources {
-        if !texture_loader.load_texture(resource) {
-            panic!("ERROR: Cannot load texture ({}).", resource);
-        }
+    for resource in &get_resources_list(RESOURCES_BASE_PATH)? {
+        texture_loader.load_texture(resource)?
     }
     Ok(texture_loader)
 }

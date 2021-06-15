@@ -13,15 +13,15 @@ impl TextureLoader {
         }
     }
 
-    pub fn load_texture(&mut self, texture_path: &str) -> bool {
+    pub fn load_texture(&mut self, texture_path: &str) -> Result<(), String> {
         let texture = Texture::from_file(texture_path);
-        let successfully_loaded = texture.is_some();
 
         if let Some(tex) = texture {
             self.textures.push(tex);
+            Ok(())
+        } else {
+            Err(format!("ERROR: Failed to load texture {}", texture_path))
         }
-
-        successfully_loaded
     }
 
     pub fn get_texture(&self, index: i32) -> &Texture {

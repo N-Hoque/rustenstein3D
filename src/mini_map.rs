@@ -88,7 +88,8 @@ impl MiniMap {
         render_window.draw(&mut rect);
 
         //TODO: Figure out how to restore view.
-        //let def_view = render_window.default_view();
-        //render_window.set_view(&def_view);
+        let def_view = render_window.default_view();
+        let new_view = View::new(def_view.center(), def_view.size());
+        render_window.set_view(&new_view);
     }
 }
