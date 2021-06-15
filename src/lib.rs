@@ -21,10 +21,11 @@ use texture_loader::TextureLoader;
 pub const RESOURCES_BASE_PATH: &'static str = "resources";
 
 fn display_help() -> () {
-    println!("Arguments availables for rustenstein3D :");
-    println!("\t-w [window_width] [window_height] : specify a new size for the window.");
-    println!("\t--noground : diseable the ground texturing (improve performance).");
-    println!("\t--help : display this help.");
+    println!("Arguments available for Rustenstein3D:");
+    println!("\t-w [window_width] [window_height] : Specify a new size for the window.");
+    println!("\t--noground : Disable the ground texturing (improve performance).");
+    println!("\t-f, --framerate [framerate_value] : Set the framerate of the game.");
+    println!("\t--help : Display this help.");
 }
 
 fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Error>> {
@@ -38,15 +39,15 @@ fn get_resources_list<P: AsRef<Path>>(path: P) -> Result<Vec<String>, Box<dyn Er
             continue;
         }
 
-        if !path_name.is_dir() {
+        if path_name.is_dir() {
+            resource_list.append(&mut get_resources_list(path_name.as_path())?);
+        } else {
             resource_list.push(
                 path_name
                     .to_str()
                     .ok_or("Cannot convert path to string")?
                     .to_string(),
             )
-        } else {
-            resource_list.append(&mut get_resources_list(path_name.as_path())?);
         }
     }
 
@@ -64,12 +65,22 @@ pub fn load_texture() -> Result<TextureLoader, Box<dyn Error>> {
     Ok(texture_loader)
 }
 
-pub fn parse_arguments() -> Result<(u32, u32, bool), Result<(), Box<dyn Error>>> {
+pub struct Arguments {
+    window_dimensions: (u32, u32),
+    no_ground: bool,
+    framerate_limit: u32,
+}
+
+pub fn parse_arguments() -> Result<Arguments, Result<(), Box<dyn Error>>> {
     let args = std::env::args().collect::<Vec<String>>();
     let arg_length = args.len();
-    let mut width: u32 = 768;
-    let mut height: u32 = 480;
-    let mut noground: bool = false;
+
+    let mut arguments = Arguments {
+        window_dimensions: (768, 480),
+        no_ground: false,
+        framerate_limit: 30,
+    };
+
     let mut i_args = 1;
     while i_args < arg_length {
         let arg = &args[i_args];
@@ -78,22 +89,33 @@ pub fn parse_arguments() -> Result<(u32, u32, bool), Result<(), Box<dyn Error>>>
                 display_help();
                 return Err(Ok(()));
             }
-            "--noground" => noground = true,
-            "-w" => {
+            "--noground" => arguments.no_ground = true,
+            "-f" | "--framerate" => {
+                if i_args + 1 >= arg_length {
+                    panic!("ERROR: Missing argument for --framerate option.");
+                }
+                let framerate_value = &args[i_args + 1];
+                arguments.framerate_limit = framerate_value.parse().expect(&format!(
+                    "ERROR: Unable to parse value for --framerate ({})",
+                    framerate_value
+                ))
+            }
+            "-w" | "--width" => {
                 if i_args + 2 >= arg_length {
                     panic!("Error missing arguments for -w option.");
                 }
-                width = args[i_args + 1]
+                let (width_arg, height_arg) = (&args[i_args + 1], &args[i_args + 2]);
+                arguments.window_dimensions.0 = width_arg
                     .parse()
-                    .expect("Error the first parameter after -w argument is not a width!");
-                height = args[i_args + 2]
+                    .expect("ERROR: First parameter after -w argument is not a width!");
+                arguments.window_dimensions.1 = height_arg
                     .parse()
-                    .expect("Error the second parameter after -w argument is not a width!");
+                    .expect("ERROR: Second parameter after -w argument is not a height!");
                 i_args += 2;
             }
             _ => panic!("Error unknown argument ({}).", arg),
         }
         i_args += 1;
     }
-    Ok((width, height, noground))
+    Ok(arguments)
 }

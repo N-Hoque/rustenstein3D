@@ -1,6 +1,3 @@
-#![crate_type = "bin"]
-#![allow(non_camel_case_types)]
-#![allow(dead_code)]
 #![allow(non_snake_case)]
 
 extern crate native;
@@ -13,7 +10,7 @@ use rsfml::{
     system::Vector2i,
     window::{ContextSettings, Style, VideoMode},
 };
-use rustenstein3D::game::GameLoop;
+use rustenstein3D::{game::GameLoop, Arguments};
 use rustenstein3D::{load_texture, parse_arguments, RESOURCES_BASE_PATH};
 
 #[cfg(target_os = "macos")]
@@ -23,7 +20,11 @@ fn start(argc: int, argv: *const *const u8) -> int {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let (width, height, noground) = match parse_arguments() {
+    let Arguments {
+        window_dimensions: (width, height),
+        framerate_limit,
+        no_ground,
+    } = match parse_arguments() {
         Ok(value) => value,
         Err(value) => return value,
     };
@@ -35,7 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut render_window = RenderWindow::new(video_mode, "Rustenstein3D", Style::CLOSE, &settings);
 
     // set the framerate limit to 30 fps.
-    render_window.set_framerate_limit(40);
+    render_window.set_framerate_limit(framerate_limit);
 
     // hide the cursor.
     render_window.set_mouse_cursor_visible(false);
@@ -51,7 +52,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let texture_loader = load_texture()?;
 
     // Create the game_loop and activate the fps handler.
-    let mut game_loop = GameLoop::new(render_window, &texture_loader, noground);
+    let mut game_loop = GameLoop::new(render_window, &texture_loader, no_ground);
     game_loop.activate_FPS(&font);
 
     game_loop.run();
