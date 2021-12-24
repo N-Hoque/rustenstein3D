@@ -1,41 +1,42 @@
-
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use rsfml::graphics::{RenderWindow, RenderTarget, View, Color, FloatRect, RectangleShape};
-use rsfml::system::{Vector2u, Vector2i, Vector2f};
+use rsfml::graphics::{
+    Color, FloatRect, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable, View,
+};
+use rsfml::system::{Vector2f, Vector2i, Vector2u};
 
-use texture_loader::TextureLoader;
 use map::*;
+use texture_loader::TextureLoader;
 
 pub struct MiniMap {
-    map : Map,
-    active : bool,
-    mini_map_view : Rc<RefCell<View>>,
-    player_pos : Vector2f,
-    rotation : f32
+    map: Map,
+    active: bool,
+    mini_map_view: Rc<RefCell<View>>,
+    player_pos: Vector2f,
+    rotation: f32,
 }
 
 impl MiniMap {
-    pub fn new(map : Map,
-               window_size : &Vector2u) -> MiniMap {
-        let tmp_view = Rc::new(RefCell::new(View::new().unwrap()));
-        (*tmp_view).borrow_mut().set_size2f(window_size.x as f32, window_size.y as f32);
-        (*tmp_view).borrow_mut().set_viewport(&FloatRect::new(0.70, 0.05, 0.25, 0.25));
-        (*tmp_view).borrow_mut().set_rotation(-90.);
+    pub fn new(map: Map, window_size: &Vector2u) -> MiniMap {
+        let mut tmp_view = View::new(Vector2f::default(), Vector2f::default());
+        tmp_view.set_size(Vector2f::new(window_size.x as f32, window_size.y as f32));
+        tmp_view.set_viewport(&FloatRect::new(0.70, 0.05, 0.25, 0.25));
+        tmp_view.set_rotation(-90.0);
+
         MiniMap {
-            map : map,
-            active : true,
-            mini_map_view : tmp_view,
-            player_pos : Vector2f {x : 0., y : 0. },
-            rotation : 0.
+            map,
+            active: true,
+            mini_map_view: Rc::new(RefCell::new(*tmp_view)),
+            player_pos: Vector2f { x: 0., y: 0. },
+            rotation: 0.,
         }
     }
 
     pub fn set_active(&mut self) -> bool {
         self.active = match self.active {
-            true    => false,
-            false   => true,
+            true => false,
+            false => true,
         };
         self.active
     }
@@ -44,46 +45,45 @@ impl MiniMap {
         self.active
     }
 
-    pub fn update(&mut self,
-                  player_position : Vector2f,
-                  new_rotation : f32) -> () {
+    pub fn update(&mut self, player_position: Vector2f, new_rotation: f32) {
         self.player_pos = player_position;
-        (*self.mini_map_view).borrow_mut().rotate(new_rotation);
-        (*self.mini_map_view).borrow_mut().set_center2f(self.player_pos.x * 80.,
-                                                          self.player_pos.y * 80.);
+        let mut map_view = (*self.mini_map_view).borrow_mut();
+        map_view.rotate(new_rotation);
+        map_view.set_center(Vector2f::new(
+            self.player_pos.x * 80.,
+            self.player_pos.y * 80.,
+        ));
         self.rotation += new_rotation;
     }
 
-    pub fn draw(&self,
-                render_window : &mut RenderWindow,
-                texture_loader : &TextureLoader) -> () {
-        let mut block : i32;
-        let def_view = render_window.get_default_view();
+    pub fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
+        let mut block: i32;
+        let def_view = render_window.default_view();
         let map_size = self.map.get_map_size();
-        let mut pos : Vector2i = Vector2i::new(0, 0);
-        let mut rect = RectangleShape::new_init(&Vector2f::new(80., 80.)).unwrap();
-        rect.set_fill_color(&Color::new_RGBA(255, 255, 255, 175));
+        let mut pos: Vector2i = Vector2i::new(0, 0);
+        let mut rect = RectangleShape::with_size(Vector2f::new(80., 80.));
+        rect.set_fill_color(Color::rgba(255, 255, 255, 175));
         render_window.set_view(&*self.mini_map_view.borrow());
         while pos.x < map_size.x {
             while pos.y < map_size.y {
-                block = self.map.get_block(&pos).expect("Cannot get block in minimap.");
-                match block {
-                    0 => { rect.set_texture(texture_loader.get_texture(block), false);
-                           rect.set_position2f(pos.x as f32 * 80., pos.y as f32 * 80.);
-                    },
-                    _ => { rect.set_texture(texture_loader.get_texture(block), false);
-                           rect.set_position2f(pos.x as f32 * 80., pos.y as f32 * 80.);
-                    }
-                }
+                block = self
+                    .map
+                    .get_block(&pos)
+                    .expect("Cannot get block in minimap.");
+                rect.set_texture(texture_loader.get_texture(block), false);
+                rect.set_position(Vector2f::new(pos.x as f32 * 80., pos.y as f32 * 80.));
                 render_window.draw(&rect);
                 pos.y += 1;
             }
             pos.x += 1;
             pos.y = 0;
         }
-        rect.set_fill_color(&Color::new_RGBA(255, 0, 0, 125));
-        rect.set_origin2f(40., 40.);
-        rect.set_position2f(self.player_pos.x as f32 * 80., self.player_pos.y as f32 * 80.);
+        rect.set_fill_color(Color::rgba(255, 0, 0, 125));
+        rect.set_origin(Vector2f::new(40., 40.));
+        rect.set_position(Vector2f::new(
+            self.player_pos.x as f32 * 80.,
+            self.player_pos.y as f32 * 80.,
+        ));
         render_window.draw(&rect);
         render_window.set_view(&def_view);
     }
