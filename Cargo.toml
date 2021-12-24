@@ -1,11 +1,14 @@
 [package]
-
 name = "rustenstein3D"
-version = "0.0.1"
-authors = ["Jeremy Letang <letang.jeremy@gmail.com>"]
+version = "0.1.0"
+authors = [
+  "Jeremy Letang <letang.jeremy@gmail.com>",
+  "Naimul Hoque <Naimul.Hoque@outlook.com>",
+]
 
 [[bin]]
 name = "rustenstein3D"
 
-[dependencies.rust-sfml]
-git = "https://github.com/jeremyletang/rust-sfml.git"
+[dependencies]
+rsfml = { version = "0.16.0", package = "sfml" }
+native = "0.1.0"
