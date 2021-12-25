@@ -3,7 +3,7 @@ use rsfml::system::Clock;
 use super::{Animation, Data, PlayState};
 
 impl Animation {
-    pub fn new(texture_ids: Vec<i32>, state: PlayState, lag: f32, offset: u32) -> Self {
+    pub fn new(texture_ids: &[i32], state: PlayState, lag: f32, offset: u32) -> Self {
         Self {
             state,
             data: Self::make_data(offset, texture_ids, lag),
@@ -45,11 +45,11 @@ impl Animation {
         }
     }
 
-    fn make_data(offset: u32, texture_ids: Vec<i32>, lag: f32) -> Data {
+    fn make_data(offset: u32, texture_ids: &[i32], lag: f32) -> Data {
         Data {
             a: 1,
             offset,
-            texture_ids,
+            texture_ids: texture_ids.to_vec(),
             lag,
         }
     }

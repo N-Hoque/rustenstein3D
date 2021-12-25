@@ -10,6 +10,6 @@ pub struct Weapon<'s> {
     texture_loader: &'s TextureLoader,
     shadows: RectangleShape<'s>,
     shadows_id: Vec<i32>,
-    current_weapon: i32,
+    current_weapon: usize,
     mouse_fire: bool,
 }

@@ -35,37 +35,26 @@ impl<'s> Weapon<'s> {
     }
 
     fn initialize_shadows(window_size: Vector2f) -> RectangleShape<'s> {
-        let mut tmp_shadow = RectangleShape::with_size(Vector2f { x: 99., y: 48. });
-        tmp_shadow.set_position(Vector2f::new(window_size.x - 115., window_size.y - 66.));
+        let mut tmp_shadow = RectangleShape::with_size(Vector2f::new(99., 48.));
+        tmp_shadow.set_position(window_size - Vector2f::new(115., 66.));
         tmp_shadow
     }
 
     fn initialize_animation() -> Vec<Animation> {
         vec![
-            Animation::new(vec![12, 13, 14, 15, 16, 17], PlayState::Stop, 0.07, 3),
-            Animation::new(vec![19, 20, 21, 22, 23, 24], PlayState::Stop, 0.07, 3),
-            Animation::new(vec![26, 27, 28, 29, 30, 31], PlayState::Stop, 0.07, 3),
-            Animation::new(vec![33, 34, 35, 36, 37, 38], PlayState::Stop, 0.07, 3),
+            Animation::new(&[12, 13, 14, 15, 16, 17], PlayState::Stop, 0.07, 3),
+            Animation::new(&[19, 20, 21, 22, 23, 24], PlayState::Stop, 0.07, 3),
+            Animation::new(&[26, 27, 28, 29, 30, 31], PlayState::Stop, 0.07, 3),
+            Animation::new(&[33, 34, 35, 36, 37, 38], PlayState::Stop, 0.07, 3),
         ]
     }
 
     pub fn update(&mut self, event_handler: &EventHandler) {
-        if event_handler.has_key_pressed_event(Key::NUM1).is_some() {
-            self.current_weapon = 0
-        };
-        if event_handler.has_key_pressed_event(Key::NUM2).is_some() {
-            self.current_weapon = 1
-        };
-        if event_handler.has_key_pressed_event(Key::NUM3).is_some() {
-            self.current_weapon = 2
-        };
-        if event_handler.has_key_pressed_event(Key::NUM4).is_some() {
-            self.current_weapon = 3
-        };
+        self.update_selected_weapon(event_handler);
 
         let animation = self
             .animations
-            .get_mut(self.current_weapon as usize)
+            .get_mut(self.current_weapon)
             .unwrap_or_else(|| {
                 panic!(
                     "Getting animation for weapon at index: {}",
@@ -96,16 +85,30 @@ impl<'s> Weapon<'s> {
         animation.update();
     }
 
+    fn update_selected_weapon(&mut self, event_handler: &EventHandler) {
+        if event_handler.has_key_pressed_event(Key::NUM1).is_some() {
+            self.current_weapon = 0
+        };
+        if event_handler.has_key_pressed_event(Key::NUM2).is_some() {
+            self.current_weapon = 1
+        };
+        if event_handler.has_key_pressed_event(Key::NUM3).is_some() {
+            self.current_weapon = 2
+        };
+        if event_handler.has_key_pressed_event(Key::NUM4).is_some() {
+            self.current_weapon = 3
+        };
+    }
+
     pub fn draw(&mut self, render_window: &mut RenderWindow) {
-        let current_weapon = self.current_weapon as usize;
         self.weapons.set_texture(
             self.texture_loader
-                .get_texture(self.animations[current_weapon].get_current_texture_id()),
+                .get_texture(self.animations[self.current_weapon].get_current_texture_id()),
             false,
         );
         self.shadows.set_texture(
             self.texture_loader
-                .get_texture(self.shadows_id[current_weapon]),
+                .get_texture(self.shadows_id[self.current_weapon]),
             false,
         );
         render_window.draw(&self.weapons);

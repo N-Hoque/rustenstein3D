@@ -98,8 +98,8 @@ impl<'s> GameMode<'s> {
         self.weapon.draw(render_window);
         render_window.set_mouse_cursor_visible(false);
         render_window.set_mouse_position(Vector2i::new(
-            (self.window_size.x) as i32 / 2,
-            (self.window_size.y) as i32 / 2,
+            self.window_size.x as i32 / 2,
+            self.window_size.y as i32 / 2,
         ));
     }
 }
