@@ -5,7 +5,7 @@ use rsfml::{
 };
 
 use crate::{
-    animation::{Animation, PlayMode, PlayState},
+    animation::{Animation, PlayState},
     event_handler::EventHandler,
     texture_loader::TextureLoader,
 };
@@ -42,34 +42,10 @@ impl<'s> Weapon<'s> {
 
     fn initialize_animation() -> Vec<Animation> {
         vec![
-            Animation::new(
-                vec![12, 13, 14, 15, 16, 17],
-                PlayState::Stop,
-                PlayMode::Once,
-                0.07,
-                3,
-            ),
-            Animation::new(
-                vec![19, 20, 21, 22, 23, 24],
-                PlayState::Stop,
-                PlayMode::Once,
-                0.07,
-                3,
-            ),
-            Animation::new(
-                vec![26, 27, 28, 29, 30, 31],
-                PlayState::Stop,
-                PlayMode::Once,
-                0.07,
-                3,
-            ),
-            Animation::new(
-                vec![33, 34, 35, 36, 37, 38],
-                PlayState::Stop,
-                PlayMode::Once,
-                0.07,
-                3,
-            ),
+            Animation::new(vec![12, 13, 14, 15, 16, 17], PlayState::Stop, 0.07, 3),
+            Animation::new(vec![19, 20, 21, 22, 23, 24], PlayState::Stop, 0.07, 3),
+            Animation::new(vec![26, 27, 28, 29, 30, 31], PlayState::Stop, 0.07, 3),
+            Animation::new(vec![33, 34, 35, 36, 37, 38], PlayState::Stop, 0.07, 3),
         ]
     }
 

@@ -7,6 +7,7 @@ use rsfml::{
 
 use crate::{animation::Animation, texture_loader::TextureLoader};
 
+#[allow(clippy::upper_case_acronyms)]
 pub struct HUD<'s> {
     window_size: Vector2f,
     background: RectangleShape<'s>,

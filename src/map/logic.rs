@@ -28,14 +28,6 @@ impl Map {
         }
     }
 
-    pub fn get_block_with_orientation(
-        &self,
-        block_orientation: Orientation,
-        position: Vector2i,
-    ) -> Option<i32> {
-        self.get_block(position + Vector2i::from(block_orientation))
-    }
-
     pub fn get_block(&self, position: Vector2i) -> Option<i32> {
         if position.x < 0
             || position.y < 0
