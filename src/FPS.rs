@@ -5,8 +5,6 @@
 *
 */
 
-#![allow(non_snake_case)]
-
 use rsfml::graphics::Transformable;
 use rsfml::graphics::{Color, Font, RenderTarget, RenderWindow, Text};
 use rsfml::system::{Clock, Vector2f};

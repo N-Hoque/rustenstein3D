@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 use crate::event_handler::*;
 use crate::fps::*;
 use crate::game_mode::*;
@@ -34,13 +32,13 @@ impl<'s> GameLoop<'s> {
         }
     }
 
-    pub fn activate_FPS(&mut self, font: &'s Font) {
+    pub fn enable_fps(&mut self, font: &'s Font) {
         if self.fps_handler.is_none() {
             self.fps_handler = Some(FPSHandler::new(font))
         }
     }
 
-    pub fn deactivate_FPS(&mut self) {
+    pub fn disable_fps(&mut self) {
         if self.fps_handler.is_some() {
             self.fps_handler = None
         }

@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 extern crate rsfml;
 
 pub mod animation;
@@ -123,7 +121,7 @@ fn main() {
     let texture_loader = load_resources();
 
     let mut game_loop = GameLoop::new(render_window, &texture_loader, args.no_ground);
-    game_loop.activate_FPS(&font);
+    game_loop.enable_fps(&font);
     game_loop.run();
 }
 
