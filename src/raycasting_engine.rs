@@ -149,18 +149,23 @@ impl REngine {
 
     fn calculate_floor(&mut self, ray_dir: &Vector2f, side: i32) -> Vector2f {
         let mut floor = Vector2f { x: 0., y: 0. };
+        let map_pos = Vector2f::new(
+            self.draw_state.map_pos.x as f32,
+            self.draw_state.map_pos.y as f32,
+        );
+
         if side == 0 && ray_dir.x > 0. {
-            floor.x = self.draw_state.map_pos.x as f32;
-            floor.y = self.draw_state.map_pos.y as f32 + self.draw_state.wall_x;
+            floor.x = map_pos.x;
+            floor.y = map_pos.y + self.draw_state.wall_x;
         } else if side == 0 && ray_dir.x < 0. {
-            floor.x = self.draw_state.map_pos.x as f32 + 1.;
-            floor.y = self.draw_state.map_pos.y as f32 + self.draw_state.wall_x;
+            floor.x = map_pos.x + 1.;
+            floor.y = map_pos.y + self.draw_state.wall_x;
         } else if side == 1 && ray_dir.y > 0. {
-            floor.x = self.draw_state.map_pos.x as f32 + self.draw_state.wall_x;
-            floor.y = self.draw_state.map_pos.y as f32;
+            floor.x = map_pos.x + self.draw_state.wall_x;
+            floor.y = map_pos.y;
         } else {
-            floor.x = self.draw_state.map_pos.x as f32 + self.draw_state.wall_x;
-            floor.y = self.draw_state.map_pos.y as f32 + 1.;
+            floor.x = map_pos.x + self.draw_state.wall_x;
+            floor.y = map_pos.y + 1.;
         }
         floor
     }
