@@ -48,6 +48,9 @@ struct RustensteinOptions {
         default_value = "640 480"
     )]
     window_size: Vec<u16>,
+
+    #[structopt(short, long, help = "Shows the cursor")]
+    cursor: bool,
 }
 
 fn load_resources() -> TextureLoader {
@@ -99,42 +102,40 @@ fn load_resources() -> TextureLoader {
 }
 
 fn main() {
-    // Check if a custom width is set.
-
     let args = RustensteinOptions::from_args();
 
+    let (width, height) = (args.window_size[0], args.window_size[1]);
+
     // Create the render_window.
-    let settings = ContextSettings::default();
+    let mut render_window = create_render_window("Rustenstein 3D", (width as u32, height as u32));
 
-    let (width, height) = (args.window_size[0] as u32, args.window_size[1] as u32);
+    // Set render window parameters.
+    set_render_window_properties(&mut render_window, &args);
 
-    let video_mode = VideoMode::new(width, height, 32);
-    // let video_mode = VideoMode::new_init(512, 384, 32);
-    let mut render_window =
-        RenderWindow::new(video_mode, "Rustenstein 3D", Style::CLOSE, &settings);
+    let font = load_font("resources/sansation.ttf");
 
-    render_window.set_framerate_limit(args.fps.into());
-
-    // hide the cursor.
-    render_window.set_mouse_cursor_visible(false);
-
-    // set the mouse positon on the center of the window
-    render_window.set_mouse_position(Vector2i {
-        x: width as i32 / 2,
-        y: height as i32 / 2,
-    });
-
-    // Create the font for the FPS_handler.
-    let font_filename = "resources/sansation.ttf";
-    let font = Font::from_file(font_filename)
-        .unwrap_or_else(|| panic!("Loading font from {}", font_filename));
-
-    // Create the texture loader and load textures
     let texture_loader = load_resources();
 
-    // Create the game_loop and activate the fps handler.
     let mut game_loop = GameLoop::new(render_window, &texture_loader, args.no_ground);
     game_loop.activate_FPS(&font);
-
     game_loop.run();
+}
+
+fn load_font(font_filename: &str) -> rsfml::SfBox<Font> {
+    Font::from_file(font_filename).unwrap_or_else(|| panic!("Loading font from {}", font_filename))
+}
+
+fn set_render_window_properties(render_window: &mut RenderWindow, args: &RustensteinOptions) {
+    render_window.set_framerate_limit(args.fps.into());
+    render_window.set_mouse_cursor_visible(args.cursor);
+    render_window.set_mouse_position(Vector2i {
+        x: args.window_size[0] as i32 / 2,
+        y: args.window_size[1] as i32 / 2,
+    });
+}
+
+fn create_render_window(title: &str, window_size: (u32, u32)) -> RenderWindow {
+    let settings = ContextSettings::default();
+    let video_mode = VideoMode::new(window_size.0, window_size.1, 32);
+    RenderWindow::new(video_mode, title, Style::CLOSE, &settings)
 }
