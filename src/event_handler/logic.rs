@@ -10,6 +10,17 @@ impl EventHandler {
         Key::is_pressed(key)
     }
 
+    pub fn get_events(&self) -> Vec<Event> {
+        self.events.to_vec()
+    }
+
+    pub fn update_events(&mut self, render_window: &mut RenderWindow) {
+        self.events.clear();
+        while let Some(ev) = render_window.poll_event() {
+            self.events.push(ev);
+        }
+    }
+
     pub fn has_closed_event(&self) -> bool {
         self.events.iter().any(|e| e == &Event::Closed)
     }
@@ -99,17 +110,6 @@ impl EventHandler {
 
     pub fn has_mouse_left_event(&self) -> bool {
         self.events.iter().any(|e| e == &Event::MouseLeft)
-    }
-
-    pub fn get_events(&self) -> Vec<Event> {
-        self.events.to_vec()
-    }
-
-    pub fn update_events(&mut self, render_window: &mut RenderWindow) {
-        self.events.clear();
-        while let Some(ev) = render_window.poll_event() {
-            self.events.push(ev);
-        }
     }
 
     pub fn has_joystick_button_pressed(&self, joystick_button: u32) -> Option<(u32, u32)> {

@@ -18,9 +18,9 @@ impl From<Orientation> for Vector2i {
 }
 
 impl Map {
-    pub fn new(map: Vec<i32>, map_size: Vector2f) -> Map {
+    pub fn new(map: &[i32], map_size: Vector2f) -> Map {
         Map {
-            map,
+            map: map.to_vec(),
             map_size: Vector2i {
                 x: map_size.x as i32,
                 y: map_size.y as i32,
