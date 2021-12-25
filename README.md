@@ -21,4 +21,4 @@ Simple Wolfenstein3D engine in rust.
 
 ## Screenshot
 
-![rustenstein screenshot](resources/screen.png "Rustenstein3D screenshot")
+![rustenstein screenshot](screen.png "Rustenstein3D screenshot")
