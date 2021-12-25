@@ -1,16 +1,16 @@
 extern crate rsfml;
 
-pub mod animation;
-pub mod event_handler;
-pub mod fps;
+pub(crate) mod animation;
+pub(crate) mod event_handler;
+pub(crate) mod fps;
 pub mod game;
-pub mod game_mode;
-pub mod hud;
-pub mod map;
-pub mod mini_map;
-pub mod raycasting_engine;
-pub mod texture_loader;
-pub mod weapon;
+pub(crate) mod game_mode;
+pub(crate) mod hud;
+pub(crate) mod map;
+pub(crate) mod mini_map;
+pub(crate) mod raycasting_engine;
+pub(crate) mod texture_loader;
+pub(crate) mod weapon;
 
 use rsfml::{
     graphics::{Font, RenderWindow},
