@@ -46,12 +46,12 @@ impl Animation {
 
     pub fn set_state(&mut self, new_state: AnimationState) {
         self.state = new_state;
-        match new_state {
-            Stop => {
+        match self.state {
+            AnimationState::Stop => {
                 self.current_texture = 0;
                 self.clock.restart();
             }
-            Play => {
+            AnimationState::Play => {
                 if self.offset <= self.current_texture {
                     self.current_texture = self.a;
                     self.clock.restart();
@@ -66,11 +66,18 @@ impl Animation {
     }
 
     pub fn get_state(&self) -> AnimationState {
-        self.state
+        match self.state {
+            AnimationState::Play => AnimationState::Play,
+            AnimationState::Pause => AnimationState::Pause,
+            AnimationState::Stop => AnimationState::Stop,
+        }
     }
 
     pub fn get_mode(&self) -> AnimationMode {
-        self.mode
+        match self.mode {
+            AnimationMode::PlayOnce => AnimationMode::PlayOnce,
+            AnimationMode::PlayInfinite => AnimationMode::PlayInfinite,
+        }
     }
 
     pub fn set_lag(&mut self, new_lag: f32) {
@@ -91,13 +98,13 @@ impl Animation {
     }
 
     pub fn update(&mut self) {
-        match self.state {
-            Play => {
+        match &self.state {
+            AnimationState::Play => {
                 if self.clock.elapsed_time().as_seconds() >= self.lag {
                     if self.current_texture == self.texture_ids.len() as u32 - 1 {
                         self.current_texture = 0;
                         match self.mode {
-                            PlayOnce => self.state = AnimationState::Stop,
+                            AnimationMode::PlayOnce => self.state = AnimationState::Stop,
                             _ => {}
                         }
                     } else {

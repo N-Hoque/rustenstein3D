@@ -9,12 +9,12 @@ impl Clone for Map {
     fn clone(&self) -> Self {
         Self {
             map: self.map.clone(),
-            map_size: self.map_size.clone(),
+            map_size: self.map_size,
         }
     }
 }
 
-enum Orientation {
+pub enum Orientation {
     Top,
     Bottom,
     Left,
