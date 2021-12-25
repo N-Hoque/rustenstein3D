@@ -5,7 +5,7 @@ use rsfml::{
 };
 
 use crate::{
-    animation::{Animation, AnimationMode, AnimationState},
+    animation::{Animation, PlayMode, PlayState},
     event_handler::EventHandler,
     texture_loader::TextureLoader,
 };
@@ -52,29 +52,29 @@ impl<'s> Weapon<'s> {
         vec![
             Animation::new(
                 vec![12, 13, 14, 15, 16, 17],
-                AnimationState::Stop,
-                AnimationMode::PlayOnce,
+                PlayState::Stop,
+                PlayMode::Once,
                 0.07,
                 3,
             ),
             Animation::new(
                 vec![19, 20, 21, 22, 23, 24],
-                AnimationState::Stop,
-                AnimationMode::PlayOnce,
+                PlayState::Stop,
+                PlayMode::Once,
                 0.07,
                 3,
             ),
             Animation::new(
                 vec![26, 27, 28, 29, 30, 31],
-                AnimationState::Stop,
-                AnimationMode::PlayOnce,
+                PlayState::Stop,
+                PlayMode::Once,
                 0.07,
                 3,
             ),
             Animation::new(
                 vec![33, 34, 35, 36, 37, 38],
-                AnimationState::Stop,
-                AnimationMode::PlayOnce,
+                PlayState::Stop,
+                PlayMode::Once,
                 0.07,
                 3,
             ),
@@ -110,7 +110,7 @@ impl<'s> Weapon<'s> {
                 .has_mouse_button_pressed_event(Button::LEFT)
                 .is_some()
             {
-                animation.set_state(AnimationState::Play);
+                animation.set_state(PlayState::Play);
                 self.mouse_fire = true;
             }
         } else if event_handler
@@ -119,11 +119,11 @@ impl<'s> Weapon<'s> {
         {
             self.mouse_fire = false;
         } else {
-            animation.set_state(AnimationState::Play);
+            animation.set_state(PlayState::Play);
         }
 
         if event_handler.is_key_pressed(Key::E) {
-            animation.set_state(AnimationState::Play);
+            animation.set_state(PlayState::Play);
         }
         animation.update();
     }

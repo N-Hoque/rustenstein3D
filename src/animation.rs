@@ -1,114 +1,110 @@
 use rsfml::system::Clock;
 
-pub enum AnimationState {
+#[derive(Clone, Copy)]
+pub enum PlayState {
     Play,
     Pause,
     Stop,
 }
 
-pub enum AnimationMode {
-    PlayOnce,
-    PlayInfinite,
+#[derive(Clone, Copy)]
+pub enum PlayMode {
+    Once,
+    Infinite,
 }
 
-pub struct Animation {
+struct Data {
     a: u32,
     b: u32,
     offset: u32,
     texture_ids: Vec<i32>,
-    state: AnimationState,
-    mode: AnimationMode,
     lag: f32,
     current_texture: u32,
     clock: Clock,
 }
 
+pub struct Animation {
+    state: PlayState,
+    mode: PlayMode,
+    data: Data,
+}
+
 impl Animation {
     pub fn new(
         texture_ids: Vec<i32>,
-        state: AnimationState,
-        mode: AnimationMode,
+        state: PlayState,
+        mode: PlayMode,
         lag: f32,
         offset: u32,
     ) -> Animation {
-        Animation {
+        let data = Data {
             a: 1,
             b: texture_ids.len() as u32 - 1u32,
             offset,
             texture_ids,
-            state,
-            mode,
             lag,
             current_texture: 0,
             clock: Clock::start(),
-        }
+        };
+        Animation { state, mode, data }
     }
 
-    pub fn set_state(&mut self, new_state: AnimationState) {
+    pub fn set_state(&mut self, new_state: PlayState) {
         self.state = new_state;
         match self.state {
-            AnimationState::Stop => {
-                self.current_texture = 0;
-                self.clock.restart();
+            PlayState::Stop => {
+                self.data.current_texture = 0;
+                self.data.clock.restart();
             }
-            AnimationState::Play => {
-                if self.offset <= self.current_texture {
-                    self.current_texture = self.a;
-                    self.clock.restart();
-                }
+            PlayState::Play if self.data.offset <= self.data.current_texture => {
+                self.data.current_texture = self.data.a;
+                self.data.clock.restart();
             }
             _ => {}
         }
     }
 
-    pub fn set_mode(&mut self, new_mode: AnimationMode) {
+    pub fn set_mode(&mut self, new_mode: PlayMode) {
         self.mode = new_mode;
     }
 
-    pub fn get_state(&self) -> AnimationState {
-        match self.state {
-            AnimationState::Play => AnimationState::Play,
-            AnimationState::Pause => AnimationState::Pause,
-            AnimationState::Stop => AnimationState::Stop,
-        }
+    pub fn get_state(&self) -> PlayState {
+        self.state
     }
 
-    pub fn get_mode(&self) -> AnimationMode {
-        match self.mode {
-            AnimationMode::PlayOnce => AnimationMode::PlayOnce,
-            AnimationMode::PlayInfinite => AnimationMode::PlayInfinite,
-        }
+    pub fn get_mode(&self) -> PlayMode {
+        self.mode
     }
 
     pub fn set_lag(&mut self, new_lag: f32) {
-        self.lag = new_lag
+        self.data.lag = new_lag
     }
 
     pub fn get_current_texture_id(&self) -> i32 {
-        self.texture_ids[self.current_texture as usize]
+        self.data.texture_ids[self.data.current_texture as usize]
     }
 
     pub fn set_loop_anim(&mut self, a: u32, b: u32) {
-        self.a = a;
-        self.b = b;
+        self.data.a = a;
+        self.data.b = b;
     }
 
     pub fn set_need_anim_offset(&mut self, offset: u32) {
-        self.offset = offset
+        self.data.offset = offset
     }
 
     pub fn update(&mut self) {
-        if let AnimationState::Play = &self.state {
-            if self.clock.elapsed_time().as_seconds() >= self.lag {
-                if self.current_texture != self.texture_ids.len() as u32 - 1 {
-                    self.current_texture += 1;
+        if let PlayState::Play = self.state {
+            if self.data.clock.elapsed_time().as_seconds() >= self.data.lag {
+                if self.data.current_texture != self.data.texture_ids.len() as u32 - 1 {
+                    self.data.current_texture += 1;
                 } else {
-                    self.current_texture = 0;
-                    if let AnimationMode::PlayOnce = self.mode {
-                        self.state = AnimationState::Stop
+                    self.data.current_texture = 0;
+                    if let PlayMode::Once = self.mode {
+                        self.state = PlayState::Stop
                     }
                 }
-                self.clock.restart();
+                self.data.clock.restart();
             }
         }
     }
