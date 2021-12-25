@@ -119,10 +119,11 @@ fn main() {
     let settings = ContextSettings::default();
     let video_mode = VideoMode::new(width, height, 32);
     // let video_mode = VideoMode::new_init(512, 384, 32);
-    let mut render_window = RenderWindow::new(video_mode, "Rustenstein3D", Style::CLOSE, &settings);
+    let mut render_window =
+        RenderWindow::new(video_mode, "Rustenstein 3D", Style::CLOSE, &settings);
 
     // set the framerate limit to 30 fps.
-    render_window.set_framerate_limit(30);
+    render_window.set_framerate_limit(60);
 
     // hide the cursor.
     render_window.set_mouse_cursor_visible(false);

@@ -59,39 +59,34 @@ impl<'s> HUD<'s> {
 
     fn draw_line(
         &mut self,
-        x1: f32,
-        x2: f32,
-        y1: f32,
-        y2: f32,
+        l1: Vector2f,
+        l2: Vector2f,
         color: &Color,
         render_window: &mut RenderWindow,
     ) {
         self.hud_vertex_array.clear();
         self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x1, y1), *color));
+            .append(&Vertex::with_pos_color(l1, *color));
         self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x2, y2), *color));
+            .append(&Vertex::with_pos_color(l2, *color));
         render_window.draw(&self.hud_vertex_array);
     }
 
     fn draw_2line(
         &mut self,
-        x1: f32,
-        x2: f32,
-        x3: f32,
-        y1: f32,
-        y2: f32,
-        y3: f32,
+        l1: Vector2f,
+        l2: Vector2f,
+        l3: Vector2f,
         color: &Color,
         render_window: &mut RenderWindow,
     ) {
         self.hud_vertex_array.clear();
         self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x1, y1), *color));
+            .append(&Vertex::with_pos_color(l1, *color));
         self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x2, y2), *color));
+            .append(&Vertex::with_pos_color(l2, *color));
         self.hud_vertex_array
-            .append(&Vertex::with_pos_color(Vector2f::new(x3, y3), *color));
+            .append(&Vertex::with_pos_color(l3, *color));
         render_window.draw(&self.hud_vertex_array);
     }
 
@@ -100,58 +95,42 @@ impl<'s> HUD<'s> {
         let window_x = self.window_size.x;
         let window_y = self.window_size.y;
         self.draw_2line(
-            window_x - 9.,
-            window_x - 9.,
-            9.,
-            window_y - 70.,
-            window_y - 10.,
-            window_y - 10.,
+            Vector2f::new(window_x - 9., window_x - 9.),
+            Vector2f::new(9., window_y - 70.),
+            Vector2f::new(window_y - 10., window_y - 10.),
             &Color::rgba(255, 255, 255, 75),
             render_window,
         );
         self.draw_2line(
-            window_x - 11.,
-            window_x - 11.,
-            11.,
-            window_y - 70.,
-            window_y - 12.,
-            window_y - 12.,
+            Vector2f::new(window_x - 11., window_x - 11.),
+            Vector2f::new(11., window_y - 70.),
+            Vector2f::new(window_y - 12., window_y - 12.),
             &Color::BLACK,
             render_window,
         );
         self.draw_2line(
-            9.,
-            9.,
-            window_x - 9.,
-            window_y - 12.,
-            window_y - 71.,
-            window_y - 71.,
+            Vector2f::new(9., 9.),
+            Vector2f::new(window_x - 9., window_y - 12.),
+            Vector2f::new(window_y - 71., window_y - 71.),
             &Color::BLACK,
             render_window,
         );
         self.draw_2line(
-            11.,
-            11.,
-            window_x - 11.,
-            window_y - 11.,
-            window_y - 69.,
-            window_y - 69.,
+            Vector2f::new(11., 11.),
+            Vector2f::new(window_x - 11., window_y - 11.),
+            Vector2f::new(window_y - 69., window_y - 69.),
             &Color::rgba(255, 255, 255, 75),
             render_window,
         );
         self.draw_line(
-            window_x,
-            0.,
-            window_y - 80.,
-            window_y - 80.,
+            Vector2f::new(window_x, 0.),
+            Vector2f::new(window_y - 80., window_y - 80.),
             &Color::rgba(255, 255, 255, 50),
             render_window,
         );
         self.draw_line(
-            window_x,
-            0.,
-            window_y - 79.,
-            window_y - 79.,
+            Vector2f::new(window_x, 0.),
+            Vector2f::new(window_y - 79., window_y - 79.),
             &Color::rgba(255, 255, 255, 75),
             render_window,
         );

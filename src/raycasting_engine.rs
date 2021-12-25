@@ -1,11 +1,13 @@
-use rsfml::graphics::{
-    Color, PrimitiveType, RenderStates, RenderTarget, RenderWindow, Vertex, VertexArray,
+use rsfml::{
+    graphics::{
+        Color, PrimitiveType, RenderStates, RenderTarget, RenderWindow, Vertex, VertexArray,
+    },
+    system::{Vector2f, Vector2i},
+    window::Key,
 };
-use rsfml::system::{Vector2f, Vector2i};
 
 use event_handler::EventHandler;
 use map::Map;
-use rsfml::window::Key;
 use texture_loader::TextureLoader;
 
 pub struct REngine {
@@ -19,11 +21,23 @@ pub struct REngine {
     ground: Vec<VertexArray>,
     sky: Vec<VertexArray>,
     noground: bool,
+    draw_state: DrawState,
+}
+
+#[derive(Default)]
+struct DrawState {
+    step: Vector2i,
+    side_dist: Vector2f,
+    draw_start: i32,
+    draw_end: i32,
+    perp_wall_dist: f32,
+    wall_x: f32,
 }
 
 impl REngine {
     pub fn new(map: Map, window_size: &Vector2f, noground: bool) -> REngine {
         REngine {
+            draw_state: DrawState::default(),
             map,
             noground,
             player_position: Vector2f { x: 22., y: 12. },
@@ -35,8 +49,8 @@ impl REngine {
             },
             vertex_array: REngine::create_line_array(window_size),
             textures_id: Vec::new(),
-            ground: REngine::create_ground_array(window_size),
-            sky: REngine::create_ground_array(window_size),
+            ground: REngine::create_line_array(window_size),
+            sky: REngine::create_line_array(window_size),
         }
     }
 
@@ -48,16 +62,10 @@ impl REngine {
         };
         let mut ray_dir = Vector2f { x: 0., y: 0. };
         let mut map_pos = Vector2i { x: 0, y: 0 };
-        let mut side_dist = Vector2f { x: 0., y: 0. };
         let mut delta_dist = Vector2f { x: 0., y: 0. };
-        let mut step = Vector2i { x: 0, y: 0 };
-        let mut draw_start: i32 = 0;
-        let mut draw_end: i32 = 0;
         let mut camera_x: f32;
         let mut side: i32;
         let mut x: i32 = 0;
-        let mut perp_wall_dist: f32 = 0.;
-        let mut wall_x: f32 = 0.;
         while x < self.window_size.x as i32 {
             // initialize
             camera_x = 2. * x as f32 / self.window_size.x - 1.;
@@ -70,56 +78,16 @@ impl REngine {
             side = 0;
 
             // calculate
-            self.calculate_step(
-                &ray_dir,
-                &mut step,
-                &ray_pos,
-                &map_pos,
-                &delta_dist,
-                &mut side_dist,
-            );
+            self.calculate_step(&ray_dir, &ray_pos, &map_pos, &delta_dist);
 
-            self.hit_wall(
-                &mut map_pos,
-                &mut side_dist,
-                &mut step,
-                &mut delta_dist,
-                &mut side,
-            );
+            self.hit_wall(&mut map_pos, &mut delta_dist, &mut side);
 
-            self.calculate_wall_height(
-                side,
-                &mut draw_start,
-                &mut draw_end,
-                &map_pos,
-                &ray_pos,
-                &ray_dir,
-                &step,
-                &mut perp_wall_dist,
-            );
+            self.calculate_wall_height(side, &map_pos, &ray_pos, &ray_dir);
 
-            self.calculate_wall_texture(
-                side,
-                &ray_dir,
-                x,
-                &map_pos,
-                &step,
-                &ray_pos,
-                draw_end,
-                draw_start,
-                &mut wall_x,
-            );
+            self.calculate_wall_texture(side, &ray_dir, x, &map_pos, &ray_pos);
 
             if !self.noground {
-                self.calculate_ground(
-                    side,
-                    &map_pos,
-                    wall_x,
-                    &ray_dir,
-                    perp_wall_dist,
-                    &mut draw_end,
-                    x,
-                );
+                self.calculate_ground(side, &map_pos, &ray_dir, x);
             }
 
             x += 1;
@@ -127,48 +95,38 @@ impl REngine {
         self.update_events(event_handler);
     }
 
-    fn calculate_ground(
-        &mut self,
-        side: i32,
-        map_pos: &Vector2i,
-        wall_x: f32,
-        ray_dir: &Vector2f,
-        perp_wall_dist: f32,
-        draw_end: &mut i32,
-        x: i32,
-    ) {
+    fn calculate_ground(&mut self, side: i32, map_pos: &Vector2i, ray_dir: &Vector2f, x: i32) {
         let mut floor = Vector2f { x: 0., y: 0. };
         let dist_player: f32 = 0.;
         let mut current_dist: f32;
         let mut weight: f32;
         let mut current_floor = Vector2f { x: 0., y: 0. };
         let mut tex_coord = Vector2f { x: 0., y: 0. };
-        let mut pos = Vector2f { x: 0., y: 0. };
-        pos.x = x as f32;
+        let mut pos = Vector2f { x: x as f32, y: 0. };
         if side == 0 && ray_dir.x > 0. {
             floor.x = map_pos.x as f32;
-            floor.y = map_pos.y as f32 + wall_x;
+            floor.y = map_pos.y as f32 + self.draw_state.wall_x;
         } else if side == 0 && ray_dir.x < 0. {
             floor.x = map_pos.x as f32 + 1.;
-            floor.y = map_pos.y as f32 + wall_x;
+            floor.y = map_pos.y as f32 + self.draw_state.wall_x;
         } else if side == 1 && ray_dir.y > 0. {
-            floor.x = map_pos.x as f32 + wall_x;
+            floor.x = map_pos.x as f32 + self.draw_state.wall_x;
             floor.y = map_pos.y as f32;
         } else {
-            floor.x = map_pos.x as f32 + wall_x;
+            floor.x = map_pos.x as f32 + self.draw_state.wall_x;
             floor.y = map_pos.y as f32 + 1.;
         }
 
-        if *draw_end < 0 {
-            *draw_end = self.window_size.y as i32;
+        if self.draw_state.draw_end < 0 {
+            self.draw_state.draw_end = self.window_size.y as i32;
         }
-        let mut y: i32 = *draw_end + 1;
+        let mut y: i32 = self.draw_state.draw_end + 1;
         self.ground.get_mut(x as usize).unwrap().clear();
         self.sky.get_mut(x as usize).unwrap().clear();
         let mut vertex = Vertex::default();
         while y < self.window_size.y as i32 {
             current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
-            weight = (current_dist - dist_player) / (perp_wall_dist - dist_player);
+            weight = (current_dist - dist_player) / (self.draw_state.perp_wall_dist - dist_player);
             current_floor.x = weight * floor.x + (1. - weight) * self.player_position.x;
             current_floor.y = weight * floor.y + (1. - weight) * self.player_position.y;
 
@@ -195,33 +153,28 @@ impl REngine {
     fn calculate_wall_height(
         &mut self,
         side: i32,
-        draw_start: &mut i32,
-        draw_end: &mut i32,
         map_pos: &Vector2i,
         ray_pos: &Vector2f,
         ray_dir: &Vector2f,
-        step: &Vector2i,
-        perp_wall_dist: &mut f32,
     ) {
-        if side == 0 {
-            *perp_wall_dist =
-                ((map_pos.x as f32 - ray_pos.x + (1 - step.x) as f32 / 2.) / ray_dir.x).abs();
+        self.draw_state.perp_wall_dist = if side == 0 {
+            (map_pos.x as f32 - ray_pos.x + (1 - self.draw_state.step.x) as f32 / 2.) / ray_dir.x
         } else {
-            *perp_wall_dist =
-                ((map_pos.y as f32 - ray_pos.y + (1 - step.y) as f32 / 2.) / ray_dir.y).abs();
+            (map_pos.y as f32 - ray_pos.y + (1 - self.draw_state.step.y) as f32 / 2.) / ray_dir.y
         }
-        let line_height: i32 = if *perp_wall_dist as i32 == 0 {
+        .abs();
+        let line_height: i32 = if self.draw_state.perp_wall_dist as i32 == 0 {
             self.window_size.y as i32
         } else {
-            ((self.window_size.y / *perp_wall_dist) as i32).abs()
+            ((self.window_size.y / self.draw_state.perp_wall_dist) as i32).abs()
         };
-        *draw_start = (self.window_size.y as i32 / 2) - (line_height / 2);
-        if *draw_start < 0 {
-            *draw_start = 0;
+        self.draw_state.draw_start = (self.window_size.y as i32 / 2) - (line_height / 2);
+        if self.draw_state.draw_start < 0 {
+            self.draw_state.draw_start = 0;
         }
-        *draw_end = line_height / 2 + self.window_size.y as i32 / 2;
-        if *draw_end > self.window_size.y as i32 {
-            *draw_end = self.window_size.y as i32 - 1;
+        self.draw_state.draw_end = line_height / 2 + self.window_size.y as i32 / 2;
+        if self.draw_state.draw_end > self.window_size.y as i32 {
+            self.draw_state.draw_end = self.window_size.y as i32 - 1;
         }
     }
 
@@ -231,29 +184,27 @@ impl REngine {
         ray_dir: &Vector2f,
         x: i32,
         map_pos: &Vector2i,
-        step: &Vector2i,
         ray_pos: &Vector2f,
-        draw_end: i32,
-        draw_start: i32,
-        wall_x: &mut f32,
     ) {
         let mut texture_id = self
             .map
             .get_block(map_pos)
-            .expect("Error on raycasting_engine line 87.");
+            .unwrap_or_else(|| panic!("Failed to get block at map position {:?}", map_pos));
 
-        if side == 1 {
-            *wall_x = ray_pos.x
-                + ((map_pos.y as f32 - ray_pos.y + (1. - step.y as f32) / 2.) / ray_dir.y)
-                    * ray_dir.x;
+        self.draw_state.wall_x = if side == 1 {
+            ray_pos.x
+                + ((map_pos.y as f32 - ray_pos.y + (1. - self.draw_state.step.y as f32) / 2.)
+                    / ray_dir.y)
+                    * ray_dir.x
         } else {
-            *wall_x = ray_pos.y
-                + ((map_pos.x as f32 - ray_pos.x + (1. - step.x as f32) / 2.) / ray_dir.x)
-                    * ray_dir.y;
-        }
-        *wall_x -= wall_x.floor();
+            ray_pos.y
+                + ((map_pos.x as f32 - ray_pos.x + (1. - self.draw_state.step.x as f32) / 2.)
+                    / ray_dir.x)
+                    * ray_dir.y
+        };
+        self.draw_state.wall_x -= self.draw_state.wall_x.floor();
 
-        let mut texture_x = (*wall_x * 128.) as i32;
+        let mut texture_x = (self.draw_state.wall_x * 128.) as i32;
         if side == 0 && ray_dir.x > 0. {
             texture_x = 128 - texture_x - 1;
         }
@@ -271,7 +222,7 @@ impl REngine {
             .get_mut(x as usize)
             .unwrap()
             .append(&Vertex::new(
-                Vector2f::new(x as f32, draw_end as f32),
+                Vector2f::new(x as f32, self.draw_state.draw_end as f32),
                 Color::WHITE,
                 Vector2f::new(texture_x as f32, 128.),
             ));
@@ -279,54 +230,45 @@ impl REngine {
             .get_mut(x as usize)
             .unwrap()
             .append(&Vertex::new(
-                Vector2f::new(x as f32, draw_start as f32),
+                Vector2f::new(x as f32, self.draw_state.draw_start as f32),
                 Color::WHITE,
                 Vector2f::new(texture_x as f32, 0.),
             ));
     }
 
     fn calculate_step(
-        &self,
+        &mut self,
         ray_dir: &Vector2f,
-        step: &mut Vector2i,
         ray_pos: &Vector2f,
         map_pos: &Vector2i,
         delta_dist: &Vector2f,
-        side_dist: &mut Vector2f,
     ) {
         if ray_dir.x < 0. {
-            step.x = -1;
-            side_dist.x = (ray_pos.x - map_pos.x as f32) * delta_dist.x;
+            self.draw_state.step.x = -1;
+            self.draw_state.side_dist.x = (ray_pos.x - map_pos.x as f32) * delta_dist.x;
         } else {
-            step.x = 1;
-            side_dist.x = (map_pos.x as f32 + 1. - ray_pos.x) * delta_dist.x;
+            self.draw_state.step.x = 1;
+            self.draw_state.side_dist.x = (map_pos.x as f32 + 1. - ray_pos.x) * delta_dist.x;
         }
         if ray_dir.y < 0. {
-            step.y = -1;
-            side_dist.y = (ray_pos.y - map_pos.y as f32) * delta_dist.y;
+            self.draw_state.step.y = -1;
+            self.draw_state.side_dist.y = (ray_pos.y - map_pos.y as f32) * delta_dist.y;
         } else {
-            step.y = 1;
-            side_dist.y = (map_pos.y as f32 + 1. - ray_pos.y) * delta_dist.y;
+            self.draw_state.step.y = 1;
+            self.draw_state.side_dist.y = (map_pos.y as f32 + 1. - ray_pos.y) * delta_dist.y;
         }
     }
 
-    fn hit_wall(
-        &self,
-        map_pos: &mut Vector2i,
-        side_dist: &mut Vector2f,
-        step: &mut Vector2i,
-        delta_dist: &mut Vector2f,
-        side: &mut i32,
-    ) {
+    fn hit_wall(&mut self, map_pos: &mut Vector2i, delta_dist: &mut Vector2f, side: &mut i32) {
         let mut hit: bool = false;
         while !hit {
-            if side_dist.x < side_dist.y {
-                side_dist.x += delta_dist.x;
-                map_pos.x += step.x;
+            if self.draw_state.side_dist.x < self.draw_state.side_dist.y {
+                self.draw_state.side_dist.x += delta_dist.x;
+                map_pos.x += self.draw_state.step.x;
                 *side = 0;
             } else {
-                side_dist.y += delta_dist.y;
-                map_pos.y += step.y;
+                self.draw_state.side_dist.y += delta_dist.y;
+                map_pos.y += self.draw_state.step.y;
                 *side = 1;
             }
             hit = match self.map.get_block(map_pos) {
@@ -344,7 +286,7 @@ impl REngine {
             if self
                 .map
                 .get_block(&pos)
-                .expect("Error on getting block (raycasting_engine.rs line 265)")
+                .unwrap_or_else(|| panic!("Error on getting block at position {:?}", pos))
                 == 0
             {
                 self.player_position.x += self.vector_direction.x * 0.1;
@@ -354,7 +296,7 @@ impl REngine {
             if self
                 .map
                 .get_block(&pos)
-                .expect("Error on getting block (raycasting_engine.rs line 268)")
+                .unwrap_or_else(|| panic!("Error on getting block at position {:?}", pos))
                 == 0
             {
                 self.player_position.y += self.vector_direction.y * 0.1;
@@ -366,7 +308,7 @@ impl REngine {
             if self
                 .map
                 .get_block(&pos)
-                .expect("Error on getting block (raycasting_engine.rs line 276)")
+                .unwrap_or_else(|| panic!("Error on getting block at position {:?}", pos))
                 == 0
             {
                 self.player_position.x -= self.vector_direction.x * 0.1;
@@ -376,7 +318,7 @@ impl REngine {
             if self
                 .map
                 .get_block(&pos)
-                .expect("Error on getting block (raycasting_engine.rs line 281)")
+                .unwrap_or_else(|| panic!("Error on getting block at position {:?}", pos))
                 == 0
             {
                 self.player_position.y -= self.vector_direction.y * 0.1;
@@ -401,21 +343,10 @@ impl REngine {
     }
 
     fn create_line_array(window_size: &Vector2f) -> Vec<VertexArray> {
-        let mut lines = Vec::new();
-        for _ in 0..window_size.x as i32 {
-            let line = VertexArray::new(PrimitiveType::LINES, 2);
-            lines.push(line);
-        }
-        lines
-    }
-
-    fn create_ground_array(window_size: &Vector2f) -> Vec<VertexArray> {
-        let mut lines = Vec::new();
-        for _ in 0..window_size.x as i32 {
-            let line = VertexArray::new(PrimitiveType::LINES, 2);
-            lines.push(line);
-        }
-        lines
+        (0..window_size.x as i32)
+            .into_iter()
+            .map(|_x| VertexArray::new(PrimitiveType::LINES, 2))
+            .collect()
     }
 
     pub fn get_player_pos(&self) -> Vector2f {

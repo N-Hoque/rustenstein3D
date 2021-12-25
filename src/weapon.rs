@@ -94,50 +94,42 @@ impl<'s> Weapon<'s> {
             self.current_weapon = 3
         };
 
+        let animation = self
+            .animations
+            .get_mut(self.current_weapon as usize)
+            .unwrap();
+
         if !self.mouse_fire {
             if event_handler
                 .has_mouse_button_pressed_event(Button::LEFT)
                 .is_some()
             {
-                self.animations
-                    .get_mut(self.current_weapon as usize)
-                    .unwrap()
-                    .set_state(AnimationState::Play);
+                animation.set_state(AnimationState::Play);
                 self.mouse_fire = true
             };
         } else {
             match event_handler.has_mouse_button_released_event(Button::LEFT) {
                 Some(_) => self.mouse_fire = false,
-                None => self
-                    .animations
-                    .get_mut(self.current_weapon as usize)
-                    .unwrap()
-                    .set_state(AnimationState::Play),
+                None => animation.set_state(AnimationState::Play),
             };
         }
 
         if event_handler.is_key_pressed(Key::E) {
-            self.animations
-                .get_mut(self.current_weapon as usize)
-                .unwrap()
-                .set_state(AnimationState::Play);
+            animation.set_state(AnimationState::Play);
         }
-        self.animations
-            .get_mut(self.current_weapon as usize)
-            .unwrap()
-            .update();
+        animation.update();
     }
 
     pub fn draw(&mut self, render_window: &mut RenderWindow) {
+        let current_weapon = self.current_weapon as usize;
         self.weapons.set_texture(
-            self.texture_loader.get_texture(
-                self.animations[self.current_weapon as usize].get_current_texture_id(),
-            ),
+            self.texture_loader
+                .get_texture(self.animations[current_weapon].get_current_texture_id()),
             false,
         );
         self.shadows.set_texture(
             self.texture_loader
-                .get_texture(self.shadows_id[self.current_weapon as usize]),
+                .get_texture(self.shadows_id[current_weapon]),
             false,
         );
         render_window.draw(&self.weapons);
