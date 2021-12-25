@@ -32,24 +32,24 @@ impl REngine {
 
     pub fn update(&mut self, event_handler: &EventHandler) {
         self.textures_id.clear();
-        let ray_pos = Vector2f {
-            x: self.player_position.x,
-            y: self.player_position.y,
-        };
-        let mut ray_dir = Vector2f { x: 0., y: 0. };
-        let mut delta_dist = Vector2f { x: 0., y: 0. };
-        let mut camera_x: f32;
-        let mut side: i32;
-        for x in 0..self.window_size.x as i32 {
+        for width_pixel in 0..self.window_size.x as i32 {
             // initialize
-            camera_x = 2. * x as f32 / self.window_size.x - 1.;
-            ray_dir.x = self.vector_direction.x + self.cam_plane.x * camera_x;
-            ray_dir.y = self.vector_direction.y + self.cam_plane.y * camera_x;
+            let camera_x = 2. * width_pixel as f32 / self.window_size.x - 1.;
+            let ray_pos = self.player_position;
+            let ray_dir = Vector2f::new(
+                self.vector_direction.x + self.cam_plane.x * camera_x,
+                self.vector_direction.y + self.cam_plane.y * camera_x,
+            );
+
             self.draw_state.map_pos.x = ray_pos.x as i32;
             self.draw_state.map_pos.y = ray_pos.y as i32;
-            delta_dist.x = (1. + (ray_dir.y * ray_dir.y) / (ray_dir.x * ray_dir.x)).sqrt();
-            delta_dist.y = (1. + (ray_dir.x * ray_dir.x) / (ray_dir.y * ray_dir.y)).sqrt();
-            side = 0;
+
+            let mut delta_dist = Vector2f::new(
+                (1. + (ray_dir.y * ray_dir.y) / (ray_dir.x * ray_dir.x)).sqrt(),
+                (1. + (ray_dir.x * ray_dir.x) / (ray_dir.y * ray_dir.y)).sqrt(),
+            );
+
+            let mut side = 0;
 
             // calculate
             self.calculate_step(ray_pos, ray_dir, delta_dist);
@@ -58,28 +58,28 @@ impl REngine {
 
             self.calculate_wall_height(ray_pos, ray_dir, side);
 
-            self.calculate_wall_texture(ray_pos, ray_dir, side, x);
+            self.calculate_wall_texture(ray_pos, ray_dir, side, width_pixel);
 
             if !self.no_ground {
-                self.calculate_ground(ray_dir, side, x);
+                self.calculate_ground(ray_dir, side, width_pixel);
             }
         }
         self.update_events(event_handler);
     }
 
-    fn calculate_ground(&mut self, ray_dir: Vector2f, side: i32, x: i32) {
+    fn calculate_ground(&mut self, ray_dir: Vector2f, side: i32, width_pixel: i32) {
         if self.draw_state.draw_end < 0 {
             self.draw_state.draw_end = self.window_size.y as i32;
         }
 
         self.ground
-            .get_mut(x as usize)
-            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+            .get_mut(width_pixel as usize)
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
             .clear();
 
         self.sky
-            .get_mut(x as usize)
-            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+            .get_mut(width_pixel as usize)
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
             .clear();
 
         const DIST_PLAYER: f32 = 0.;
@@ -88,7 +88,10 @@ impl REngine {
         let mut weight: f32;
         let mut current_floor = Vector2f { x: 0., y: 0. };
         let mut tex_coord = Vector2f { x: 0., y: 0. };
-        let mut pos = Vector2f { x: x as f32, y: 0. };
+        let mut pos = Vector2f {
+            x: width_pixel as f32,
+            y: 0.,
+        };
 
         let floor = self.calculate_floor(ray_dir, side);
 
@@ -106,8 +109,8 @@ impl REngine {
             let vertex = Vertex::new(pos, Color::WHITE, tex_coord);
 
             self.ground
-                .get_mut(x as usize)
-                .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+                .get_mut(width_pixel as usize)
+                .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
                 .append(&vertex);
 
             pos.y = self.window_size.y - y as f32;
@@ -115,8 +118,8 @@ impl REngine {
             let vertex = Vertex::new(pos, Color::WHITE, tex_coord);
 
             self.sky
-                .get_mut(x as usize)
-                .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+                .get_mut(width_pixel as usize)
+                .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
                 .append(&vertex);
         }
     }
@@ -173,7 +176,13 @@ impl REngine {
         }
     }
 
-    fn calculate_wall_texture(&mut self, ray_pos: Vector2f, ray_dir: Vector2f, side: i32, x: i32) {
+    fn calculate_wall_texture(
+        &mut self,
+        ray_pos: Vector2f,
+        ray_dir: Vector2f,
+        side: i32,
+        width_pixel: i32,
+    ) {
         self.draw_state.wall_x = if side == 1 {
             ray_pos.x
                 + ((self.draw_state.map_pos.y as f32 - ray_pos.y
@@ -213,22 +222,22 @@ impl REngine {
 
         self.textures_id.push(texture_id);
         self.vertex_array
-            .get_mut(x as usize)
-            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+            .get_mut(width_pixel as usize)
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
             .clear();
         self.vertex_array
-            .get_mut(x as usize)
-            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+            .get_mut(width_pixel as usize)
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
             .append(&Vertex::new(
-                Vector2f::new(x as f32, self.draw_state.draw_end as f32),
+                Vector2f::new(width_pixel as f32, self.draw_state.draw_end as f32),
                 Color::WHITE,
                 Vector2f::new(texture_x as f32, 128.),
             ));
         self.vertex_array
-            .get_mut(x as usize)
-            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+            .get_mut(width_pixel as usize)
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
             .append(&Vertex::new(
-                Vector2f::new(x as f32, self.draw_state.draw_start as f32),
+                Vector2f::new(width_pixel as f32, self.draw_state.draw_start as f32),
                 Color::WHITE,
                 Vector2f::new(texture_x as f32, 0.),
             ));
