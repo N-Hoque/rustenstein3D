@@ -271,9 +271,10 @@ impl REngine {
                 map_pos.y += self.draw_state.step.y;
                 *side = 1;
             }
-            hit = match self.map.get_block(map_pos) {
-                Some(block) => block != 0,
-                None => true,
+            hit = if let Some(0) = self.map.get_block(map_pos) {
+                false
+            } else {
+                true
             };
         }
     }
@@ -289,6 +290,7 @@ impl REngine {
         } else {
             0.
         } / -250.;
+
         let old_dir_x = self.vector_direction.x;
         self.vector_direction.x = self.vector_direction.x * (mouse_move).cos()
             - self.vector_direction.y * (mouse_move).sin();
@@ -342,6 +344,7 @@ impl REngine {
 
     pub fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
         let mut render_states = RenderStates::default();
+
         for (idx, line) in self.vertex_array.iter().enumerate() {
             render_states.set_texture(Some(
                 texture_loader.get_texture(self.textures_id[idx as usize]),
