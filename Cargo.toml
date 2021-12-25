@@ -6,9 +6,6 @@ authors = [
   "Naimul Hoque <Naimul.Hoque@outlook.com>",
 ]
 
-[[bin]]
-name = "rustenstein3D"
-
 [dependencies]
 rsfml = { version = "0.16.0", package = "sfml" }
 native = "0.1.0"

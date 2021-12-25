@@ -30,16 +30,13 @@ impl MiniMap {
             map,
             active: true,
             mini_map_view,
-            player_pos: Vector2f { x: 0., y: 0. },
+            player_pos: Vector2f::default(),
             rotation: 0.,
         }
     }
 
     pub fn set_active(&mut self) -> bool {
-        self.active = match self.active {
-            true => false,
-            false => true,
-        };
+        self.active = !self.active;
         self.active
     }
 
@@ -59,19 +56,17 @@ impl MiniMap {
     }
 
     pub fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
-        let mini_map_view = self.mini_map_view.clone();
         let def_view_centre = render_window.default_view().center();
         let def_view_size = render_window.default_view().size();
         let def_view = View::new(def_view_centre, def_view_size);
-        let mut block: i32;
-        let map_size = self.map.get_map_size();
-        let mut pos: Vector2i = Vector2i::new(0, 0);
         let mut rect = RectangleShape::with_size(Vector2f::new(80., 80.));
         rect.set_fill_color(Color::rgba(255, 255, 255, 175));
-        render_window.set_view(&mini_map_view);
+        render_window.set_view(&self.mini_map_view);
+        let mut pos = Vector2i::new(0, 0);
+        let map_size = self.map.get_map_size();
         while pos.x < map_size.x {
             while pos.y < map_size.y {
-                block = self
+                let block = self
                     .map
                     .get_block(&pos)
                     .expect("Cannot get block in minimap.");

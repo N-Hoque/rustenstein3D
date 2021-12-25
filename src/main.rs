@@ -1,5 +1,4 @@
 #![allow(non_snake_case)]
-#![crate_type = "bin"]
 
 extern crate native;
 extern crate rsfml;
