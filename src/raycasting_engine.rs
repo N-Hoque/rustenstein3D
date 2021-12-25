@@ -20,7 +20,7 @@ pub struct REngine {
     textures_id: Vec<i32>,
     ground: Vec<VertexArray>,
     sky: Vec<VertexArray>,
-    noground: bool,
+    no_ground: bool,
     draw_state: DrawState,
 }
 
@@ -39,7 +39,7 @@ impl REngine {
         REngine {
             draw_state: DrawState::default(),
             map,
-            noground,
+            no_ground: noground,
             player_position: Vector2f { x: 22., y: 12. },
             vector_direction: Vector2f { x: -1., y: 0. },
             cam_plane: Vector2f { x: 0., y: 0.66 },
@@ -86,7 +86,7 @@ impl REngine {
 
             self.calculate_wall_texture(side, &ray_dir, x, &map_pos, &ray_pos);
 
-            if !self.noground {
+            if !self.no_ground {
                 self.calculate_ground(side, &map_pos, &ray_dir, x);
             }
 

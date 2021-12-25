@@ -17,139 +17,129 @@ impl EventHandler {
     }
 
     pub fn has_closed_event(&self) -> bool {
-        for ev in self.events.iter() {
-            if *ev == Event::Closed {
-                return true;
-            }
-        }
-        false
+        self.events.iter().any(|e| e == &Event::Closed)
     }
 
     pub fn has_gained_focus_event(&self) -> bool {
-        for ev in self.events.iter() {
-            if *ev == Event::GainedFocus {
-                return true;
-            }
-        }
-        false
+        self.events.iter().any(|e| e == &Event::GainedFocus)
     }
 
     pub fn has_lost_focus_event(&self) -> bool {
-        for ev in self.events.iter() {
-            if *ev == Event::LostFocus {
-                return true;
-            }
-        }
-        false
+        self.events.iter().any(|e| e == &Event::LostFocus)
     }
 
     pub fn has_text_entered(&self) -> Option<char> {
-        for ev in self.events.iter() {
-            if let Event::TextEntered { unicode } = *ev {
-                return Some(unicode);
+        self.events.iter().find_map(|e| {
+            if let Event::TextEntered { unicode } = *e {
+                Some(unicode)
+            } else {
+                None
             }
-        }
-        None
+        })
     }
 
     pub fn has_key_pressed_event(&self, key: Key) -> Option<(Key, bool, bool, bool, bool)> {
-        for ev in self.events.iter() {
+        self.events.iter().find_map(|e| {
             if let Event::KeyPressed {
                 code,
                 alt,
                 ctrl,
                 shift,
                 system,
-            } = *ev
+            } = *e
             {
                 if code == key {
-                    return Some((code, alt, ctrl, shift, system));
+                    Some((code, alt, ctrl, shift, system))
+                } else {
+                    None
                 }
+            } else {
+                None
             }
-        }
-        None
+        })
     }
 
     pub fn has_key_released_event(&self, key: Key) -> Option<(Key, bool, bool, bool, bool)> {
-        for ev in self.events.iter() {
+        self.events.iter().find_map(|e| {
             if let Event::KeyReleased {
                 code,
                 alt,
                 ctrl,
                 shift,
                 system,
-            } = *ev
+            } = *e
             {
                 if code == key {
-                    return Some((code, alt, ctrl, shift, system));
+                    Some((code, alt, ctrl, shift, system))
+                } else {
+                    None
                 }
+            } else {
+                None
             }
-        }
-        None
+        })
     }
 
     pub fn has_mouse_wheel_moved_event(&self) -> Option<(f32, i32, i32)> {
-        for ev in self.events.iter() {
-            if let Event::MouseWheelScrolled { delta, x, y, .. } = *ev {
-                return Some((delta, x, y));
+        self.events.iter().find_map(|e| {
+            if let Event::MouseWheelScrolled { delta, x, y, .. } = *e {
+                Some((delta, x, y))
+            } else {
+                None
             }
-        }
-        None
+        })
     }
 
     pub fn has_mouse_button_pressed_event(
         &self,
         mouse_button: Button,
     ) -> Option<(Button, i32, i32)> {
-        for ev in self.events.iter() {
-            if let Event::MouseButtonPressed { button, x, y } = *ev {
+        self.events.iter().find_map(|e| {
+            if let Event::MouseButtonPressed { button, x, y } = *e {
                 if mouse_button == button {
-                    return Some((button, x, y));
+                    Some((button, x, y))
+                } else {
+                    None
                 }
+            } else {
+                None
             }
-        }
-        None
+        })
     }
 
     pub fn has_mouse_button_released_event(
         &self,
         mouse_button: Button,
     ) -> Option<(Button, i32, i32)> {
-        for ev in self.events.iter() {
-            if let Event::MouseButtonReleased { button, x, y } = *ev {
+        self.events.iter().find_map(|e| {
+            if let Event::MouseButtonReleased { button, x, y } = *e {
                 if mouse_button == button {
-                    return Some((button, x, y));
+                    Some((button, x, y))
+                } else {
+                    None
                 }
+            } else {
+                None
             }
-        }
-        None
+        })
     }
 
     pub fn has_mouse_moved_event(&self) -> Option<(i32, i32)> {
-        for ev in self.events.iter() {
-            if let Event::MouseMoved { x, y } = *ev {
-                return Some((x, y));
+        self.events.iter().find_map(|e| {
+            if let Event::MouseMoved { x, y } = *e {
+                Some((x, y))
+            } else {
+                None
             }
-        }
-        None
+        })
     }
 
     pub fn has_mouse_entered_event(&self) -> bool {
-        for ev in self.events.iter() {
-            if let Event::MouseEntered = *ev {
-                return true;
-            }
-        }
-        false
+        self.events.iter().any(|e| e == &Event::MouseEntered)
     }
 
     pub fn has_mouse_left_event(&self) -> bool {
-        for ev in self.events.iter() {
-            if *ev == Event::MouseLeft {
-                return true;
-            }
-        }
-        false
+        self.events.iter().any(|e| e == &Event::MouseLeft)
     }
 
     // pub fn get_mouse_position(&self) -> Vector2i {

@@ -46,7 +46,7 @@ impl<'s> Weapon<'s> {
     }
 
     fn initialize_animation() -> Vec<Animation> {
-        let animations = vec![
+        vec![
             Animation::new(
                 vec![12, 13, 14, 15, 16, 17],
                 AnimationState::Stop,
@@ -75,12 +75,10 @@ impl<'s> Weapon<'s> {
                 0.07,
                 3,
             ),
-        ];
-
-        animations
+        ]
     }
 
-    pub fn update<'r>(&'r mut self, event_handler: &'r EventHandler) {
+    pub fn update(&mut self, event_handler: &EventHandler) {
         if event_handler.has_key_pressed_event(Key::NUM1).is_some() {
             self.current_weapon = 0
         };
@@ -107,11 +105,13 @@ impl<'s> Weapon<'s> {
                 animation.set_state(AnimationState::Play);
                 self.mouse_fire = true
             };
+        } else if event_handler
+            .has_mouse_button_released_event(Button::LEFT)
+            .is_some()
+        {
+            self.mouse_fire = false
         } else {
-            match event_handler.has_mouse_button_released_event(Button::LEFT) {
-                Some(_) => self.mouse_fire = false,
-                None => animation.set_state(AnimationState::Play),
-            };
+            animation.set_state(AnimationState::Play)
         }
 
         if event_handler.is_key_pressed(Key::E) {

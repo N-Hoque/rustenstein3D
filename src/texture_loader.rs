@@ -11,13 +11,25 @@ impl TextureLoader {
         }
     }
 
-    pub fn load_texture(&mut self, texture_path: &str) -> bool {
-        match Texture::from_file(texture_path) {
-            Some(tex) => {
-                self.textures.push(tex);
-                true
-            }
-            None => false,
+    pub fn with_textures(texture_paths: &[&str]) -> Self {
+        let textures = texture_paths
+            .iter()
+            .map(|t| Texture::from_file(t).unwrap_or_else(|| panic!("Loading texture from {}", t)))
+            .collect();
+        Self { textures }
+    }
+
+    pub fn load_textures(&mut self, texture_paths: &[&str]) {
+        for texture_path in texture_paths {
+            self.load_texture(texture_path);
+        }
+    }
+
+    pub fn load_texture(&mut self, texture_path: &str) {
+        if let Some(tex) = Texture::from_file(texture_path) {
+            self.textures.push(tex);
+        } else {
+            panic!("Cannot load texture at: {}", texture_path);
         }
     }
 
