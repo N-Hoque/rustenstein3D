@@ -1,11 +1,12 @@
-use rsfml::graphics::{RectangleShape, RenderTarget, RenderWindow, Shape, Transformable};
-use rsfml::system::Vector2f;
+use rsfml::{
+    graphics::{RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
+    system::Vector2f,
+    window::{mouse::Button, Key},
+};
 
-use animation::*;
-use event_handler::EventHandler;
-use rsfml::window::mouse::Button;
-use rsfml::window::Key;
-use texture_loader::TextureLoader;
+use crate::animation::*;
+use crate::event_handler::EventHandler;
+use crate::texture_loader::TextureLoader;
 
 pub struct Weapon<'s> {
     weapons: RectangleShape<'s>,

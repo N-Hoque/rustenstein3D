@@ -1,6 +1,7 @@
 [package]
 name = "rustenstein3D"
 version = "0.1.0"
+edition = "2021"
 authors = [
   "Jeremy Letang <letang.jeremy@gmail.com>",
   "Naimul Hoque <Naimul.Hoque@outlook.com>",

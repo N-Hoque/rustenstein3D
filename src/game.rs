@@ -1,9 +1,9 @@
 #![allow(non_snake_case)]
 
-use event_handler::*;
-use game_mode::*;
-use texture_loader::TextureLoader;
-use FPS::*;
+use crate::event_handler::*;
+use crate::game_mode::*;
+use crate::texture_loader::TextureLoader;
+use crate::FPS::*;
 
 use rsfml::{
     graphics::{Color, Font, RenderTarget, RenderWindow},

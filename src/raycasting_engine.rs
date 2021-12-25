@@ -6,9 +6,9 @@ use rsfml::{
     window::Key,
 };
 
-use event_handler::EventHandler;
-use map::Map;
-use texture_loader::TextureLoader;
+use crate::event_handler::EventHandler;
+use crate::map::Map;
+use crate::texture_loader::TextureLoader;
 
 pub struct REngine {
     player_position: Vector2f,
