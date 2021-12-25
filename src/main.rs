@@ -45,7 +45,6 @@ struct RustensteinOptions {
         help = "Set the size of the window",
         number_of_values = 2,
         value_names = &["width", "height"],
-        default_value = "640 480"
     )]
     window_size: Vec<u16>,
 
@@ -102,14 +101,21 @@ fn load_resources() -> TextureLoader {
 }
 
 fn main() {
-    let args = RustensteinOptions::from_args();
+    let mut args = RustensteinOptions::from_args();
 
-    let (width, height) = (args.window_size[0], args.window_size[1]);
+    if args.window_size.is_empty() {
+        args.window_size = vec![640, 480];
+    } else if args.window_size[0] == 0 {
+        args.window_size[0] = 640;
+    } else if args.window_size[1] == 0 {
+        args.window_size[1] = 480;
+    }
 
-    // Create the render_window.
-    let mut render_window = create_render_window("Rustenstein 3D", (width as u32, height as u32));
+    let mut render_window = create_render_window(
+        "Rustenstein 3D",
+        (args.window_size[0] as u32, args.window_size[1] as u32),
+    );
 
-    // Set render window parameters.
     set_render_window_properties(&mut render_window, &args);
 
     let font = load_font("resources/sansation.ttf");
