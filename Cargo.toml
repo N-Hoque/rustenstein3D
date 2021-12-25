@@ -9,4 +9,4 @@ authors = [
 
 [dependencies]
 rsfml = { version = "0.16.0", package = "sfml" }
-native = "0.1.0"
+structopt = { version = "0.3.25" }

@@ -1,6 +1,5 @@
 #![allow(non_snake_case)]
 
-extern crate native;
 extern crate rsfml;
 
 pub mod animation;
@@ -15,24 +14,40 @@ pub mod raycasting_engine;
 pub mod texture_loader;
 pub mod weapon;
 
-use game::GameLoop;
-use rsfml::graphics::{Font, RenderWindow};
-use rsfml::system::Vector2i;
-use rsfml::window::{ContextSettings, Style, VideoMode};
+use rsfml::{
+    graphics::{Font, RenderWindow},
+    system::Vector2i,
+    window::{ContextSettings, Style, VideoMode},
+};
 
+use game::GameLoop;
 use texture_loader::TextureLoader;
 
-#[cfg(target_os = "macos")]
-#[start]
-fn start(argc: int, argv: *const *const u8) -> int {
-    native::start(argc, argv, main)
-}
+use structopt::StructOpt;
 
-fn display_help() {
-    println!("Rustenstein 3D:");
-    println!("\t-w [width] [height]: Specify the window size.");
-    println!("\t--no-ground: Disable the ground texturing (improves performance).");
-    println!("\t--help: Display this help.");
+#[derive(Debug, StructOpt)]
+#[structopt(name = "Rustenstein 3D", about = "Options for Rustenstein3D")]
+struct RustensteinOptions {
+    #[structopt(short, long, help = "Disables floor and sky rendering")]
+    no_ground: bool,
+
+    #[structopt(
+        short,
+        long,
+        help = "Sets the FPS (Frames per second)",
+        default_value = "30"
+    )]
+    fps: u8,
+
+    #[structopt(
+        short,
+        long,
+        help = "Set the size of the window",
+        number_of_values = 2,
+        value_names = &["width", "height"],
+        default_value = "640 480"
+    )]
+    window_size: Vec<u16>,
 }
 
 fn load_resources() -> TextureLoader {
@@ -85,45 +100,20 @@ fn load_resources() -> TextureLoader {
 
 fn main() {
     // Check if a custom width is set.
-    let args = std::env::args().skip(1).collect::<Vec<_>>();
-    let mut width = 768;
-    let mut height = 480;
-    let mut no_ground: bool = false;
-    let mut fps = 30;
-    let mut i_args = 0;
-    while i_args < args.len() {
-        match args[i_args].as_str() {
-            "-h" | "--help" => {
-                display_help();
-                return;
-            }
-            "-n" | "--no-ground" => no_ground = true,
-            "-f" | "--fps" => fps = args[i_args].parse().unwrap_or(30),
-            "-w" | "--window-size" => {
-                if i_args + 2 >= args.len() {
-                    panic!("Rustenstein 3D: Missing arguments for -w option.");
-                }
-                width = args[i_args + 1].parse::<u32>().unwrap_or(768);
-                height = args[i_args + 2].parse::<u32>().unwrap_or(480);
-                i_args += 2;
-            }
-            _ => {
-                println!("Rustenstein 3D: Unknown argument(s) given {:?}", &args[1..]);
-                display_help();
-                return;
-            }
-        }
-        i_args += 1;
-    }
+
+    let args = RustensteinOptions::from_args();
 
     // Create the render_window.
     let settings = ContextSettings::default();
+
+    let (width, height) = (args.window_size[0] as u32, args.window_size[1] as u32);
+
     let video_mode = VideoMode::new(width, height, 32);
     // let video_mode = VideoMode::new_init(512, 384, 32);
     let mut render_window =
         RenderWindow::new(video_mode, "Rustenstein 3D", Style::CLOSE, &settings);
 
-    render_window.set_framerate_limit(fps);
+    render_window.set_framerate_limit(args.fps.into());
 
     // hide the cursor.
     render_window.set_mouse_cursor_visible(false);
@@ -143,7 +133,7 @@ fn main() {
     let texture_loader = load_resources();
 
     // Create the game_loop and activate the fps handler.
-    let mut game_loop = GameLoop::new(render_window, &texture_loader, no_ground);
+    let mut game_loop = GameLoop::new(render_window, &texture_loader, args.no_ground);
     game_loop.activate_FPS(&font);
 
     game_loop.run();
