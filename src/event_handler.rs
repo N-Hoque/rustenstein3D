@@ -1,10 +1,16 @@
 use rsfml::{
     graphics::RenderWindow,
-    window::{mouse::Button, Event, Key},
+    window::{joystick::Axis, mouse::Button, Event, Key},
 };
 
 pub struct EventHandler {
     pub events: Vec<Event>,
+}
+
+impl Default for EventHandler {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl EventHandler {
@@ -142,10 +148,6 @@ impl EventHandler {
         self.events.iter().any(|e| e == &Event::MouseLeft)
     }
 
-    // pub fn get_mouse_position(&self) -> Vector2i {
-    //     self.render_window.get_mouse_position()
-    // }
-
     pub fn get_events(&self) -> Vec<Event> {
         self.events.to_vec()
     }
@@ -156,17 +158,67 @@ impl EventHandler {
             self.events.push(ev);
         }
     }
-}
 
-impl Default for EventHandler {
-    fn default() -> Self {
-        Self::new()
+    pub fn has_joystick_button_pressed(&self, joystick_button: u32) -> Option<(u32, u32)> {
+        self.events.iter().find_map(|e| {
+            if let Event::JoystickButtonPressed { button, joystickid } = *e {
+                if joystick_button == button {
+                    Some((button, joystickid))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn has_joystick_button_released(&self, joystick_button: u32) -> Option<(u32, u32)> {
+        self.events.iter().find_map(|e| {
+            if let Event::JoystickButtonReleased { button, joystickid } = *e {
+                if joystick_button == button {
+                    Some((button, joystickid))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn has_joystick_moved(&self) -> Option<(Axis, f32, u32)> {
+        self.events.iter().find_map(|e| {
+            if let Event::JoystickMoved {
+                axis,
+                position,
+                joystickid,
+            } = *e
+            {
+                Some((axis, position, joystickid))
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn has_joystick_connected(&self) -> Option<u32> {
+        self.events.iter().find_map(|e| {
+            if let Event::JoystickConnected { joystickid } = *e {
+                Some(joystickid)
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn has_joystick_disconnected(&self) -> Option<u32> {
+        self.events.iter().find_map(|e| {
+            if let Event::JoystickDisconnected { joystickid } = *e {
+                Some(joystickid)
+            } else {
+                None
+            }
+        })
     }
 }
-
-// TODO IMPLEMENT FUNCTION FOR JOYSTICK HANDLE
-// JoystickButtonPressed { joystickid : int, button : int },
-// JoystickButtonReleased { joystickid : int, button : int },
-// JoystickMoved { joystickid : uint, axis : Axis, position : float },
-// JoystickConnected { joystickid : uint },
-// JoystickDisconnected { joystickid : uint },
