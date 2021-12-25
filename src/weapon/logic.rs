@@ -13,7 +13,7 @@ use crate::{
 use super::Weapon;
 
 impl<'s> Weapon<'s> {
-    pub fn new(window_size: &Vector2f, texture_loader: &'s TextureLoader) -> Weapon<'s> {
+    pub fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> Weapon<'s> {
         Weapon {
             texture_loader,
             weapons: Weapon::initialize_weapons(window_size),
@@ -25,7 +25,7 @@ impl<'s> Weapon<'s> {
         }
     }
 
-    fn initialize_weapons(window_size: &Vector2f) -> RectangleShape<'s> {
+    fn initialize_weapons(window_size: Vector2f) -> RectangleShape<'s> {
         let mut tmp_weapon = RectangleShape::with_size(Vector2f { x: 400., y: 400. });
         tmp_weapon.set_position(Vector2f::new(
             window_size.x / 2. - 200.,
@@ -34,7 +34,7 @@ impl<'s> Weapon<'s> {
         tmp_weapon
     }
 
-    fn initialize_shadows(window_size: &Vector2f) -> RectangleShape<'s> {
+    fn initialize_shadows(window_size: Vector2f) -> RectangleShape<'s> {
         let mut tmp_shadow = RectangleShape::with_size(Vector2f { x: 99., y: 48. });
         tmp_shadow.set_position(Vector2f::new(window_size.x - 115., window_size.y - 66.));
         tmp_shadow

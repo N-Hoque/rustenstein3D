@@ -29,13 +29,13 @@ impl<'s> GameMode<'s> {
         });
         ground.set_fill_color(Color::rgb(109, 108, 112));
         ground.set_position(Vector2f::new(0., window_size.y as f32 / 2. - 40.));
-        let window_size_f32 = &Vector2f::new(window_size.x as f32, window_size.y as f32);
+        let window_size_f32 = Vector2f::new(window_size.x as f32, window_size.y as f32);
         GameMode {
             window_size,
             texture_loader,
             sky,
             ground,
-            mini_map: MiniMap::new(map.clone(), &window_size),
+            mini_map: MiniMap::new(map.clone(), window_size),
             r_engine: REngine::new(map, window_size_f32, no_ground),
             hud: HUD::new(window_size_f32, texture_loader),
             weapon: Weapon::new(window_size_f32, texture_loader),
@@ -43,7 +43,7 @@ impl<'s> GameMode<'s> {
     }
 
     pub fn get_map() -> Map {
-        let map_i32: Vec<i32> = vec![
+        let map_i32 = vec![
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -65,7 +65,7 @@ impl<'s> GameMode<'s> {
             0, 0, 0, 0, 0, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         ];
-        Map::new(map_i32, &Vector2f::new(24., 24.))
+        Map::new(map_i32, Vector2f::new(24., 24.))
     }
 
     pub fn update(&mut self, event_handler: &EventHandler) {

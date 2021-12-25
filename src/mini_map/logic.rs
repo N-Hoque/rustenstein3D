@@ -12,7 +12,7 @@ use crate::{map::Map, texture_loader::TextureLoader};
 use super::MiniMap;
 
 impl MiniMap {
-    pub fn new(map: Map, window_size: &Vector2u) -> MiniMap {
+    pub fn new(map: Map, window_size: Vector2u) -> MiniMap {
         let mut mini_map_view = View::new(Vector2f::default(), Vector2f::default());
         mini_map_view.set_size(Vector2f::new(window_size.x as f32, window_size.y as f32));
         mini_map_view.set_viewport(&FloatRect::new(0.70, 0.05, 0.25, 0.25));
@@ -60,7 +60,7 @@ impl MiniMap {
             while pos.y < map_size.y {
                 let block = self
                     .map
-                    .get_block(&pos)
+                    .get_block(pos)
                     .unwrap_or_else(|| panic!("Getting block in minimap at position: {:?}", pos));
                 rect.set_texture(texture_loader.get_texture(block), false);
                 rect.set_position(Vector2f::new(pos.x as f32 * 80., pos.y as f32 * 80.));

@@ -18,7 +18,7 @@ impl From<Orientation> for Vector2i {
 }
 
 impl Map {
-    pub fn new(map: Vec<i32>, map_size: &Vector2f) -> Map {
+    pub fn new(map: Vec<i32>, map_size: Vector2f) -> Map {
         Map {
             map,
             map_size: Vector2i {
@@ -31,12 +31,12 @@ impl Map {
     pub fn get_block_with_orientation(
         &self,
         block_orientation: Orientation,
-        position: &Vector2i,
+        position: Vector2i,
     ) -> Option<i32> {
-        self.get_block(&(*position + Vector2i::from(block_orientation)))
+        self.get_block(position + Vector2i::from(block_orientation))
     }
 
-    pub fn get_block(&self, position: &Vector2i) -> Option<i32> {
+    pub fn get_block(&self, position: Vector2i) -> Option<i32> {
         if position.x < 0
             || position.y < 0
             || position.x > self.map_size.x
@@ -48,7 +48,7 @@ impl Map {
         }
     }
 
-    pub fn get_map_size(&self) -> &Vector2i {
-        &self.map_size
+    pub fn get_map_size(&self) -> Vector2i {
+        self.map_size
     }
 }
