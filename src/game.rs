@@ -1,7 +1,7 @@
-use crate::event_handler::*;
-use crate::fps::*;
-use crate::game_mode::*;
-use crate::texture_loader::TextureLoader;
+use crate::{
+    event_handler::EventHandler, fps::FPSHandler, game_mode::GameMode,
+    texture_loader::TextureLoader,
+};
 
 use rsfml::{
     graphics::{Color, Font, RenderTarget, RenderWindow},

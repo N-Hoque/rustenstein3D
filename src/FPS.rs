@@ -5,9 +5,10 @@
 *
 */
 
-use rsfml::graphics::Transformable;
-use rsfml::graphics::{Color, Font, RenderTarget, RenderWindow, Text};
-use rsfml::system::{Clock, Vector2f};
+use rsfml::{
+    graphics::{Color, Font, RenderTarget, RenderWindow, Text, Transformable},
+    system::{Clock, Vector2f},
+};
 
 /// Definition of class FPSHandler
 pub struct FPSHandler<'s> {

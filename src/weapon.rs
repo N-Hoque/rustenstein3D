@@ -4,9 +4,11 @@ use rsfml::{
     window::{mouse::Button, Key},
 };
 
-use crate::animation::*;
-use crate::event_handler::EventHandler;
-use crate::texture_loader::TextureLoader;
+use crate::{
+    animation::{Animation, AnimationMode, AnimationState},
+    event_handler::EventHandler,
+    texture_loader::TextureLoader,
+};
 
 pub struct Weapon<'s> {
     weapons: RectangleShape<'s>,

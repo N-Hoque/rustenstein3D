@@ -4,8 +4,10 @@ use rsfml::graphics::{
 };
 use rsfml::system::{Clock, Vector2f};
 
-use crate::animation::*;
-use crate::texture_loader::TextureLoader;
+use crate::{
+    animation::{Animation, AnimationMode, AnimationState},
+    texture_loader::TextureLoader,
+};
 
 pub struct HUD<'s> {
     window_size: Vector2f,
