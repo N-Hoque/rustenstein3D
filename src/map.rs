@@ -1,17 +1,9 @@
 use rsfml::system::{Vector2f, Vector2i};
 
+#[derive(Clone)]
 pub struct Map {
     map: Vec<i32>,
     map_size: Vector2i,
-}
-
-impl Clone for Map {
-    fn clone(&self) -> Self {
-        Self {
-            map: self.map.clone(),
-            map_size: self.map_size,
-        }
-    }
 }
 
 pub enum Orientation {

@@ -10,34 +10,33 @@ use rsfml::{
     window::Key,
 };
 
+const CLEAR_COLOR: Color = Color::rgb(3, 64, 59);
+
 pub struct GameLoop<'s> {
+    game_mode: GameMode<'s>,
+    event_handler: EventHandler,
     render_window: RenderWindow,
     fps_handler: Option<FPSHandler<'s>>,
-    event_handler: EventHandler,
-    clear_color: Color,
-    game_mode: GameMode<'s>,
 }
 
 impl<'s> GameLoop<'s> {
     pub fn new(
         render_window: RenderWindow,
         texture_loader: &'s TextureLoader,
-        noground: bool,
+        no_ground: bool,
     ) -> GameLoop<'s> {
-        let tmp_size = render_window.size();
+        let window_size = render_window.size();
         GameLoop {
             render_window,
             fps_handler: None,
             event_handler: EventHandler::new(),
-            clear_color: Color::rgb(3, 64, 59),
-            game_mode: GameMode::new(tmp_size, texture_loader, noground),
+            game_mode: GameMode::new(window_size, texture_loader, no_ground),
         }
     }
 
     pub fn activate_FPS(&mut self, font: &'s Font) {
-        match self.fps_handler {
-            Some(_) => (),
-            None => self.fps_handler = Some(FPSHandler::new(font)),
+        if self.fps_handler.is_none() {
+            self.fps_handler = Some(FPSHandler::new(font))
         }
     }
 
@@ -64,7 +63,7 @@ impl<'s> GameLoop<'s> {
     }
 
     pub fn draw(&mut self) {
-        self.render_window.clear(self.clear_color);
+        self.render_window.clear(CLEAR_COLOR);
         self.game_mode.draw(&mut self.render_window);
         if self.fps_handler.is_some() {
             self.fps_handler

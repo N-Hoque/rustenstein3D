@@ -85,20 +85,21 @@ fn load_resources() -> TextureLoader {
 
 fn main() {
     // Check if a custom width is set.
-    let args = std::env::args().collect::<Vec<_>>();
+    let args = std::env::args().skip(1).collect::<Vec<_>>();
     let mut width = 768;
     let mut height = 480;
-    let mut noground: bool = false;
-    let mut i_args = 1;
-
+    let mut no_ground: bool = false;
+    let mut fps = 30;
+    let mut i_args = 0;
     while i_args < args.len() {
         match args[i_args].as_str() {
-            "--help" => {
+            "-h" | "--help" => {
                 display_help();
                 return;
             }
-            "--noground" => noground = true,
-            "-w" => {
+            "-n" | "--no-ground" => no_ground = true,
+            "-f" | "--fps" => fps = args[i_args].parse().unwrap_or(30),
+            "-w" | "--window-size" => {
                 if i_args + 2 >= args.len() {
                     panic!("Rustenstein 3D: Missing arguments for -w option.");
                 }
@@ -122,8 +123,7 @@ fn main() {
     let mut render_window =
         RenderWindow::new(video_mode, "Rustenstein 3D", Style::CLOSE, &settings);
 
-    // set the framerate limit to 30 fps.
-    render_window.set_framerate_limit(60);
+    render_window.set_framerate_limit(fps);
 
     // hide the cursor.
     render_window.set_mouse_cursor_visible(false);
@@ -135,13 +135,15 @@ fn main() {
     });
 
     // Create the font for the FPS_handler.
-    let font = Font::from_file("resources/sansation.ttf").expect("Loading resources/sansation.ttf");
+    let font_filename = "resources/sansation.ttf";
+    let font = Font::from_file(font_filename)
+        .unwrap_or_else(|| panic!("Loading font from {}", font_filename));
 
     // Create the texture loader and load textures
     let texture_loader = load_resources();
 
     // Create the game_loop and activate the fps handler.
-    let mut game_loop = GameLoop::new(render_window, &texture_loader, noground);
+    let mut game_loop = GameLoop::new(render_window, &texture_loader, no_ground);
     game_loop.activate_FPS(&font);
 
     game_loop.run();

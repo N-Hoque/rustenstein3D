@@ -25,7 +25,7 @@ impl<'s> GameMode<'s> {
     pub fn new(
         window_size: Vector2u,
         texture_loader: &'s TextureLoader,
-        noground: bool,
+        no_ground: bool,
     ) -> GameMode<'s> {
         let map = GameMode::get_map();
         let mut sky = RectangleShape::with_size(Vector2f {
@@ -41,14 +41,14 @@ impl<'s> GameMode<'s> {
         ground.set_position(Vector2f::new(0., window_size.y as f32 / 2. - 40.));
         let window_size_f32 = &Vector2f::new(window_size.x as f32, window_size.y as f32);
         GameMode {
-            mini_map: MiniMap::new(map.clone(), &window_size),
-            r_engine: REngine::new(map, window_size_f32, noground),
-            hud: HUD::new(window_size_f32, texture_loader),
-            weapon: Weapon::new(window_size_f32, texture_loader),
             window_size,
             texture_loader,
             sky,
             ground,
+            mini_map: MiniMap::new(map.clone(), &window_size),
+            r_engine: REngine::new(map, window_size_f32, no_ground),
+            hud: HUD::new(window_size_f32, texture_loader),
+            weapon: Weapon::new(window_size_f32, texture_loader),
         }
     }
 
@@ -86,9 +86,8 @@ impl<'s> GameMode<'s> {
         if event_handler.is_key_pressed(Key::RIGHT) {
             rotation = 5.25;
         }
-        match event_handler.has_key_pressed_event(Key::M) {
-            Some((_, _, _, _, _)) => self.mini_map.set_active(),
-            None => true,
+        if event_handler.has_key_pressed_event(Key::M).is_some() {
+            self.mini_map.toggle_active();
         };
         self.r_engine.update(event_handler);
         if self.mini_map.is_active() {
@@ -110,8 +109,8 @@ impl<'s> GameMode<'s> {
         self.weapon.draw(render_window);
         render_window.set_mouse_cursor_visible(false);
         render_window.set_mouse_position(Vector2i::new(
-            (self.window_size.x / 2) as i32,
-            (self.window_size.y / 2) as i32,
+            (self.window_size.x) as i32 / 2,
+            (self.window_size.y) as i32 / 2,
         ));
     }
 }

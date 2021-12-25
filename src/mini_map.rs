@@ -35,7 +35,7 @@ impl MiniMap {
         }
     }
 
-    pub fn set_active(&mut self) -> bool {
+    pub fn toggle_active(&mut self) -> bool {
         self.active = !self.active;
         self.active
     }
@@ -69,7 +69,7 @@ impl MiniMap {
                 let block = self
                     .map
                     .get_block(&pos)
-                    .expect("Cannot get block in minimap.");
+                    .unwrap_or_else(|| panic!("Getting block in minimap at position: {:?}", pos));
                 rect.set_texture(texture_loader.get_texture(block), false);
                 rect.set_position(Vector2f::new(pos.x as f32 * 80., pos.y as f32 * 80.));
                 render_window.draw(&rect);

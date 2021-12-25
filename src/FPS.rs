@@ -30,12 +30,12 @@ impl<'s> FPSHandler<'s> {
      * Return a new instance of FPSHandler
      */
     pub fn new(font: &'s Font) -> FPSHandler<'s> {
-        let mut t = Text::new("0", font, 20);
-        t.set_position(Vector2f::new(10., 10.));
-        t.set_fill_color(Color::WHITE);
+        let mut text = Text::new("0", font, 20);
+        text.set_position(Vector2f::new(10., 10.));
+        text.set_fill_color(Color::WHITE);
         FPSHandler {
+            text,
             fps_clock: Clock::start(),
-            text: t,
             images: 0,
         }
     }

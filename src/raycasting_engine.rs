@@ -35,11 +35,11 @@ struct DrawState {
 }
 
 impl REngine {
-    pub fn new(map: Map, window_size: &Vector2f, noground: bool) -> REngine {
+    pub fn new(map: Map, window_size: &Vector2f, no_ground: bool) -> REngine {
         REngine {
             draw_state: DrawState::default(),
             map,
-            no_ground: noground,
+            no_ground,
             player_position: Vector2f { x: 22., y: 12. },
             vector_direction: Vector2f { x: -1., y: 0. },
             cam_plane: Vector2f { x: 0., y: 0.66 },
