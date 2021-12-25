@@ -24,6 +24,7 @@ pub struct REngine {
 
 #[derive(Default)]
 struct DrawState {
+    map_pos: Vector2i,
     step: Vector2i,
     side_dist: Vector2f,
     draw_start: i32,
@@ -35,9 +36,9 @@ struct DrawState {
 impl REngine {
     pub fn new(map: Map, window_size: &Vector2f, no_ground: bool) -> REngine {
         REngine {
-            draw_state: DrawState::default(),
             map,
             no_ground,
+            draw_state: DrawState::default(),
             player_position: Vector2f { x: 22., y: 12. },
             vector_direction: Vector2f { x: -1., y: 0. },
             cam_plane: Vector2f { x: 0., y: 0.66 },
@@ -59,7 +60,6 @@ impl REngine {
             y: self.player_position.y,
         };
         let mut ray_dir = Vector2f { x: 0., y: 0. };
-        let mut map_pos = Vector2i { x: 0, y: 0 };
         let mut delta_dist = Vector2f { x: 0., y: 0. };
         let mut camera_x: f32;
         let mut side: i32;
@@ -69,23 +69,23 @@ impl REngine {
             camera_x = 2. * x as f32 / self.window_size.x - 1.;
             ray_dir.x = self.vector_direction.x + self.cam_plane.x * camera_x;
             ray_dir.y = self.vector_direction.y + self.cam_plane.y * camera_x;
-            map_pos.x = ray_pos.x as i32;
-            map_pos.y = ray_pos.y as i32;
+            self.draw_state.map_pos.x = ray_pos.x as i32;
+            self.draw_state.map_pos.y = ray_pos.y as i32;
             delta_dist.x = (1. + (ray_dir.y * ray_dir.y) / (ray_dir.x * ray_dir.x)).sqrt();
             delta_dist.y = (1. + (ray_dir.x * ray_dir.x) / (ray_dir.y * ray_dir.y)).sqrt();
             side = 0;
 
             // calculate
-            self.calculate_step(&ray_dir, &ray_pos, &map_pos, &delta_dist);
+            self.calculate_step(&ray_pos, &ray_dir, &delta_dist);
 
-            self.hit_wall(&mut map_pos, &mut delta_dist, &mut side);
+            self.hit_wall(&mut delta_dist, &mut side);
 
-            self.calculate_wall_height(side, &map_pos, &ray_pos, &ray_dir);
+            self.calculate_wall_height(&ray_pos, &ray_dir, side);
 
-            self.calculate_wall_texture(side, &ray_dir, x, &map_pos, &ray_pos);
+            self.calculate_wall_texture(&ray_pos, &ray_dir, side, x);
 
             if !self.no_ground {
-                self.calculate_ground(side, &map_pos, &ray_dir, x);
+                self.calculate_ground(&ray_dir, side, x);
             }
 
             x += 1;
@@ -93,7 +93,7 @@ impl REngine {
         self.update_events(event_handler);
     }
 
-    fn calculate_ground(&mut self, side: i32, map_pos: &Vector2i, ray_dir: &Vector2f, x: i32) {
+    fn calculate_ground(&mut self, ray_dir: &Vector2f, side: i32, x: i32) {
         if self.draw_state.draw_end < 0 {
             self.draw_state.draw_end = self.window_size.y as i32;
         }
@@ -116,7 +116,7 @@ impl REngine {
         let mut tex_coord = Vector2f { x: 0., y: 0. };
         let mut pos = Vector2f { x: x as f32, y: 0. };
 
-        let floor = self.calculate_floor(side, ray_dir, map_pos);
+        let floor = self.calculate_floor(ray_dir, side);
 
         for y in (self.draw_state.draw_end + 1)..(self.window_size.y as i32) {
             current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
@@ -147,35 +147,33 @@ impl REngine {
         }
     }
 
-    fn calculate_floor(&mut self, side: i32, ray_dir: &Vector2f, map_pos: &Vector2i) -> Vector2f {
+    fn calculate_floor(&mut self, ray_dir: &Vector2f, side: i32) -> Vector2f {
         let mut floor = Vector2f { x: 0., y: 0. };
         if side == 0 && ray_dir.x > 0. {
-            floor.x = map_pos.x as f32;
-            floor.y = map_pos.y as f32 + self.draw_state.wall_x;
+            floor.x = self.draw_state.map_pos.x as f32;
+            floor.y = self.draw_state.map_pos.y as f32 + self.draw_state.wall_x;
         } else if side == 0 && ray_dir.x < 0. {
-            floor.x = map_pos.x as f32 + 1.;
-            floor.y = map_pos.y as f32 + self.draw_state.wall_x;
+            floor.x = self.draw_state.map_pos.x as f32 + 1.;
+            floor.y = self.draw_state.map_pos.y as f32 + self.draw_state.wall_x;
         } else if side == 1 && ray_dir.y > 0. {
-            floor.x = map_pos.x as f32 + self.draw_state.wall_x;
-            floor.y = map_pos.y as f32;
+            floor.x = self.draw_state.map_pos.x as f32 + self.draw_state.wall_x;
+            floor.y = self.draw_state.map_pos.y as f32;
         } else {
-            floor.x = map_pos.x as f32 + self.draw_state.wall_x;
-            floor.y = map_pos.y as f32 + 1.;
+            floor.x = self.draw_state.map_pos.x as f32 + self.draw_state.wall_x;
+            floor.y = self.draw_state.map_pos.y as f32 + 1.;
         }
         floor
     }
 
-    fn calculate_wall_height(
-        &mut self,
-        side: i32,
-        map_pos: &Vector2i,
-        ray_pos: &Vector2f,
-        ray_dir: &Vector2f,
-    ) {
+    fn calculate_wall_height(&mut self, ray_pos: &Vector2f, ray_dir: &Vector2f, side: i32) {
         self.draw_state.perp_wall_dist = if side == 0 {
-            (map_pos.x as f32 - ray_pos.x + (1 - self.draw_state.step.x) as f32 / 2.) / ray_dir.x
+            (self.draw_state.map_pos.x as f32 - ray_pos.x
+                + (1 - self.draw_state.step.x) as f32 / 2.)
+                / ray_dir.x
         } else {
-            (map_pos.y as f32 - ray_pos.y + (1 - self.draw_state.step.y) as f32 / 2.) / ray_dir.y
+            (self.draw_state.map_pos.y as f32 - ray_pos.y
+                + (1 - self.draw_state.step.y) as f32 / 2.)
+                / ray_dir.y
         }
         .abs();
 
@@ -198,20 +196,21 @@ impl REngine {
 
     fn calculate_wall_texture(
         &mut self,
-        side: i32,
-        ray_dir: &Vector2f,
-        x: i32,
-        map_pos: &Vector2i,
         ray_pos: &Vector2f,
+        ray_dir: &Vector2f,
+        side: i32,
+        x: i32,
     ) {
         self.draw_state.wall_x = if side == 1 {
             ray_pos.x
-                + ((map_pos.y as f32 - ray_pos.y + (1. - self.draw_state.step.y as f32) / 2.)
+                + ((self.draw_state.map_pos.y as f32 - ray_pos.y
+                    + (1. - self.draw_state.step.y as f32) / 2.)
                     / ray_dir.y)
                     * ray_dir.x
         } else {
             ray_pos.y
-                + ((map_pos.x as f32 - ray_pos.x + (1. - self.draw_state.step.x as f32) / 2.)
+                + ((self.draw_state.map_pos.x as f32 - ray_pos.x
+                    + (1. - self.draw_state.step.x as f32) / 2.)
                     / ray_dir.x)
                     * ray_dir.y
         };
@@ -227,8 +226,13 @@ impl REngine {
 
         let mut texture_id = self
             .map
-            .get_block(map_pos)
-            .unwrap_or_else(|| panic!("Getting block at map position {:?}", map_pos));
+            .get_block(&self.draw_state.map_pos)
+            .unwrap_or_else(|| {
+                panic!(
+                    "Getting block at map position {:?}",
+                    self.draw_state.map_pos
+                )
+            });
 
         if side == 1 {
             texture_id += 5;
@@ -257,38 +261,36 @@ impl REngine {
             ));
     }
 
-    fn calculate_step(
-        &mut self,
-        ray_dir: &Vector2f,
-        ray_pos: &Vector2f,
-        map_pos: &Vector2i,
-        delta_dist: &Vector2f,
-    ) {
+    fn calculate_step(&mut self, ray_pos: &Vector2f, ray_dir: &Vector2f, delta_dist: &Vector2f) {
         if ray_dir.x < 0. {
             self.draw_state.step.x = -1;
-            self.draw_state.side_dist.x = (ray_pos.x - map_pos.x as f32) * delta_dist.x;
+            self.draw_state.side_dist.x =
+                (ray_pos.x - self.draw_state.map_pos.x as f32) * delta_dist.x;
         } else {
             self.draw_state.step.x = 1;
-            self.draw_state.side_dist.x = (map_pos.x as f32 + 1. - ray_pos.x) * delta_dist.x;
+            self.draw_state.side_dist.x =
+                (self.draw_state.map_pos.x as f32 + 1. - ray_pos.x) * delta_dist.x;
         }
         if ray_dir.y < 0. {
             self.draw_state.step.y = -1;
-            self.draw_state.side_dist.y = (ray_pos.y - map_pos.y as f32) * delta_dist.y;
+            self.draw_state.side_dist.y =
+                (ray_pos.y - self.draw_state.map_pos.y as f32) * delta_dist.y;
         } else {
             self.draw_state.step.y = 1;
-            self.draw_state.side_dist.y = (map_pos.y as f32 + 1. - ray_pos.y) * delta_dist.y;
+            self.draw_state.side_dist.y =
+                (self.draw_state.map_pos.y as f32 + 1. - ray_pos.y) * delta_dist.y;
         }
     }
 
-    fn hit_wall(&mut self, map_pos: &mut Vector2i, delta_dist: &mut Vector2f, side: &mut i32) {
-        while matches!(self.map.get_block(map_pos), Some(0)) {
+    fn hit_wall(&mut self, delta_dist: &mut Vector2f, side: &mut i32) {
+        while matches!(self.map.get_block(&self.draw_state.map_pos), Some(0)) {
             if self.draw_state.side_dist.x < self.draw_state.side_dist.y {
                 self.draw_state.side_dist.x += delta_dist.x;
-                map_pos.x += self.draw_state.step.x;
+                self.draw_state.map_pos.x += self.draw_state.step.x;
                 *side = 0;
             } else {
                 self.draw_state.side_dist.y += delta_dist.y;
-                map_pos.y += self.draw_state.step.y;
+                self.draw_state.map_pos.y += self.draw_state.step.y;
                 *side = 1;
             }
         }
