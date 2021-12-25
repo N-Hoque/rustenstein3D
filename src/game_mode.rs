@@ -12,9 +12,7 @@ use weapon::Weapon;
 
 pub struct GameMode<'s> {
     window_size: Vector2u,
-    map: Map,
     mini_map: MiniMap,
-    player_position: Vector2f,
     r_engine: REngine,
     texture_loader: &'s TextureLoader,
     hud: HUD<'s>,
@@ -43,12 +41,10 @@ impl<'s> GameMode<'s> {
         ground.set_position(Vector2f::new(0., window_size.y as f32 / 2. - 40.));
         let window_size_f32 = &Vector2f::new(window_size.x as f32, window_size.y as f32);
         GameMode {
-            map: map.clone(),
             mini_map: MiniMap::new(map.clone(), &window_size),
-            player_position: Vector2f::new(4., 1.),
-            r_engine: REngine::new(map, &window_size_f32, noground),
-            hud: HUD::new(&window_size_f32, texture_loader),
-            weapon: Weapon::new(&window_size_f32, texture_loader),
+            r_engine: REngine::new(map, window_size_f32, noground),
+            hud: HUD::new(window_size_f32, texture_loader),
+            weapon: Weapon::new(window_size_f32, texture_loader),
             window_size,
             texture_loader,
             sky,
@@ -82,7 +78,7 @@ impl<'s> GameMode<'s> {
         Map::new(map_i32, &Vector2f::new(24., 24.))
     }
 
-    pub fn update<'r>(&mut self, event_handler: &'r EventHandler) {
+    pub fn update(&mut self, event_handler: &EventHandler) {
         let mut rotation: f32 = 0.;
         if event_handler.is_key_pressed(Key::LEFT) {
             rotation = -5.25;
@@ -103,7 +99,7 @@ impl<'s> GameMode<'s> {
         self.weapon.update(event_handler);
     }
 
-    pub fn draw<'r>(&mut self, render_window: &'r mut RenderWindow) {
+    pub fn draw(&mut self, render_window: &mut RenderWindow) {
         render_window.draw(&self.sky);
         render_window.draw(&self.ground);
         self.r_engine.draw(render_window, self.texture_loader);

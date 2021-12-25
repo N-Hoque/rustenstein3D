@@ -98,22 +98,18 @@ impl Animation {
     }
 
     pub fn update(&mut self) {
-        match &self.state {
-            AnimationState::Play => {
-                if self.clock.elapsed_time().as_seconds() >= self.lag {
-                    if self.current_texture == self.texture_ids.len() as u32 - 1 {
-                        self.current_texture = 0;
-                        match self.mode {
-                            AnimationMode::PlayOnce => self.state = AnimationState::Stop,
-                            _ => {}
-                        }
-                    } else {
-                        self.current_texture += 1;
+        if let AnimationState::Play = &self.state {
+            if self.clock.elapsed_time().as_seconds() >= self.lag {
+                if self.current_texture != self.texture_ids.len() as u32 - 1 {
+                    self.current_texture += 1;
+                } else {
+                    self.current_texture = 0;
+                    if let AnimationMode::PlayOnce = self.mode {
+                        self.state = AnimationState::Stop
                     }
-                    self.clock.restart();
                 }
+                self.clock.restart();
             }
-            _ => {}
         }
     }
 }

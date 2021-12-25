@@ -16,7 +16,6 @@ pub struct GameLoop<'s> {
     event_handler: EventHandler,
     clear_color: Color,
     game_mode: GameMode<'s>,
-    texture_loader: &'s TextureLoader,
 }
 
 impl<'s> GameLoop<'s> {
@@ -28,7 +27,6 @@ impl<'s> GameLoop<'s> {
         let tmp_size = render_window.size();
         GameLoop {
             render_window,
-            texture_loader,
             fps_handler: None,
             event_handler: EventHandler::new(),
             clear_color: Color::rgb(3, 64, 59),
@@ -44,9 +42,8 @@ impl<'s> GameLoop<'s> {
     }
 
     pub fn deactivate_FPS(&mut self) {
-        match self.fps_handler {
-            Some(_) => self.fps_handler = None,
-            None => (),
+        if self.fps_handler.is_some() {
+            self.fps_handler = None
         }
     }
 
@@ -69,13 +66,11 @@ impl<'s> GameLoop<'s> {
     pub fn draw(&mut self) {
         self.render_window.clear(self.clear_color);
         self.game_mode.draw(&mut self.render_window);
-        match self.fps_handler {
-            Some(_) => self
-                .fps_handler
+        if self.fps_handler.is_some() {
+            self.fps_handler
                 .as_mut()
                 .unwrap()
-                .draw(&mut self.render_window),
-            None => {}
+                .draw(&mut self.render_window)
         };
         self.render_window.display();
     }

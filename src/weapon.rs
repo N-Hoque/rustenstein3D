@@ -46,67 +46,64 @@ impl<'s> Weapon<'s> {
     }
 
     fn initialize_animation() -> Vec<Animation> {
-        let mut animations = Vec::new();
-        animations.push(Animation::new(
-            vec![12, 13, 14, 15, 16, 17],
-            AnimationState::Stop,
-            AnimationMode::PlayOnce,
-            0.07,
-            3,
-        ));
-        animations.push(Animation::new(
-            vec![19, 20, 21, 22, 23, 24],
-            AnimationState::Stop,
-            AnimationMode::PlayOnce,
-            0.07,
-            3,
-        ));
-        animations.push(Animation::new(
-            vec![26, 27, 28, 29, 30, 31],
-            AnimationState::Stop,
-            AnimationMode::PlayOnce,
-            0.07,
-            3,
-        ));
-        animations.push(Animation::new(
-            vec![33, 34, 35, 36, 37, 38],
-            AnimationState::Stop,
-            AnimationMode::PlayOnce,
-            0.07,
-            3,
-        ));
+        let animations = vec![
+            Animation::new(
+                vec![12, 13, 14, 15, 16, 17],
+                AnimationState::Stop,
+                AnimationMode::PlayOnce,
+                0.07,
+                3,
+            ),
+            Animation::new(
+                vec![19, 20, 21, 22, 23, 24],
+                AnimationState::Stop,
+                AnimationMode::PlayOnce,
+                0.07,
+                3,
+            ),
+            Animation::new(
+                vec![26, 27, 28, 29, 30, 31],
+                AnimationState::Stop,
+                AnimationMode::PlayOnce,
+                0.07,
+                3,
+            ),
+            Animation::new(
+                vec![33, 34, 35, 36, 37, 38],
+                AnimationState::Stop,
+                AnimationMode::PlayOnce,
+                0.07,
+                3,
+            ),
+        ];
 
         animations
     }
 
     pub fn update<'r>(&'r mut self, event_handler: &'r EventHandler) {
-        match event_handler.has_key_pressed_event(Key::NUM1) {
-            Some(_) => self.current_weapon = 0,
-            None => {}
+        if event_handler.has_key_pressed_event(Key::NUM1).is_some() {
+            self.current_weapon = 0
         };
-        match event_handler.has_key_pressed_event(Key::NUM2) {
-            Some(_) => self.current_weapon = 1,
-            None => {}
+        if event_handler.has_key_pressed_event(Key::NUM2).is_some() {
+            self.current_weapon = 1
         };
-        match event_handler.has_key_pressed_event(Key::NUM3) {
-            Some(_) => self.current_weapon = 2,
-            None => {}
+        if event_handler.has_key_pressed_event(Key::NUM3).is_some() {
+            self.current_weapon = 2
         };
-        match event_handler.has_key_pressed_event(Key::NUM4) {
-            Some(_) => self.current_weapon = 3,
-            None => {}
+        if event_handler.has_key_pressed_event(Key::NUM4).is_some() {
+            self.current_weapon = 3
         };
 
-        if self.mouse_fire == false {
-            match event_handler.has_mouse_button_pressed_event(Button::LEFT) {
-                Some(_) => {
-                    self.animations
-                        .get_mut(self.current_weapon as usize)
-                        .unwrap()
-                        .set_state(AnimationState::Play);
-                    self.mouse_fire = true
-                }
-                None => {}
+        if !self.mouse_fire {
+            if event_handler
+                .has_mouse_button_pressed_event(Button::LEFT)
+                .is_some()
+            {
+                self.animations
+                    .get_mut(self.current_weapon as usize)
+                    .unwrap()
+                    .set_state(AnimationState::Play);
+                self.mouse_fire = true
             };
         } else {
             match event_handler.has_mouse_button_released_event(Button::LEFT) {
@@ -131,7 +128,7 @@ impl<'s> Weapon<'s> {
             .update();
     }
 
-    pub fn draw<'r>(&'r mut self, render_window: &'r mut RenderWindow) {
+    pub fn draw(&mut self, render_window: &mut RenderWindow) {
         self.weapons.set_texture(
             self.texture_loader.get_texture(
                 self.animations[self.current_weapon as usize].get_current_texture_id(),

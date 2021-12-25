@@ -14,10 +14,10 @@ pub struct REngine {
     cam_plane: Vector2f,
     map: Map,
     window_size: Vector2f,
-    vertex_array: Vec<Box<VertexArray>>,
+    vertex_array: Vec<VertexArray>,
     textures_id: Vec<i32>,
-    ground: Vec<Box<VertexArray>>,
-    sky: Vec<Box<VertexArray>>,
+    ground: Vec<VertexArray>,
+    sky: Vec<VertexArray>,
     noground: bool,
 }
 
@@ -40,7 +40,7 @@ impl REngine {
         }
     }
 
-    pub fn update<'r>(&'r mut self, event_handler: &EventHandler) {
+    pub fn update(&mut self, event_handler: &EventHandler) {
         self.textures_id.clear();
         let ray_pos = Vector2f {
             x: self.player_position.x,
@@ -319,7 +319,7 @@ impl REngine {
         side: &mut i32,
     ) {
         let mut hit: bool = false;
-        while hit == false {
+        while !hit {
             if side_dist.x < side_dist.y {
                 side_dist.x += delta_dist.x;
                 map_pos.x += step.x;
@@ -329,12 +329,9 @@ impl REngine {
                 map_pos.y += step.y;
                 *side = 1;
             }
-            match self.map.get_block(map_pos) {
-                Some(block) => match block {
-                    0 => hit = false,
-                    _ => hit = true,
-                },
-                None => hit = true,
+            hit = match self.map.get_block(map_pos) {
+                Some(block) => block != 0,
+                None => true,
             };
         }
     }
@@ -403,51 +400,45 @@ impl REngine {
             old_cam_plane_x * (mouse_move).sin() + self.cam_plane.y * (mouse_move).cos();
     }
 
-    fn create_line_array<'r>(window_size: &'r Vector2f) -> Vec<Box<VertexArray>> {
-        let mut i = 0;
+    fn create_line_array(window_size: &Vector2f) -> Vec<VertexArray> {
         let mut lines = Vec::new();
-        while i < window_size.x as i32 {
-            let mut line = Box::new(VertexArray::new(PrimitiveType::LINES, 0));
+        for _ in 0..window_size.x as i32 {
+            let line = VertexArray::new(PrimitiveType::LINES, 2);
             lines.push(line);
-            i += 1;
         }
         lines
     }
 
-    fn create_ground_array<'r>(window_size: &'r Vector2f) -> Vec<Box<VertexArray>> {
-        let mut i = 0;
+    fn create_ground_array(window_size: &Vector2f) -> Vec<VertexArray> {
         let mut lines = Vec::new();
-        while i < window_size.x as i32 {
-            let line = Box::new(VertexArray::new(PrimitiveType::LINES, 0));
+        for _ in 0..window_size.x as i32 {
+            let line = VertexArray::new(PrimitiveType::LINES, 2);
             lines.push(line);
-            i += 1;
         }
         lines
     }
 
     pub fn get_player_pos(&self) -> Vector2f {
-        self.player_position.clone()
+        self.player_position
     }
 
-    pub fn draw<'r>(&self, render_window: &'r mut RenderWindow, texture_loader: &'r TextureLoader) {
-        let mut i: i32 = 0;
+    pub fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
         let mut render_states = RenderStates::default();
-        for line in self.vertex_array.iter() {
+        for (idx, line) in self.vertex_array.iter().enumerate() {
             render_states.set_texture(Some(
-                texture_loader.get_texture(self.textures_id[i as usize]),
+                texture_loader.get_texture(self.textures_id[idx as usize]),
             ));
-            render_window.draw_with_renderstates(&*(*line), &mut render_states);
-            i += 1;
+            render_window.draw_with_renderstates(line, &render_states);
         }
 
         render_states.set_texture(Some(texture_loader.get_texture(0)));
         for gr in self.ground.iter() {
-            render_window.draw_with_renderstates(&*(*gr), &mut render_states);
+            render_window.draw_with_renderstates(gr, &render_states);
         }
 
         render_states.set_texture(Some(texture_loader.get_texture(11)));
         for sky in self.sky.iter() {
-            render_window.draw_with_renderstates(&*(*sky), &mut render_states);
+            render_window.draw_with_renderstates(sky, &render_states);
         }
     }
 }

@@ -18,9 +18,8 @@ impl EventHandler {
 
     pub fn has_closed_event(&self) -> bool {
         for ev in self.events.iter() {
-            match *ev {
-                Event::Closed => return true,
-                _ => {}
+            if *ev == Event::Closed {
+                return true;
             }
         }
         false
@@ -28,9 +27,8 @@ impl EventHandler {
 
     pub fn has_gained_focus_event(&self) -> bool {
         for ev in self.events.iter() {
-            match *ev {
-                Event::GainedFocus => return true,
-                _ => {}
+            if *ev == Event::GainedFocus {
+                return true;
             }
         }
         false
@@ -38,9 +36,8 @@ impl EventHandler {
 
     pub fn has_lost_focus_event(&self) -> bool {
         for ev in self.events.iter() {
-            match *ev {
-                Event::LostFocus => return true,
-                _ => {}
+            if *ev == Event::LostFocus {
+                return true;
             }
         }
         false
@@ -48,9 +45,8 @@ impl EventHandler {
 
     pub fn has_text_entered(&self) -> Option<char> {
         for ev in self.events.iter() {
-            match *ev {
-                Event::TextEntered { unicode } => return Some(unicode),
-                _ => {}
+            if let Event::TextEntered { unicode } = *ev {
+                return Some(unicode);
             }
         }
         None
@@ -58,19 +54,17 @@ impl EventHandler {
 
     pub fn has_key_pressed_event(&self, key: Key) -> Option<(Key, bool, bool, bool, bool)> {
         for ev in self.events.iter() {
-            match *ev {
-                Event::KeyPressed {
-                    code,
-                    alt,
-                    ctrl,
-                    shift,
-                    system,
-                } => {
-                    if code == key {
-                        return Some((code, alt, ctrl, shift, system));
-                    }
+            if let Event::KeyPressed {
+                code,
+                alt,
+                ctrl,
+                shift,
+                system,
+            } = *ev
+            {
+                if code == key {
+                    return Some((code, alt, ctrl, shift, system));
                 }
-                _ => {}
             }
         }
         None
@@ -78,19 +72,17 @@ impl EventHandler {
 
     pub fn has_key_released_event(&self, key: Key) -> Option<(Key, bool, bool, bool, bool)> {
         for ev in self.events.iter() {
-            match *ev {
-                Event::KeyReleased {
-                    code,
-                    alt,
-                    ctrl,
-                    shift,
-                    system,
-                } => {
-                    if code == key {
-                        return Some((code, alt, ctrl, shift, system));
-                    }
+            if let Event::KeyReleased {
+                code,
+                alt,
+                ctrl,
+                shift,
+                system,
+            } = *ev
+            {
+                if code == key {
+                    return Some((code, alt, ctrl, shift, system));
                 }
-                _ => {}
             }
         }
         None
@@ -98,9 +90,8 @@ impl EventHandler {
 
     pub fn has_mouse_wheel_moved_event(&self) -> Option<(f32, i32, i32)> {
         for ev in self.events.iter() {
-            match *ev {
-                Event::MouseWheelScrolled { delta, x, y, .. } => return Some((delta, x, y)),
-                _ => {}
+            if let Event::MouseWheelScrolled { delta, x, y, .. } = *ev {
+                return Some((delta, x, y));
             }
         }
         None
@@ -111,13 +102,10 @@ impl EventHandler {
         mouse_button: Button,
     ) -> Option<(Button, i32, i32)> {
         for ev in self.events.iter() {
-            match *ev {
-                Event::MouseButtonPressed { button, x, y } => {
-                    if mouse_button == button {
-                        return Some((button, x, y));
-                    }
+            if let Event::MouseButtonPressed { button, x, y } = *ev {
+                if mouse_button == button {
+                    return Some((button, x, y));
                 }
-                _ => {}
             }
         }
         None
@@ -128,13 +116,10 @@ impl EventHandler {
         mouse_button: Button,
     ) -> Option<(Button, i32, i32)> {
         for ev in self.events.iter() {
-            match *ev {
-                Event::MouseButtonReleased { button, x, y } => {
-                    if mouse_button == button {
-                        return Some((button, x, y));
-                    }
+            if let Event::MouseButtonReleased { button, x, y } = *ev {
+                if mouse_button == button {
+                    return Some((button, x, y));
                 }
-                _ => {}
             }
         }
         None
@@ -142,9 +127,8 @@ impl EventHandler {
 
     pub fn has_mouse_moved_event(&self) -> Option<(i32, i32)> {
         for ev in self.events.iter() {
-            match *ev {
-                Event::MouseMoved { x, y } => return Some((x, y)),
-                _ => {}
+            if let Event::MouseMoved { x, y } = *ev {
+                return Some((x, y));
             }
         }
         None
@@ -152,9 +136,8 @@ impl EventHandler {
 
     pub fn has_mouse_entered_event(&self) -> bool {
         for ev in self.events.iter() {
-            match *ev {
-                Event::MouseEntered => return true,
-                _ => {}
+            if let Event::MouseEntered = *ev {
+                return true;
             }
         }
         false
@@ -162,9 +145,8 @@ impl EventHandler {
 
     pub fn has_mouse_left_event(&self) -> bool {
         for ev in self.events.iter() {
-            match *ev {
-                Event::MouseLeft => return true,
-                _ => {}
+            if *ev == Event::MouseLeft {
+                return true;
             }
         }
         false
@@ -175,11 +157,7 @@ impl EventHandler {
     // }
 
     pub fn get_events(&self) -> Vec<Event> {
-        let mut r_events = Vec::new();
-        for ev in self.events.iter() {
-            r_events.push(*ev)
-        }
-        r_events
+        self.events.to_vec()
     }
 
     pub fn update_events(&mut self, render_window: &mut RenderWindow) {
@@ -187,6 +165,12 @@ impl EventHandler {
         while let Some(ev) = render_window.poll_event() {
             self.events.push(ev);
         }
+    }
+}
+
+impl Default for EventHandler {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

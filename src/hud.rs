@@ -19,13 +19,13 @@ pub struct HUD<'s> {
 
 impl<'s> HUD<'s> {
     pub fn new(window_size: &Vector2f, texture_loader: &'s TextureLoader) -> HUD<'s> {
-        let mut array = VertexArray::new(PrimitiveType::LINE_STRIP, 4);
+        let array = VertexArray::new(PrimitiveType::LINE_STRIP, 4);
         let mut face = RectangleShape::with_size(Vector2f::new(43., 58.));
         face.set_position(Vector2f::new(window_size.x / 2. - 21., window_size.y - 71.));
         HUD {
             texture_loader,
             face,
-            window_size: window_size.clone(),
+            window_size: *window_size,
             background: RectangleShape::new(),
             hud_vertex_array: array,
             face_animation: Animation::new(
