@@ -36,49 +36,49 @@ fn display_help() {
 
 fn load_texture() -> TextureLoader {
     let mut texture_loader = TextureLoader::new();
-    if !texture_loader.load_texture("../resources/ground.tga".to_string())  || // 0
-       !texture_loader.load_texture("../resources/1.tga".to_string())  || // 1
-       !texture_loader.load_texture("../resources/2.tga".to_string())  || // 2
-       !texture_loader.load_texture("../resources/3.tga".to_string())  || // 3
-       !texture_loader.load_texture("../resources/4.tga".to_string())  || // 4
-       !texture_loader.load_texture("../resources/5.tga".to_string())  || // 5
-       !texture_loader.load_texture("../resources/6.tga".to_string())  || // 6
-       !texture_loader.load_texture("../resources/7.tga".to_string())  || // 7
-       !texture_loader.load_texture("../resources/8.tga".to_string())  || // 8
-       !texture_loader.load_texture("../resources/9.tga".to_string())  || // 9
-       !texture_loader.load_texture("../resources/10.tga".to_string())  || // 10
-       !texture_loader.load_texture("../resources/sky.tga".to_string())  || // 11
-       !texture_loader.load_texture("../resources/weapons/gun_1.png".to_string())  || // 12
-       !texture_loader.load_texture("../resources/weapons/gun_2.png".to_string())  || // 13
-       !texture_loader.load_texture("../resources/weapons/gun_3.png".to_string())  || // 14
-       !texture_loader.load_texture("../resources/weapons/gun_4.png".to_string())  || // 15
-       !texture_loader.load_texture("../resources/weapons/gun_5.png".to_string())  || // 16
-       !texture_loader.load_texture("../resources/weapons/gun_6.png".to_string())  || // 17
-       !texture_loader.load_texture("../resources/weapons/gun_shadow.png".to_string())  || // 18
-       !texture_loader.load_texture("../resources/weapons/gun2_1.png".to_string())  || // 19
-       !texture_loader.load_texture("../resources/weapons/gun2_2.png".to_string())  || // 20
-       !texture_loader.load_texture("../resources/weapons/gun2_3.png".to_string())  || // 21
-       !texture_loader.load_texture("../resources/weapons/gun2_4.png".to_string())  || // 22
-       !texture_loader.load_texture("../resources/weapons/gun2_5.png".to_string())  || // 23
-       !texture_loader.load_texture("../resources/weapons/gun2_6.png".to_string())  || // 24
-       !texture_loader.load_texture("../resources/weapons/gun2_shadow.png".to_string())  || // 25
-       !texture_loader.load_texture("../resources/weapons/gun3_1.png".to_string())  || // 26
-       !texture_loader.load_texture("../resources/weapons/gun3_2.png".to_string())  || // 27
-       !texture_loader.load_texture("../resources/weapons/gun3_3.png".to_string())  || // 28
-       !texture_loader.load_texture("../resources/weapons/gun3_4.png".to_string())  || // 29
-       !texture_loader.load_texture("../resources/weapons/gun3_5.png".to_string())  || // 30
-       !texture_loader.load_texture("../resources/weapons/gun3_6.png".to_string())  || // 31
-       !texture_loader.load_texture("../resources/weapons/gun3_shadow.png".to_string())  || // 32
-       !texture_loader.load_texture("../resources/weapons/cut_1.png".to_string())  || // 33
-       !texture_loader.load_texture("../resources/weapons/cut_2.png".to_string())  || // 34
-       !texture_loader.load_texture("../resources/weapons/cut_3.png".to_string())  || // 35
-       !texture_loader.load_texture("../resources/weapons/cut_4.png".to_string())  || // 36
-       !texture_loader.load_texture("../resources/weapons/cut_5.png".to_string())  || // 37
-       !texture_loader.load_texture("../resources/weapons/cut_6.png".to_string())  || //38
-       !texture_loader.load_texture("../resources/weapons/cut_shadow.png".to_string())  || // 39
-       !texture_loader.load_texture("../resources/face1.png".to_string())  || //40
-       !texture_loader.load_texture("../resources/face2.png".to_string())  || //41
-       !texture_loader.load_texture("../resources/face3.png".to_string())
+    if !texture_loader.load_texture("resources/ground.tga")  || // 0
+       !texture_loader.load_texture("resources/1.tga")  || // 1
+       !texture_loader.load_texture("resources/2.tga")  || // 2
+       !texture_loader.load_texture("resources/3.tga")  || // 3
+       !texture_loader.load_texture("resources/4.tga")  || // 4
+       !texture_loader.load_texture("resources/5.tga")  || // 5
+       !texture_loader.load_texture("resources/6.tga")  || // 6
+       !texture_loader.load_texture("resources/7.tga")  || // 7
+       !texture_loader.load_texture("resources/8.tga")  || // 8
+       !texture_loader.load_texture("resources/9.tga")  || // 9
+       !texture_loader.load_texture("resources/10.tga")  || // 10
+       !texture_loader.load_texture("resources/sky.tga")  || // 11
+       !texture_loader.load_texture("resources/weapons/gun_1.png")  || // 12
+       !texture_loader.load_texture("resources/weapons/gun_2.png")  || // 13
+       !texture_loader.load_texture("resources/weapons/gun_3.png")  || // 14
+       !texture_loader.load_texture("resources/weapons/gun_4.png")  || // 15
+       !texture_loader.load_texture("resources/weapons/gun_5.png")  || // 16
+       !texture_loader.load_texture("resources/weapons/gun_6.png")  || // 17
+       !texture_loader.load_texture("resources/weapons/gun_shadow.png")  || // 18
+       !texture_loader.load_texture("resources/weapons/gun2_1.png")  || // 19
+       !texture_loader.load_texture("resources/weapons/gun2_2.png")  || // 20
+       !texture_loader.load_texture("resources/weapons/gun2_3.png")  || // 21
+       !texture_loader.load_texture("resources/weapons/gun2_4.png")  || // 22
+       !texture_loader.load_texture("resources/weapons/gun2_5.png")  || // 23
+       !texture_loader.load_texture("resources/weapons/gun2_6.png")  || // 24
+       !texture_loader.load_texture("resources/weapons/gun2_shadow.png")  || // 25
+       !texture_loader.load_texture("resources/weapons/gun3_1.png")  || // 26
+       !texture_loader.load_texture("resources/weapons/gun3_2.png")  || // 27
+       !texture_loader.load_texture("resources/weapons/gun3_3.png")  || // 28
+       !texture_loader.load_texture("resources/weapons/gun3_4.png")  || // 29
+       !texture_loader.load_texture("resources/weapons/gun3_5.png")  || // 30
+       !texture_loader.load_texture("resources/weapons/gun3_6.png")  || // 31
+       !texture_loader.load_texture("resources/weapons/gun3_shadow.png")  || // 32
+       !texture_loader.load_texture("resources/weapons/cut_1.png")  || // 33
+       !texture_loader.load_texture("resources/weapons/cut_2.png")  || // 34
+       !texture_loader.load_texture("resources/weapons/cut_3.png")  || // 35
+       !texture_loader.load_texture("resources/weapons/cut_4.png")  || // 36
+       !texture_loader.load_texture("resources/weapons/cut_5.png")  || // 37
+       !texture_loader.load_texture("resources/weapons/cut_6.png")  || //38
+       !texture_loader.load_texture("resources/weapons/cut_shadow.png")  || // 39
+       !texture_loader.load_texture("resources/face1.png")  || //40
+       !texture_loader.load_texture("resources/face2.png")  || //41
+       !texture_loader.load_texture("resources/face3.png")
     {
         //42
         panic!("Error : Cannot load texture.");
@@ -121,7 +121,7 @@ fn main() {
     let mut render_window = RenderWindow::new(video_mode, "Rustenstein3D", Style::CLOSE, &settings);
 
     // set the framerate limit to 30 fps.
-    render_window.set_framerate_limit(40);
+    render_window.set_framerate_limit(30);
 
     // hide the cursor.
     render_window.set_mouse_cursor_visible(false);
@@ -133,7 +133,7 @@ fn main() {
     });
 
     // Create the font for the FPS_handler.
-    let font = Font::from_file("../resources/sansation.ttf")
+    let font = Font::from_file("resources/sansation.ttf")
         .expect("Error : Cannot load font, font resources/sansation.ttf doesn.t exist!");
 
     // Create the texture loader and load textures

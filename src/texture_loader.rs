@@ -11,8 +11,8 @@ impl TextureLoader {
         }
     }
 
-    pub fn load_texture(&mut self, texture_path: String) -> bool {
-        match Texture::from_file(texture_path.as_str()) {
+    pub fn load_texture(&mut self, texture_path: &str) -> bool {
+        match Texture::from_file(texture_path) {
             Some(tex) => {
                 self.textures.push(tex);
                 true
