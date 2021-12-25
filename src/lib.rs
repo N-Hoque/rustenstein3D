@@ -1,9 +1,8 @@
 extern crate rsfml;
 
-#[allow(non_snake_case)]
-pub mod FPS;
 pub mod animation;
 pub mod event_handler;
+pub mod fps;
 pub mod game;
 pub mod game_mode;
 pub mod hud;
