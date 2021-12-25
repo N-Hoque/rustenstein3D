@@ -1,6 +1,6 @@
 use crate::{
-    event_handler::EventHandler, fps::FPSHandler, game_mode::GameMode,
-    texture_loader::TextureLoader,
+    event_handler::EventHandler, game_mode::GameMode, texture_loader::TextureLoader,
+    FPS::FPSHandler,
 };
 
 use rsfml::{
