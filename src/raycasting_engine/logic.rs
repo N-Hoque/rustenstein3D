@@ -82,12 +82,6 @@ impl REngine {
             .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
             .clear();
 
-        const DIST_PLAYER: f32 = 0.;
-
-        let mut current_dist: f32;
-        let mut weight: f32;
-        let mut current_floor = Vector2f { x: 0., y: 0. };
-        let mut tex_coord = Vector2f { x: 0., y: 0. };
         let mut pos = Vector2f {
             x: width_pixel as f32,
             y: 0.,
@@ -96,14 +90,14 @@ impl REngine {
         let floor = self.calculate_floor(ray_dir, side);
 
         for y in (self.draw_state.draw_end + 1)..(self.window_size.y as i32) {
-            current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
-            weight = (current_dist - DIST_PLAYER) / (self.draw_state.perp_wall_dist - DIST_PLAYER);
-            current_floor.x = weight * floor.x + (1. - weight) * self.player_position.x;
-            current_floor.y = weight * floor.y + (1. - weight) * self.player_position.y;
+            let current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
+            let weight = current_dist / self.draw_state.perp_wall_dist;
+            let current_floor = weight * floor + (1.0 - weight) * self.player_position;
 
-            tex_coord.x = ((current_floor.x * 128.) as i32 % 128) as f32;
-            tex_coord.y = ((current_floor.y * 128.) as i32 % 128) as f32;
-
+            let tex_coord = Vector2f::new(
+                ((current_floor.x * 128.) as i32 % 128) as f32,
+                ((current_floor.y * 128.) as i32 % 128) as f32,
+            );
             pos.y = y as f32;
 
             let vertex = Vertex::new(pos, Color::WHITE, tex_coord);
@@ -221,10 +215,12 @@ impl REngine {
         }
 
         self.textures_id.push(texture_id);
+
         self.vertex_array
             .get_mut(width_pixel as usize)
             .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
             .clear();
+
         self.vertex_array
             .get_mut(width_pixel as usize)
             .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
@@ -233,6 +229,7 @@ impl REngine {
                 Color::WHITE,
                 Vector2f::new(texture_x as f32, 128.),
             ));
+
         self.vertex_array
             .get_mut(width_pixel as usize)
             .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
@@ -331,10 +328,7 @@ impl REngine {
     }
 
     fn create_line_array(window_size: Vector2f) -> Vec<VertexArray> {
-        (0..window_size.x as i32)
-            .into_iter()
-            .map(|_x| VertexArray::new(PrimitiveType::LINES, 2))
-            .collect()
+        vec![VertexArray::new(PrimitiveType::LINES, 0); window_size.x as usize]
     }
 
     pub fn get_player_pos(&self) -> Vector2f {
