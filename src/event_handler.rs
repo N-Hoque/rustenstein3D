@@ -35,64 +35,42 @@ impl EventHandler {
     }
 
     pub fn has_text_entered(&self) -> Option<char> {
-        self.events.iter().find_map(|e| {
-            if let Event::TextEntered { unicode } = *e {
-                Some(unicode)
-            } else {
-                None
-            }
+        self.events.iter().find_map(|e| match *e {
+            Event::TextEntered { unicode } => Some(unicode),
+            _ => None,
         })
     }
 
     pub fn has_key_pressed_event(&self, key: Key) -> Option<(Key, bool, bool, bool, bool)> {
-        self.events.iter().find_map(|e| {
-            if let Event::KeyPressed {
+        self.events.iter().find_map(|e| match *e {
+            Event::KeyPressed {
                 code,
                 alt,
                 ctrl,
                 shift,
                 system,
-            } = *e
-            {
-                if code == key {
-                    Some((code, alt, ctrl, shift, system))
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
+            } if code == key => Some((code, alt, ctrl, shift, system)),
+            _ => None,
         })
     }
 
     pub fn has_key_released_event(&self, key: Key) -> Option<(Key, bool, bool, bool, bool)> {
-        self.events.iter().find_map(|e| {
-            if let Event::KeyReleased {
+        self.events.iter().find_map(|e| match *e {
+            Event::KeyReleased {
                 code,
                 alt,
                 ctrl,
                 shift,
                 system,
-            } = *e
-            {
-                if code == key {
-                    Some((code, alt, ctrl, shift, system))
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
+            } if code == key => Some((code, alt, ctrl, shift, system)),
+            _ => None,
         })
     }
 
     pub fn has_mouse_wheel_moved_event(&self) -> Option<(f32, i32, i32)> {
-        self.events.iter().find_map(|e| {
-            if let Event::MouseWheelScrolled { delta, x, y, .. } = *e {
-                Some((delta, x, y))
-            } else {
-                None
-            }
+        self.events.iter().find_map(|e| match *e {
+            Event::MouseWheelScrolled { delta, x, y, .. } => Some((delta, x, y)),
+            _ => None,
         })
     }
 
@@ -100,16 +78,11 @@ impl EventHandler {
         &self,
         mouse_button: Button,
     ) -> Option<(Button, i32, i32)> {
-        self.events.iter().find_map(|e| {
-            if let Event::MouseButtonPressed { button, x, y } = *e {
-                if mouse_button == button {
-                    Some((button, x, y))
-                } else {
-                    None
-                }
-            } else {
-                None
+        self.events.iter().find_map(|e| match *e {
+            Event::MouseButtonPressed { button, x, y } if mouse_button == button => {
+                Some((button, x, y))
             }
+            _ => None,
         })
     }
 
@@ -117,26 +90,18 @@ impl EventHandler {
         &self,
         mouse_button: Button,
     ) -> Option<(Button, i32, i32)> {
-        self.events.iter().find_map(|e| {
-            if let Event::MouseButtonReleased { button, x, y } = *e {
-                if mouse_button == button {
-                    Some((button, x, y))
-                } else {
-                    None
-                }
-            } else {
-                None
+        self.events.iter().find_map(|e| match *e {
+            Event::MouseButtonReleased { button, x, y } if mouse_button == button => {
+                Some((button, x, y))
             }
+            _ => None,
         })
     }
 
     pub fn has_mouse_moved_event(&self) -> Option<(i32, i32)> {
-        self.events.iter().find_map(|e| {
-            if let Event::MouseMoved { x, y } = *e {
-                Some((x, y))
-            } else {
-                None
-            }
+        self.events.iter().find_map(|e| match *e {
+            Event::MouseMoved { x, y } => Some((x, y)),
+            _ => None,
         })
     }
 
@@ -160,65 +125,45 @@ impl EventHandler {
     }
 
     pub fn has_joystick_button_pressed(&self, joystick_button: u32) -> Option<(u32, u32)> {
-        self.events.iter().find_map(|e| {
-            if let Event::JoystickButtonPressed { button, joystickid } = *e {
-                if joystick_button == button {
-                    Some((button, joystickid))
-                } else {
-                    None
-                }
-            } else {
-                None
+        self.events.iter().find_map(|e| match *e {
+            Event::JoystickButtonPressed { button, joystickid } if joystick_button == button => {
+                Some((button, joystickid))
             }
+            _ => None,
         })
     }
 
     pub fn has_joystick_button_released(&self, joystick_button: u32) -> Option<(u32, u32)> {
-        self.events.iter().find_map(|e| {
-            if let Event::JoystickButtonReleased { button, joystickid } = *e {
-                if joystick_button == button {
-                    Some((button, joystickid))
-                } else {
-                    None
-                }
-            } else {
-                None
+        self.events.iter().find_map(|e| match *e {
+            Event::JoystickButtonReleased { button, joystickid } if joystick_button == button => {
+                Some((button, joystickid))
             }
+            _ => None,
         })
     }
 
     pub fn has_joystick_moved(&self) -> Option<(Axis, f32, u32)> {
-        self.events.iter().find_map(|e| {
-            if let Event::JoystickMoved {
+        self.events.iter().find_map(|e| match *e {
+            Event::JoystickMoved {
                 axis,
                 position,
                 joystickid,
-            } = *e
-            {
-                Some((axis, position, joystickid))
-            } else {
-                None
-            }
+            } => Some((axis, position, joystickid)),
+            _ => None,
         })
     }
 
     pub fn has_joystick_connected(&self) -> Option<u32> {
-        self.events.iter().find_map(|e| {
-            if let Event::JoystickConnected { joystickid } = *e {
-                Some(joystickid)
-            } else {
-                None
-            }
+        self.events.iter().find_map(|e| match *e {
+            Event::JoystickConnected { joystickid } => Some(joystickid),
+            _ => None,
         })
     }
 
     pub fn has_joystick_disconnected(&self) -> Option<u32> {
-        self.events.iter().find_map(|e| {
-            if let Event::JoystickDisconnected { joystickid } = *e {
-                Some(joystickid)
-            } else {
-                None
-            }
+        self.events.iter().find_map(|e| match *e {
+            Event::JoystickDisconnected { joystickid } => Some(joystickid),
+            _ => None,
         })
     }
 }
