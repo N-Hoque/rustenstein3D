@@ -279,57 +279,16 @@ impl REngine {
     }
 
     fn update_events(&mut self, event_handler: &EventHandler) {
-        let mut pos = Vector2i { x: 0, y: 0 };
-        if event_handler.is_key_pressed(Key::W) {
-            pos.x = (self.player_position.x + (self.vector_direction.x * 0.1)) as i32;
-            pos.y = self.player_position.y as i32;
-            if self
-                .map
-                .get_block(&pos)
-                .unwrap_or_else(|| panic!("Error on getting block at position {:?}", pos))
-                == 0
-            {
-                self.player_position.x += self.vector_direction.x * 0.1;
-            }
-            pos.y = (self.player_position.y + (self.vector_direction.y * 0.1)) as i32;
-            pos.x = self.player_position.x as i32;
-            if self
-                .map
-                .get_block(&pos)
-                .unwrap_or_else(|| panic!("Error on getting block at position {:?}", pos))
-                == 0
-            {
-                self.player_position.y += self.vector_direction.y * 0.1;
-            }
-        }
-        if event_handler.is_key_pressed(Key::S) {
-            pos.x = (self.player_position.x - (self.vector_direction.x * 0.1)) as i32;
-            pos.y = self.player_position.y as i32;
-            if self
-                .map
-                .get_block(&pos)
-                .unwrap_or_else(|| panic!("Error on getting block at position {:?}", pos))
-                == 0
-            {
-                self.player_position.x -= self.vector_direction.x * 0.1;
-            }
-            pos.y = (self.player_position.y - (self.vector_direction.y * 0.1)) as i32;
-            pos.x = self.player_position.x as i32;
-            if self
-                .map
-                .get_block(&pos)
-                .unwrap_or_else(|| panic!("Error on getting block at position {:?}", pos))
-                == 0
-            {
-                self.player_position.y -= self.vector_direction.y * 0.1;
-            }
-        }
+        self.update_position(event_handler);
+        self.update_direction(event_handler);
+    }
 
-        let mouse_move: f32 = match event_handler.has_mouse_moved_event() {
-            Some((x, _)) => x as f32 - (self.window_size.x / 2.) as f32,
-            None => 0.,
+    fn update_direction(&mut self, event_handler: &EventHandler) {
+        let mouse_move = if let Some((x, _)) = event_handler.has_mouse_moved_event() {
+            x as f32 - (self.window_size.x / 2.)
+        } else {
+            0.
         } / -250.;
-
         let old_dir_x = self.vector_direction.x;
         self.vector_direction.x = self.vector_direction.x * (mouse_move).cos()
             - self.vector_direction.y * (mouse_move).sin();
@@ -340,6 +299,34 @@ impl REngine {
             self.cam_plane.x * (mouse_move).cos() - self.cam_plane.y * (mouse_move).sin();
         self.cam_plane.y =
             old_cam_plane_x * (mouse_move).sin() + self.cam_plane.y * (mouse_move).cos();
+    }
+
+    fn update_by_key(&mut self, pos: &mut Vector2i, event_handler: &EventHandler, key: Key) {
+        let multiplier = match key {
+            Key::W => 1.0,
+            Key::S => -1.0,
+            _ => return,
+        };
+
+        if event_handler.is_key_pressed(key) {
+            pos.x = (self.player_position.x + (self.vector_direction.x * 0.1 * multiplier)) as i32;
+            pos.y = self.player_position.y as i32;
+            if let Some(0) = self.map.get_block(&pos) {
+                self.player_position.x += 0.1 * multiplier * self.vector_direction.x;
+            }
+
+            pos.y = (self.player_position.y + (self.vector_direction.y * 0.1 * multiplier)) as i32;
+            pos.x = self.player_position.x as i32;
+            if let Some(0) = self.map.get_block(&pos) {
+                self.player_position.y += 0.1 * multiplier * self.vector_direction.y;
+            }
+        }
+    }
+
+    fn update_position(&mut self, event_handler: &EventHandler) {
+        let mut pos = Vector2i::default();
+        self.update_by_key(&mut pos, event_handler, Key::W);
+        self.update_by_key(&mut pos, event_handler, Key::S);
     }
 
     fn create_line_array(window_size: &Vector2f) -> Vec<VertexArray> {
