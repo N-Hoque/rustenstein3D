@@ -2,6 +2,21 @@ use rsfml::system::{Vector2f, Vector2i};
 
 use super::{Map, Orientation};
 
+impl From<Orientation> for Vector2i {
+    fn from(o: Orientation) -> Self {
+        match o {
+            Orientation::Top => Vector2i::new(-1, 0),
+            Orientation::Bottom => Vector2i::new(1, 0),
+            Orientation::Left => Vector2i::new(0, -1),
+            Orientation::Right => Vector2i::new(0, 1),
+            Orientation::TopLeft => Vector2i::new(-1, -1),
+            Orientation::TopRight => Vector2i::new(-1, 1),
+            Orientation::BottomLeft => Vector2i::new(1, -1),
+            Orientation::BottomRight => Vector2i::new(1, 1),
+        }
+    }
+}
+
 impl Map {
     pub fn new(map: Vec<i32>, map_size: &Vector2f) -> Map {
         Map {
@@ -18,16 +33,7 @@ impl Map {
         block_orientation: Orientation,
         position: &Vector2i,
     ) -> Option<i32> {
-        match block_orientation {
-            Orientation::Top => self.handle_top(position),
-            Orientation::Bottom => self.handle_bottom(position),
-            Orientation::Left => self.handle_left(position),
-            Orientation::Right => self.handle_right(position),
-            Orientation::TopLeft => self.handle_top_left(position),
-            Orientation::TopRight => self.handle_top_right(position),
-            Orientation::BottomLeft => self.handle_bottom_left(position),
-            Orientation::BottomRight => self.handle_bottom_right(position),
-        }
+        self.get_block(&(*position + Vector2i::from(block_orientation)))
     }
 
     pub fn get_block(&self, position: &Vector2i) -> Option<i32> {
@@ -44,69 +50,5 @@ impl Map {
 
     pub fn get_map_size(&self) -> &Vector2i {
         &self.map_size
-    }
-
-    fn handle_top(&self, position: &Vector2i) -> Option<i32> {
-        let tmp_pos = Vector2i {
-            x: position.x - 1,
-            y: position.y,
-        };
-        self.get_block(&tmp_pos)
-    }
-
-    fn handle_bottom(&self, position: &Vector2i) -> Option<i32> {
-        let tmp_pos = Vector2i {
-            x: position.x + 1,
-            y: position.y,
-        };
-        self.get_block(&tmp_pos)
-    }
-
-    fn handle_left(&self, position: &Vector2i) -> Option<i32> {
-        let tmp_pos = Vector2i {
-            x: position.x,
-            y: position.y - 1,
-        };
-        self.get_block(&tmp_pos)
-    }
-
-    fn handle_right(&self, position: &Vector2i) -> Option<i32> {
-        let tmp_pos = Vector2i {
-            x: position.x,
-            y: position.y + 1,
-        };
-        self.get_block(&tmp_pos)
-    }
-
-    fn handle_top_left(&self, position: &Vector2i) -> Option<i32> {
-        let tmp_pos = Vector2i {
-            x: position.x - 1,
-            y: position.y - 1,
-        };
-        self.get_block(&tmp_pos)
-    }
-
-    fn handle_top_right(&self, position: &Vector2i) -> Option<i32> {
-        let tmp_pos = Vector2i {
-            x: position.x - 1,
-            y: position.y + 1,
-        };
-        self.get_block(&tmp_pos)
-    }
-
-    fn handle_bottom_left(&self, position: &Vector2i) -> Option<i32> {
-        let tmp_pos = Vector2i {
-            x: position.x + 1,
-            y: position.y - 1,
-        };
-        self.get_block(&tmp_pos)
-    }
-
-    fn handle_bottom_right(&self, position: &Vector2i) -> Option<i32> {
-        let tmp_pos = Vector2i {
-            x: position.x + 1,
-            y: position.y + 1,
-        };
-        self.get_block(&tmp_pos)
     }
 }
