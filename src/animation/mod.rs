@@ -21,12 +21,12 @@ struct Data {
     offset: u32,
     texture_ids: Vec<i32>,
     lag: f32,
-    current_texture: u32,
-    clock: Clock,
 }
 
 pub struct Animation {
     state: PlayState,
     mode: PlayMode,
     data: Data,
+    current_texture: u32,
+    clock: Clock,
 }

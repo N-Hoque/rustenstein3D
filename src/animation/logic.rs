@@ -9,29 +9,26 @@ impl Animation {
         mode: PlayMode,
         lag: f32,
         offset: u32,
-    ) -> Animation {
-        let data = Data {
-            a: 1,
-            b: texture_ids.len() as u32 - 1u32,
-            offset,
-            texture_ids,
-            lag,
+    ) -> Self {
+        Self {
+            state,
+            mode,
+            data: Self::make_data(offset, texture_ids, lag),
             current_texture: 0,
             clock: Clock::start(),
-        };
-        Animation { state, mode, data }
+        }
     }
 
     pub fn set_state(&mut self, new_state: PlayState) {
         self.state = new_state;
         match self.state {
             PlayState::Stop => {
-                self.data.current_texture = 0;
-                self.data.clock.restart();
+                self.current_texture = 0;
+                self.clock.restart();
             }
-            PlayState::Play if self.data.offset <= self.data.current_texture => {
-                self.data.current_texture = self.data.a;
-                self.data.clock.restart();
+            PlayState::Play if self.data.offset <= self.current_texture => {
+                self.current_texture = self.data.a;
+                self.clock.restart();
             }
             _ => {}
         }
@@ -54,7 +51,7 @@ impl Animation {
     }
 
     pub fn get_current_texture_id(&self) -> i32 {
-        self.data.texture_ids[self.data.current_texture as usize]
+        self.data.texture_ids[self.current_texture as usize]
     }
 
     pub fn set_loop_anim(&mut self, a: u32, b: u32) {
@@ -68,17 +65,27 @@ impl Animation {
 
     pub fn update(&mut self) {
         if let PlayState::Play = self.state {
-            if self.data.clock.elapsed_time().as_seconds() >= self.data.lag {
-                if self.data.current_texture != self.data.texture_ids.len() as u32 - 1 {
-                    self.data.current_texture += 1;
+            if self.clock.elapsed_time().as_seconds() >= self.data.lag {
+                if self.current_texture != self.data.texture_ids.len() as u32 - 1 {
+                    self.current_texture += 1;
                 } else {
-                    self.data.current_texture = 0;
+                    self.current_texture = 0;
                     if let PlayMode::Once = self.mode {
                         self.state = PlayState::Stop
                     }
                 }
-                self.data.clock.restart();
+                self.clock.restart();
             }
+        }
+    }
+
+    fn make_data(offset: u32, texture_ids: Vec<i32>, lag: f32) -> Data {
+        Data {
+            a: 1,
+            b: texture_ids.len() as u32 - 1u32,
+            offset,
+            texture_ids,
+            lag,
         }
     }
 }
