@@ -57,18 +57,20 @@ impl<'s> GameLoop<'s> {
             self.render_window.close();
         }
         self.game_mode.update(&self.event_handler);
-        self.fps_handler.as_mut().unwrap().update();
+        self.fps_handler
+            .as_mut()
+            .expect("Updating FPS Handler")
+            .update();
     }
 
     pub fn draw(&mut self) {
         self.render_window.clear(CLEAR_COLOR);
         self.game_mode.draw(&mut self.render_window);
-        if self.fps_handler.is_some() {
-            self.fps_handler
-                .as_mut()
-                .unwrap()
-                .draw(&mut self.render_window)
-        };
+
+        if let Some(fps_handler) = self.fps_handler.as_mut() {
+            fps_handler.draw(&mut self.render_window);
+        }
+
         self.render_window.display();
     }
 }

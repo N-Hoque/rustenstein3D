@@ -98,7 +98,12 @@ impl<'s> Weapon<'s> {
         let animation = self
             .animations
             .get_mut(self.current_weapon as usize)
-            .unwrap();
+            .unwrap_or_else(|| {
+                panic!(
+                    "Getting animation for weapon at index: {}",
+                    self.current_weapon
+                )
+            });
 
         if !self.mouse_fire {
             if event_handler
@@ -106,15 +111,15 @@ impl<'s> Weapon<'s> {
                 .is_some()
             {
                 animation.set_state(AnimationState::Play);
-                self.mouse_fire = true
-            };
+                self.mouse_fire = true;
+            }
         } else if event_handler
             .has_mouse_button_released_event(Button::LEFT)
             .is_some()
         {
-            self.mouse_fire = false
+            self.mouse_fire = false;
         } else {
-            animation.set_state(AnimationState::Play)
+            animation.set_state(AnimationState::Play);
         }
 
         if event_handler.is_key_pressed(Key::E) {

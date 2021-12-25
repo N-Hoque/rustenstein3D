@@ -94,13 +94,61 @@ impl REngine {
     }
 
     fn calculate_ground(&mut self, side: i32, map_pos: &Vector2i, ray_dir: &Vector2f, x: i32) {
-        let mut floor = Vector2f { x: 0., y: 0. };
-        let dist_player: f32 = 0.;
+        if self.draw_state.draw_end < 0 {
+            self.draw_state.draw_end = self.window_size.y as i32;
+        }
+
+        self.ground
+            .get_mut(x as usize)
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+            .clear();
+
+        self.sky
+            .get_mut(x as usize)
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+            .clear();
+
+        const DIST_PLAYER: f32 = 0.;
+
         let mut current_dist: f32;
         let mut weight: f32;
         let mut current_floor = Vector2f { x: 0., y: 0. };
         let mut tex_coord = Vector2f { x: 0., y: 0. };
         let mut pos = Vector2f { x: x as f32, y: 0. };
+
+        let floor = self.calculate_floor(side, ray_dir, map_pos);
+
+        for y in (self.draw_state.draw_end + 1)..(self.window_size.y as i32) {
+            current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
+            weight = (current_dist - DIST_PLAYER) / (self.draw_state.perp_wall_dist - DIST_PLAYER);
+            current_floor.x = weight * floor.x + (1. - weight) * self.player_position.x;
+            current_floor.y = weight * floor.y + (1. - weight) * self.player_position.y;
+
+            tex_coord.x = ((current_floor.x * 128.) as i32 % 128) as f32;
+            tex_coord.y = ((current_floor.y * 128.) as i32 % 128) as f32;
+
+            pos.y = y as f32;
+
+            let vertex = Vertex::new(pos, Color::WHITE, tex_coord);
+
+            self.ground
+                .get_mut(x as usize)
+                .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+                .append(&vertex);
+
+            pos.y = self.window_size.y - y as f32;
+
+            let vertex = Vertex::new(pos, Color::WHITE, tex_coord);
+
+            self.sky
+                .get_mut(x as usize)
+                .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+                .append(&vertex);
+        }
+    }
+
+    fn calculate_floor(&mut self, side: i32, ray_dir: &Vector2f, map_pos: &Vector2i) -> Vector2f {
+        let mut floor = Vector2f { x: 0., y: 0. };
         if side == 0 && ray_dir.x > 0. {
             floor.x = map_pos.x as f32;
             floor.y = map_pos.y as f32 + self.draw_state.wall_x;
@@ -114,38 +162,7 @@ impl REngine {
             floor.x = map_pos.x as f32 + self.draw_state.wall_x;
             floor.y = map_pos.y as f32 + 1.;
         }
-
-        if self.draw_state.draw_end < 0 {
-            self.draw_state.draw_end = self.window_size.y as i32;
-        }
-        let mut y: i32 = self.draw_state.draw_end + 1;
-        self.ground.get_mut(x as usize).unwrap().clear();
-        self.sky.get_mut(x as usize).unwrap().clear();
-        let mut vertex = Vertex::default();
-        while y < self.window_size.y as i32 {
-            current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
-            weight = (current_dist - dist_player) / (self.draw_state.perp_wall_dist - dist_player);
-            current_floor.x = weight * floor.x + (1. - weight) * self.player_position.x;
-            current_floor.y = weight * floor.y + (1. - weight) * self.player_position.y;
-
-            tex_coord.x = ((current_floor.x * 128.) as i32 % 128) as f32;
-            tex_coord.y = ((current_floor.y * 128.) as i32 % 128) as f32;
-
-            pos.y = y as f32;
-            vertex.position.x = pos.x;
-            vertex.position.y = pos.y;
-            vertex.tex_coords.x = tex_coord.x;
-            vertex.tex_coords.y = tex_coord.y;
-            self.ground.get_mut(x as usize).unwrap().append(&vertex);
-            pos.y = self.window_size.y - y as f32;
-            vertex.position.x = pos.x;
-            vertex.position.y = pos.y;
-            vertex.tex_coords.x = tex_coord.x;
-            vertex.tex_coords.y = tex_coord.y;
-            self.sky.get_mut(x as usize).unwrap().append(&vertex);
-
-            y += 1;
-        }
+        floor
     }
 
     fn calculate_wall_height(
@@ -161,15 +178,18 @@ impl REngine {
             (map_pos.y as f32 - ray_pos.y + (1 - self.draw_state.step.y) as f32 / 2.) / ray_dir.y
         }
         .abs();
+
         let line_height: i32 = if self.draw_state.perp_wall_dist as i32 == 0 {
             self.window_size.y as i32
         } else {
             ((self.window_size.y / self.draw_state.perp_wall_dist) as i32).abs()
         };
+
         self.draw_state.draw_start = (self.window_size.y as i32 / 2) - (line_height / 2);
         if self.draw_state.draw_start < 0 {
             self.draw_state.draw_start = 0;
         }
+
         self.draw_state.draw_end = line_height / 2 + self.window_size.y as i32 / 2;
         if self.draw_state.draw_end > self.window_size.y as i32 {
             self.draw_state.draw_end = self.window_size.y as i32 - 1;
@@ -184,11 +204,6 @@ impl REngine {
         map_pos: &Vector2i,
         ray_pos: &Vector2f,
     ) {
-        let mut texture_id = self
-            .map
-            .get_block(map_pos)
-            .unwrap_or_else(|| panic!("Failed to get block at map position {:?}", map_pos));
-
         self.draw_state.wall_x = if side == 1 {
             ray_pos.x
                 + ((map_pos.y as f32 - ray_pos.y + (1. - self.draw_state.step.y as f32) / 2.)
@@ -210,15 +225,23 @@ impl REngine {
             texture_x = 128 - texture_x - 1;
         }
 
+        let mut texture_id = self
+            .map
+            .get_block(map_pos)
+            .unwrap_or_else(|| panic!("Getting block at map position {:?}", map_pos));
+
         if side == 1 {
             texture_id += 5;
         }
 
         self.textures_id.push(texture_id);
-        self.vertex_array.get_mut(x as usize).unwrap().clear();
         self.vertex_array
             .get_mut(x as usize)
-            .unwrap()
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
+            .clear();
+        self.vertex_array
+            .get_mut(x as usize)
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
             .append(&Vertex::new(
                 Vector2f::new(x as f32, self.draw_state.draw_end as f32),
                 Color::WHITE,
@@ -226,7 +249,7 @@ impl REngine {
             ));
         self.vertex_array
             .get_mut(x as usize)
-            .unwrap()
+            .unwrap_or_else(|| panic!("Getting vertices at index: {}", x))
             .append(&Vertex::new(
                 Vector2f::new(x as f32, self.draw_state.draw_start as f32),
                 Color::WHITE,
@@ -258,8 +281,7 @@ impl REngine {
     }
 
     fn hit_wall(&mut self, map_pos: &mut Vector2i, delta_dist: &mut Vector2f, side: &mut i32) {
-        let mut hit: bool = false;
-        while !hit {
+        while matches!(self.map.get_block(map_pos), Some(0)) {
             if self.draw_state.side_dist.x < self.draw_state.side_dist.y {
                 self.draw_state.side_dist.x += delta_dist.x;
                 map_pos.x += self.draw_state.step.x;
@@ -269,11 +291,6 @@ impl REngine {
                 map_pos.y += self.draw_state.step.y;
                 *side = 1;
             }
-            hit = if let Some(0) = self.map.get_block(map_pos) {
-                false
-            } else {
-                true
-            };
         }
     }
 
@@ -303,22 +320,22 @@ impl REngine {
 
     fn update_by_key(&mut self, pos: &mut Vector2i, event_handler: &EventHandler, key: Key) {
         let multiplier = match key {
-            Key::W => 1.0,
-            Key::S => -1.0,
+            Key::W => 0.1,
+            Key::S => -0.1,
             _ => return,
         };
 
         if event_handler.is_key_pressed(key) {
-            pos.x = (self.player_position.x + (self.vector_direction.x * 0.1 * multiplier)) as i32;
+            pos.x = (self.player_position.x + (self.vector_direction.x * multiplier)) as i32;
             pos.y = self.player_position.y as i32;
-            if let Some(0) = self.map.get_block(&pos) {
-                self.player_position.x += 0.1 * multiplier * self.vector_direction.x;
+            if let Some(0) = self.map.get_block(pos) {
+                self.player_position.x += multiplier * self.vector_direction.x;
             }
 
-            pos.y = (self.player_position.y + (self.vector_direction.y * 0.1 * multiplier)) as i32;
+            pos.y = (self.player_position.y + (self.vector_direction.y * multiplier)) as i32;
             pos.x = self.player_position.x as i32;
-            if let Some(0) = self.map.get_block(&pos) {
-                self.player_position.y += 0.1 * multiplier * self.vector_direction.y;
+            if let Some(0) = self.map.get_block(pos) {
+                self.player_position.y += multiplier * self.vector_direction.y;
             }
         }
     }
