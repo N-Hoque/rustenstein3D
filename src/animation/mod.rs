@@ -9,7 +9,7 @@ pub enum PlayState {
 }
 
 struct Data {
-    a: u32,
+    start_tid: u32,
     offset: u32,
     texture_ids: Vec<i32>,
     lag: f32,
@@ -18,6 +18,6 @@ struct Data {
 pub struct Animation {
     state: PlayState,
     data: Data,
-    current_texture: u32,
+    active_texture: u32,
     clock: Clock,
 }

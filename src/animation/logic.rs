@@ -7,24 +7,28 @@ impl Animation {
         Self {
             state,
             data: Self::make_data(offset, texture_ids, lag),
-            current_texture: 0,
+            active_texture: 0,
             clock: Clock::start(),
         }
     }
 
     pub fn get_current_texture_id(&self) -> i32 {
-        self.data.texture_ids[self.current_texture as usize]
+        self.data.texture_ids[self.active_texture as usize]
     }
 
     pub fn set_state(&mut self, new_state: PlayState) {
         self.state = new_state;
+        self.set_active_texture();
+    }
+
+    fn set_active_texture(&mut self) {
         match self.state {
             PlayState::Stop => {
-                self.current_texture = 0;
+                self.active_texture = 0;
                 self.clock.restart();
             }
-            PlayState::Play if self.data.offset <= self.current_texture => {
-                self.current_texture = self.data.a;
+            PlayState::Play if self.data.offset <= self.active_texture => {
+                self.active_texture = self.data.start_tid;
                 self.clock.restart();
             }
             _ => {}
@@ -34,10 +38,10 @@ impl Animation {
     pub fn update(&mut self) {
         if let PlayState::Play = self.state {
             if self.clock.elapsed_time().as_seconds() >= self.data.lag {
-                if self.current_texture != self.data.texture_ids.len() as u32 - 1 {
-                    self.current_texture += 1;
+                if self.active_texture != self.data.texture_ids.len() as u32 - 1 {
+                    self.active_texture += 1;
                 } else {
-                    self.current_texture = 0;
+                    self.active_texture = 0;
                     self.state = PlayState::Stop
                 }
                 self.clock.restart();
@@ -47,7 +51,7 @@ impl Animation {
 
     fn make_data(offset: u32, texture_ids: &[i32], lag: f32) -> Data {
         Data {
-            a: 1,
+            start_tid: 1,
             offset,
             texture_ids: texture_ids.to_vec(),
             lag,
