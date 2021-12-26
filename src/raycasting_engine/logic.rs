@@ -299,7 +299,7 @@ impl REngine {
             old_cam_plane_x * (mouse_move).sin() + self.cam_plane.y * (mouse_move).cos();
     }
 
-    fn update_by_key(&mut self, pos: &mut Vector2i, event_handler: &EventHandler, key: Key) {
+    fn update_by_key(&mut self, event_handler: &EventHandler, key: Key) {
         let multiplier = match key {
             Key::W => 0.1,
             Key::S => -0.1,
@@ -307,24 +307,19 @@ impl REngine {
         };
 
         if event_handler.is_key_pressed(key) {
-            pos.x = (self.player_position.x + (self.vector_direction.x * multiplier)) as i32;
-            pos.y = self.player_position.y as i32;
-            if let Some(0) = self.map.get_block(*pos) {
-                self.player_position.x += multiplier * self.vector_direction.x;
-            }
-
-            pos.y = (self.player_position.y + (self.vector_direction.y * multiplier)) as i32;
-            pos.x = self.player_position.x as i32;
-            if let Some(0) = self.map.get_block(*pos) {
-                self.player_position.y += multiplier * self.vector_direction.y;
+            let pos = self.player_position + (self.vector_direction * multiplier);
+            if let Some(0) = self.map.get_block(Vector2i {
+                x: pos.x as i32,
+                y: pos.y as i32,
+            }) {
+                self.player_position = pos;
             }
         }
     }
 
     fn update_position(&mut self, event_handler: &EventHandler) {
-        let mut pos = Vector2i::default();
-        self.update_by_key(&mut pos, event_handler, Key::W);
-        self.update_by_key(&mut pos, event_handler, Key::S);
+        self.update_by_key(event_handler, Key::W);
+        self.update_by_key(event_handler, Key::S);
     }
 
     fn create_line_array(window_size: Vector2f) -> Vec<VertexArray> {
