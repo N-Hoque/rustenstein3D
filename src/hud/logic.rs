@@ -83,48 +83,6 @@ impl<'s> HUD<'s> {
 
     pub fn draw(&mut self, render_window: &mut RenderWindow) {
         render_window.draw(&self.background);
-        let window_x = self.window_size.x;
-        let window_y = self.window_size.y;
-        self.draw_line2(
-            Vector2f::new(window_x - 9., window_x - 9.),
-            Vector2f::new(9., window_y - 70.),
-            Vector2f::new(window_y - 10., window_y - 10.),
-            Color::rgba(255, 255, 255, 75),
-            render_window,
-        );
-        self.draw_line2(
-            Vector2f::new(window_x - 11., window_x - 11.),
-            Vector2f::new(11., window_y - 70.),
-            Vector2f::new(window_y - 12., window_y - 12.),
-            Color::BLACK,
-            render_window,
-        );
-        self.draw_line2(
-            Vector2f::new(9., 9.),
-            Vector2f::new(window_x - 9., window_y - 12.),
-            Vector2f::new(window_y - 71., window_y - 71.),
-            Color::BLACK,
-            render_window,
-        );
-        self.draw_line2(
-            Vector2f::new(11., 11.),
-            Vector2f::new(window_x - 11., window_y - 11.),
-            Vector2f::new(window_y - 69., window_y - 69.),
-            Color::rgba(255, 255, 255, 75),
-            render_window,
-        );
-        self.draw_line(
-            Vector2f::new(window_x, 0.),
-            Vector2f::new(window_y - 80., window_y - 80.),
-            Color::rgba(255, 255, 255, 50),
-            render_window,
-        );
-        self.draw_line(
-            Vector2f::new(window_x, 0.),
-            Vector2f::new(window_y - 79., window_y - 79.),
-            Color::rgba(255, 255, 255, 75),
-            render_window,
-        );
         render_window.draw(&self.face);
     }
 }
