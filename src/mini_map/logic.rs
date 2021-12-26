@@ -5,6 +5,7 @@ use rsfml::{
         Color, FloatRect, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable, View,
     },
     system::{Vector2f, Vector2i, Vector2u},
+    SfBox,
 };
 
 use crate::{map::Map, texture_loader::TextureLoader};
@@ -47,13 +48,19 @@ impl MiniMap {
     }
 
     pub fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
-        let def_view_centre = render_window.default_view().center();
-        let def_view_size = render_window.default_view().size();
-        let def_view = View::new(def_view_centre, def_view_size);
-        let mut rect = RectangleShape::with_size(Vector2f::new(80., 80.));
-        rect.set_fill_color(Color::rgba(255, 255, 255, 175));
         render_window.set_view(&self.mini_map_view);
-        let map_size = self.map.get_map_size();
+        let drawn_block = self.create_block(render_window, self.map.get_map_size(), texture_loader);
+        render_window.draw(&drawn_block);
+        render_window.set_view(&get_default_view(render_window));
+    }
+
+    fn create_block<'s>(
+        &self,
+        render_window: &mut RenderWindow,
+        map_size: Vector2i,
+        texture_loader: &'s TextureLoader,
+    ) -> RectangleShape<'s> {
+        let mut rect = create_default_block();
         let mut pos = Vector2i::default();
         while pos.x < map_size.x {
             while pos.y < map_size.y {
@@ -72,7 +79,18 @@ impl MiniMap {
         rect.set_fill_color(Color::rgba(255, 0, 0, 125));
         rect.set_origin(Vector2f::new(40., 40.));
         rect.set_position(self.player_pos * 80.);
-        render_window.draw(&rect);
-        render_window.set_view(&def_view);
+        rect
     }
+}
+
+fn create_default_block<'s>() -> RectangleShape<'s> {
+    let mut rect = RectangleShape::with_size(Vector2f::new(80., 80.));
+    rect.set_fill_color(Color::rgba(255, 255, 255, 175));
+    rect
+}
+
+fn get_default_view(render_window: &RenderWindow) -> SfBox<View> {
+    let def_view_centre = render_window.default_view().center();
+    let def_view_size = render_window.default_view().size();
+    View::new(def_view_centre, def_view_size)
 }

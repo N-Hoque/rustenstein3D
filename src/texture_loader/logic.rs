@@ -6,7 +6,7 @@ impl TextureLoader {
     pub fn with_textures(texture_paths: &[&str]) -> Self {
         let textures = texture_paths
             .iter()
-            .map(|t| Texture::from_file(t).unwrap_or_else(|| fail_message(t)))
+            .map(|t| Texture::from_file(t).unwrap_or_else(|| panic!("Loading texture from: {}", t)))
             .collect();
         Self { textures }
     }
@@ -18,15 +18,13 @@ impl TextureLoader {
     }
 
     pub fn load_texture(&mut self, texture_path: &str) {
-        Texture::from_file(texture_path)
-            .map_or_else(|| fail_message(texture_path), |tex| self.textures.push(tex));
+        Texture::from_file(texture_path).map_or_else(
+            || panic!("Loading texture from: {}", texture_path),
+            |tex| self.textures.push(tex),
+        );
     }
 
     pub fn get_texture(&self, index: i32) -> &Texture {
         &self.textures[index as usize]
     }
-}
-
-fn fail_message(path: &str) -> ! {
-    panic!("Loading texture from: {}", path)
 }

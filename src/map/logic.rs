@@ -30,8 +30,8 @@ impl Map {
 
     pub fn get_block(&self, position: Vector2i) -> Option<i32> {
         if position.x < 0
-            || position.y < 0
             || position.x > self.map_size.x
+            || position.y < 0
             || position.y > self.map_size.y
         {
             None

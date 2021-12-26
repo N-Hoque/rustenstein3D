@@ -24,7 +24,7 @@ impl<'s> HUD<'s> {
             face,
             window_size,
             background: RectangleShape::new(),
-            hud_vertex_array: VertexArray::new(PrimitiveType::LINE_STRIP, 4),
+            hud_vertex_array: VertexArray::new(PrimitiveType::LINE_STRIP, 0),
             face_animation,
             face_clock: Clock::start(),
         }

@@ -26,7 +26,7 @@ impl<'s> Weapon<'s> {
     }
 
     fn initialize_weapons(window_size: Vector2f) -> RectangleShape<'s> {
-        let mut tmp_weapon = RectangleShape::with_size(Vector2f { x: 400., y: 400. });
+        let mut tmp_weapon = RectangleShape::with_size(Vector2f::new(400., 400.));
         tmp_weapon.set_position(Vector2f::new(
             window_size.x / 2. - 200.,
             window_size.y - 400. - 81.,
