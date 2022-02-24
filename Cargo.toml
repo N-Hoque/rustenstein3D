@@ -7,6 +7,12 @@ authors = [
   "Naimul Hoque <Naimul.Hoque@outlook.com>",
 ]
 
+[profile.performance]
+inherits = "release"
+opt-level = 3
+lto = "fat"
+incremental = true
+
 [dependencies]
 rsfml = { version = "0.16.0", package = "sfml" }
 structopt = { version = "0.3.25" }
