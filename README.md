@@ -14,7 +14,8 @@ Simple Wolfenstein3D engine in rust.
    2. Macintosh:
       1. TODO
    3. Linux:
-      1. TODO
+      1. Download [SFML2](https://www.sfml-dev.org/download/sfml/2.5.1/) and [CSFML2](https://www.sfml-dev.org/download/csfml/)
+      2. Symlink the `libcsfml` static libraries to your `target/release` folder
 3. Use `cargo run --release` to run `Rustenstein3D`.
    - Use `cargo run --release -- -w "[WIDTH]" "[HEIGHT]"` for a custom window size.
    - Use `cargo run --release -- --help` to view the full list of commands.

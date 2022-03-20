@@ -12,6 +12,7 @@ inherits = "release"
 opt-level = 3
 lto = "fat"
 incremental = true
+panic = "abort"
 
 [dependencies]
 rsfml = { version = "0.16.0", package = "sfml" }
