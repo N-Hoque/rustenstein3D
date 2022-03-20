@@ -6,7 +6,7 @@ use rsfml::{
 
 use crate::{
     event_handler::EventHandler, hud::HUD, map::Map, mini_map::MiniMap, raycasting_engine::REngine,
-    texture_loader::TextureLoader, weapon::Weapon,
+    texture_loader::TextureLoader, weapon::Weapon, RenderMut, TextureRender,
 };
 
 pub struct GameMode<'s> {
@@ -95,8 +95,10 @@ impl<'s> GameMode<'s> {
         self.hud.update();
         self.weapon.update(event_handler);
     }
+}
 
-    pub fn draw(&mut self, render_window: &mut RenderWindow) {
+impl RenderMut for GameMode<'_> {
+    fn draw(&mut self, render_window: &mut RenderWindow) {
         render_window.draw(&self.sky);
         render_window.draw(&self.ground);
         self.r_engine.draw(render_window, self.texture_loader);

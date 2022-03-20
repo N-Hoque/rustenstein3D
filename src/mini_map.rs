@@ -8,7 +8,7 @@ use rsfml::{
     SfBox,
 };
 
-use crate::{map::Map, texture_loader::TextureLoader};
+use crate::{map::Map, texture_loader::TextureLoader, TextureRender};
 
 pub struct MiniMap {
     map: Map,
@@ -53,13 +53,6 @@ impl MiniMap {
         self.rotation += new_rotation;
     }
 
-    pub fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
-        render_window.set_view(&self.mini_map_view);
-        let drawn_block = self.create_block(render_window, self.map.get_map_size(), texture_loader);
-        render_window.draw(&drawn_block);
-        render_window.set_view(&get_default_view(render_window));
-    }
-
     fn create_block<'s>(
         &self,
         render_window: &mut RenderWindow,
@@ -86,6 +79,15 @@ impl MiniMap {
         rect.set_origin(Vector2f::new(40., 40.));
         rect.set_position(self.player_pos * 80.);
         rect
+    }
+}
+
+impl TextureRender for MiniMap {
+    fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
+        render_window.set_view(&self.mini_map_view);
+        let drawn_block = self.create_block(render_window, self.map.get_map_size(), texture_loader);
+        render_window.draw(&drawn_block);
+        render_window.set_view(&get_default_view(render_window));
     }
 }
 

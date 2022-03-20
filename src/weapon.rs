@@ -8,6 +8,7 @@ use crate::{
     animation::{Animation, PlayState},
     event_handler::EventHandler,
     texture_loader::TextureLoader,
+    RenderMut,
 };
 
 pub struct Weapon<'s> {
@@ -107,8 +108,10 @@ impl<'s> Weapon<'s> {
             self.current_weapon = 3
         };
     }
+}
 
-    pub fn draw(&mut self, render_window: &mut RenderWindow) {
+impl RenderMut for Weapon<'_> {
+    fn draw(&mut self, render_window: &mut RenderWindow) {
         self.weapons.set_texture(
             self.texture_loader
                 .get_texture(self.animations[self.current_weapon].get_current_texture_id()),

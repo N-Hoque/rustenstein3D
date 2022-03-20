@@ -6,6 +6,7 @@ use rsfml::{
 use crate::{
     animation::{Animation, PlayState},
     texture_loader::TextureLoader,
+    RenderMut,
 };
 
 #[allow(clippy::upper_case_acronyms)]
@@ -51,8 +52,10 @@ impl<'s> HUD<'s> {
             self.face_clock.restart();
         }
     }
+}
 
-    pub fn draw(&mut self, render_window: &mut RenderWindow) {
+impl RenderMut for HUD<'_> {
+    fn draw(&mut self, render_window: &mut RenderWindow) {
         render_window.draw(&self.background);
         render_window.draw(&self.face);
     }

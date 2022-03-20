@@ -5,7 +5,7 @@ use rsfml::{
 
 use crate::{
     event_handler::EventHandler, fps::FPSHandler, game_mode::GameMode,
-    texture_loader::TextureLoader,
+    texture_loader::TextureLoader, DrawMut, Render, RenderMut,
 };
 
 const CLEAR_COLOR: Color = Color::rgb(3, 64, 59);
@@ -62,8 +62,10 @@ impl<'s> GameLoop<'s> {
             .expect("Updating FPS Handler")
             .update();
     }
+}
 
-    pub fn draw(&mut self) {
+impl DrawMut for GameLoop<'_> {
+    fn draw(&mut self) {
         self.render_window.clear(CLEAR_COLOR);
         self.game_mode.draw(&mut self.render_window);
 

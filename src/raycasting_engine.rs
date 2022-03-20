@@ -6,7 +6,7 @@ use rsfml::{
     window::Key,
 };
 
-use crate::{event_handler::EventHandler, map::Map, texture_loader::TextureLoader};
+use crate::{event_handler::EventHandler, map::Map, texture_loader::TextureLoader, TextureRender};
 
 pub struct REngine {
     player_position: Vector2f,
@@ -343,8 +343,10 @@ impl REngine {
     pub fn get_player_pos(&self) -> Vector2f {
         self.player_position
     }
+}
 
-    pub fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
+impl TextureRender for REngine {
+    fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
         let mut render_states = RenderStates::default();
 
         for (idx, line) in self.vertex_array.iter().enumerate() {

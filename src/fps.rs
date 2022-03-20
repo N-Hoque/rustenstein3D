@@ -3,6 +3,8 @@ use rsfml::{
     system::{Clock, Vector2f},
 };
 
+use crate::Render;
+
 pub struct FPSHandler<'s> {
     fps_clock: Clock,
     text: Text<'s>,
@@ -26,8 +28,10 @@ impl<'s> FPSHandler<'s> {
 
         self.fps_clock.restart();
     }
+}
 
-    pub fn draw(&self, render_window: &mut RenderWindow) {
+impl Render for FPSHandler<'_> {
+    fn draw(&self, render_window: &mut RenderWindow) {
         render_window.draw(&self.text)
     }
 }

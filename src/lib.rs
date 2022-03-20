@@ -22,6 +22,30 @@ use texture_loader::TextureLoader;
 
 use structopt::StructOpt;
 
+pub(crate) trait Draw {
+    fn draw(&self);
+}
+
+pub(crate) trait Render {
+    fn draw(&self, render_window: &mut RenderWindow);
+}
+
+pub(crate) trait TextureRender {
+    fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader);
+}
+
+pub(crate) trait DrawMut {
+    fn draw(&mut self);
+}
+
+pub(crate) trait RenderMut {
+    fn draw(&mut self, render_window: &mut RenderWindow);
+}
+
+pub(crate) trait TextureRenderMut {
+    fn draw(&mut self, render_window: &mut RenderWindow, texture_loader: &TextureLoader);
+}
+
 #[derive(Debug, StructOpt)]
 #[structopt(name = "Rustenstein 3D", about = "Options for Rustenstein3D")]
 pub struct RustensteinOptions {
