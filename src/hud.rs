@@ -5,8 +5,8 @@ use rsfml::{
 
 use crate::{
     animation::{Animation, PlayState},
+    core::{RenderMut, Update},
     texture_loader::TextureLoader,
-    RenderMut, Update,
 };
 
 #[allow(clippy::upper_case_acronyms)]

@@ -6,9 +6,9 @@ use rsfml::{
 
 use crate::{
     animation::{Animation, PlayState},
+    core::{EventUpdate, RenderMut, Update},
     event_handler::EventHandler,
     texture_loader::TextureLoader,
-    EventUpdate, RenderMut, Update,
 };
 
 pub struct Weapon<'s> {

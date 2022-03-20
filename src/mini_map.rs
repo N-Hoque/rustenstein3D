@@ -8,7 +8,7 @@ use rsfml::{
     SfBox,
 };
 
-use crate::{map::Map, texture_loader::TextureLoader, TextureRender};
+use crate::{core::TextureRender, map::Map, texture_loader::TextureLoader};
 
 pub struct MiniMap {
     map: Map,

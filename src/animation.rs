@@ -1,6 +1,6 @@
 use rsfml::system::Clock;
 
-use crate::Update;
+use crate::core::Update;
 
 #[derive(Clone, Copy)]
 pub enum PlayState {

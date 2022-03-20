@@ -4,8 +4,11 @@ use rsfml::{
 };
 
 use crate::{
-    event_handler::EventHandler, fps::FPSHandler, game_mode::GameMode,
-    texture_loader::TextureLoader, DrawMut, EventUpdate, Render, RenderMut, RenderUpdate, Update,
+    core::{DrawMut, EventUpdate, Render, RenderMut, RenderUpdate, Update},
+    event_handler::EventHandler,
+    fps::FPSHandler,
+    game_mode::GameMode,
+    texture_loader::TextureLoader,
 };
 
 const CLEAR_COLOR: Color = Color::rgb(3, 64, 59);

@@ -3,7 +3,7 @@ use rsfml::{
     window::{mouse::Button, Event, Key},
 };
 
-use crate::RenderUpdate;
+use crate::core::RenderUpdate;
 #[derive(Default)]
 pub struct EventHandler {
     pub events: Vec<Event>,

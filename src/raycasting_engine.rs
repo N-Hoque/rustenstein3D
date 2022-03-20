@@ -7,8 +7,10 @@ use rsfml::{
 };
 
 use crate::{
-    event_handler::EventHandler, map::Map, texture_loader::TextureLoader, EventUpdate,
-    TextureRender,
+    core::{EventUpdate, TextureRender},
+    event_handler::EventHandler,
+    map::Map,
+    texture_loader::TextureLoader,
 };
 
 pub struct REngine {
