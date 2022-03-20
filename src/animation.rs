@@ -1,5 +1,7 @@
 use rsfml::system::Clock;
 
+use crate::Update;
+
 #[derive(Clone, Copy)]
 pub enum PlayState {
     Play,
@@ -53,7 +55,18 @@ impl Animation {
         }
     }
 
-    pub fn update(&mut self) {
+    fn make_data(offset: u32, texture_ids: &[i32], lag: f32) -> Data {
+        Data {
+            start_tid: 1,
+            offset,
+            texture_ids: texture_ids.to_vec(),
+            lag,
+        }
+    }
+}
+
+impl Update for Animation {
+    fn update(&mut self) {
         if let PlayState::Play = self.state {
             if self.clock.elapsed_time().as_seconds() >= self.data.lag {
                 if self.active_texture != self.data.texture_ids.len() as u32 - 1 {
@@ -64,15 +77,6 @@ impl Animation {
                 }
                 self.clock.restart();
             }
-        }
-    }
-
-    fn make_data(offset: u32, texture_ids: &[i32], lag: f32) -> Data {
-        Data {
-            start_tid: 1,
-            offset,
-            texture_ids: texture_ids.to_vec(),
-            lag,
         }
     }
 }

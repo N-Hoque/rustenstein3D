@@ -6,7 +6,7 @@ use rsfml::{
 
 use crate::{
     event_handler::EventHandler, hud::HUD, map::Map, mini_map::MiniMap, raycasting_engine::REngine,
-    texture_loader::TextureLoader, weapon::Weapon, RenderMut, TextureRender,
+    texture_loader::TextureLoader, weapon::Weapon, EventUpdate, RenderMut, TextureRender, Update,
 };
 
 pub struct GameMode<'s> {
@@ -75,8 +75,10 @@ impl<'s> GameMode<'s> {
     pub fn get_map() -> Map {
         Map::new(&RAW_MAP, Vector2f::new(24., 24.))
     }
+}
 
-    pub fn update(&mut self, event_handler: &EventHandler) {
+impl EventUpdate for GameMode<'_> {
+    fn update(&mut self, event_handler: &EventHandler) {
         let mut rotation: f32 = 0.;
         if event_handler.is_key_pressed(Key::LEFT) {
             rotation = -5.25;

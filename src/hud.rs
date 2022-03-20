@@ -6,7 +6,7 @@ use rsfml::{
 use crate::{
     animation::{Animation, PlayState},
     texture_loader::TextureLoader,
-    RenderMut,
+    RenderMut, Update,
 };
 
 #[allow(clippy::upper_case_acronyms)]
@@ -34,8 +34,10 @@ impl<'s> HUD<'s> {
             face_clock: Clock::start(),
         }
     }
+}
 
-    pub fn update(&mut self) {
+impl Update for HUD<'_> {
+    fn update(&mut self) {
         self.background
             .set_size(Vector2f::new(self.window_size.x - 21., 59.));
         self.background.set_fill_color(Color::rgb(6, 1, 162));

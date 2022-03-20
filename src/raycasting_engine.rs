@@ -6,7 +6,10 @@ use rsfml::{
     window::Key,
 };
 
-use crate::{event_handler::EventHandler, map::Map, texture_loader::TextureLoader, TextureRender};
+use crate::{
+    event_handler::EventHandler, map::Map, texture_loader::TextureLoader, EventUpdate,
+    TextureRender,
+};
 
 pub struct REngine {
     player_position: Vector2f,
@@ -51,42 +54,6 @@ impl REngine {
             ground: REngine::create_line_array(window_size),
             sky: REngine::create_line_array(window_size),
         }
-    }
-
-    pub fn update(&mut self, event_handler: &EventHandler) {
-        self.textures_id.clear();
-        for width_pixel in 0..self.window_size.x as i32 {
-            // initialize
-            let camera_x = 2. * width_pixel as f32 / self.window_size.x - 1.;
-
-            let ray_pos = self.player_position;
-            self.draw_state.map_pos = Vector2i {
-                x: ray_pos.x as i32,
-                y: ray_pos.y as i32,
-            };
-
-            let ray_dir = self.vector_direction + (self.cam_plane * camera_x);
-            let delta_dist = Vector2f::new(
-                (1. + (ray_dir.y * ray_dir.y) / (ray_dir.x * ray_dir.x)).sqrt(),
-                (1. + (ray_dir.x * ray_dir.x) / (ray_dir.y * ray_dir.y)).sqrt(),
-            );
-
-            let mut side = 0;
-
-            // calculate
-            self.calculate_step(ray_pos, ray_dir, delta_dist);
-
-            self.hit_wall(&mut side, &delta_dist);
-
-            self.calculate_wall_height(ray_pos, ray_dir, side);
-
-            self.calculate_wall_texture(ray_pos, ray_dir, side, width_pixel);
-
-            if !self.no_ground {
-                self.calculate_ground(ray_dir, side, width_pixel);
-            }
-        }
-        self.update_events(event_handler);
     }
 
     fn calculate_ground(&mut self, ray_dir: Vector2f, side: i32, width_pixel: i32) {
@@ -289,11 +256,6 @@ impl REngine {
         }
     }
 
-    fn update_events(&mut self, event_handler: &EventHandler) {
-        self.update_position(event_handler);
-        self.update_direction(event_handler);
-    }
-
     fn update_direction(&mut self, event_handler: &EventHandler) {
         let mouse_move = if let Some((x, _)) = event_handler.has_mouse_moved_event() {
             x as f32 - (self.window_size.x / 2.)
@@ -363,5 +325,44 @@ impl TextureRender for REngine {
         for sky in self.sky.iter() {
             render_window.draw_with_renderstates(sky, &render_states);
         }
+    }
+}
+
+impl EventUpdate for REngine {
+    fn update(&mut self, event_handler: &EventHandler) {
+        self.textures_id.clear();
+        for width_pixel in 0..self.window_size.x as i32 {
+            // initialize
+            let camera_x = 2. * width_pixel as f32 / self.window_size.x - 1.;
+
+            let ray_pos = self.player_position;
+            self.draw_state.map_pos = Vector2i {
+                x: ray_pos.x as i32,
+                y: ray_pos.y as i32,
+            };
+
+            let ray_dir = self.vector_direction + (self.cam_plane * camera_x);
+            let delta_dist = Vector2f::new(
+                (1. + (ray_dir.y * ray_dir.y) / (ray_dir.x * ray_dir.x)).sqrt(),
+                (1. + (ray_dir.x * ray_dir.x) / (ray_dir.y * ray_dir.y)).sqrt(),
+            );
+
+            let mut side = 0;
+
+            // calculate
+            self.calculate_step(ray_pos, ray_dir, delta_dist);
+
+            self.hit_wall(&mut side, &delta_dist);
+
+            self.calculate_wall_height(ray_pos, ray_dir, side);
+
+            self.calculate_wall_texture(ray_pos, ray_dir, side, width_pixel);
+
+            if !self.no_ground {
+                self.calculate_ground(ray_dir, side, width_pixel);
+            }
+        }
+        self.update_direction(event_handler);
+        self.update_position(event_handler);
     }
 }

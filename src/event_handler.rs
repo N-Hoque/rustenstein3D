@@ -2,6 +2,8 @@ use rsfml::{
     graphics::RenderWindow,
     window::{mouse::Button, Event, Key},
 };
+
+use crate::RenderUpdate;
 #[derive(Default)]
 pub struct EventHandler {
     pub events: Vec<Event>,
@@ -10,13 +12,6 @@ pub struct EventHandler {
 impl EventHandler {
     pub fn is_key_pressed(&self, key: Key) -> bool {
         Key::is_pressed(key)
-    }
-
-    pub fn update_events(&mut self, render_window: &mut RenderWindow) {
-        self.events.clear();
-        while let Some(ev) = render_window.poll_event() {
-            self.events.push(ev);
-        }
     }
 
     pub fn has_closed_event(&self) -> bool {
@@ -65,5 +60,14 @@ impl EventHandler {
             Event::MouseMoved { x, y } => Some((x, y)),
             _ => None,
         })
+    }
+}
+
+impl RenderUpdate for EventHandler {
+    fn update(&mut self, render_window: &mut RenderWindow) {
+        self.events.clear();
+        while let Some(ev) = render_window.poll_event() {
+            self.events.push(ev);
+        }
     }
 }

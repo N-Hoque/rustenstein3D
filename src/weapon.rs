@@ -8,7 +8,7 @@ use crate::{
     animation::{Animation, PlayState},
     event_handler::EventHandler,
     texture_loader::TextureLoader,
-    RenderMut,
+    EventUpdate, RenderMut, Update,
 };
 
 pub struct Weapon<'s> {
@@ -58,7 +58,24 @@ impl<'s> Weapon<'s> {
         ]
     }
 
-    pub fn update(&mut self, event_handler: &EventHandler) {
+    fn update_selected_weapon(&mut self, event_handler: &EventHandler) {
+        if event_handler.has_key_pressed_event(Key::NUM1).is_some() {
+            self.current_weapon = 0
+        };
+        if event_handler.has_key_pressed_event(Key::NUM2).is_some() {
+            self.current_weapon = 1
+        };
+        if event_handler.has_key_pressed_event(Key::NUM3).is_some() {
+            self.current_weapon = 2
+        };
+        if event_handler.has_key_pressed_event(Key::NUM4).is_some() {
+            self.current_weapon = 3
+        };
+    }
+}
+
+impl EventUpdate for Weapon<'_> {
+    fn update(&mut self, event_handler: &EventHandler) {
         self.update_selected_weapon(event_handler);
 
         let animation = self
@@ -92,21 +109,6 @@ impl<'s> Weapon<'s> {
             animation.set_state(PlayState::Play);
         }
         animation.update();
-    }
-
-    fn update_selected_weapon(&mut self, event_handler: &EventHandler) {
-        if event_handler.has_key_pressed_event(Key::NUM1).is_some() {
-            self.current_weapon = 0
-        };
-        if event_handler.has_key_pressed_event(Key::NUM2).is_some() {
-            self.current_weapon = 1
-        };
-        if event_handler.has_key_pressed_event(Key::NUM3).is_some() {
-            self.current_weapon = 2
-        };
-        if event_handler.has_key_pressed_event(Key::NUM4).is_some() {
-            self.current_weapon = 3
-        };
     }
 }
 

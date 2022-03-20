@@ -5,7 +5,7 @@ use rsfml::{
 
 use crate::{
     event_handler::EventHandler, fps::FPSHandler, game_mode::GameMode,
-    texture_loader::TextureLoader, DrawMut, Render, RenderMut,
+    texture_loader::TextureLoader, DrawMut, EventUpdate, Render, RenderMut, RenderUpdate, Update,
 };
 
 const CLEAR_COLOR: Color = Color::rgb(3, 64, 59);
@@ -50,9 +50,11 @@ impl<'s> GameLoop<'s> {
             self.draw();
         }
     }
+}
 
-    pub fn update(&mut self) {
-        self.event_handler.update_events(&mut self.render_window);
+impl Update for GameLoop<'_> {
+    fn update(&mut self) {
+        self.event_handler.update(&mut self.render_window);
         if self.event_handler.has_closed_event() || self.event_handler.is_key_pressed(Key::ESCAPE) {
             self.render_window.close();
         }

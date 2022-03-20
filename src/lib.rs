@@ -18,6 +18,8 @@ use rsfml::{
     window::{ContextSettings, Style, VideoMode},
 };
 
+use event_handler::EventHandler;
+
 use texture_loader::TextureLoader;
 
 use structopt::StructOpt;
@@ -44,6 +46,22 @@ pub(crate) trait RenderMut {
 
 pub(crate) trait TextureRenderMut {
     fn draw(&mut self, render_window: &mut RenderWindow, texture_loader: &TextureLoader);
+}
+
+pub(crate) trait Update {
+    fn update(&mut self);
+}
+
+pub(crate) trait EventUpdate {
+    fn update(&mut self, event_handler: &EventHandler);
+}
+
+pub(crate) trait EventUpdateMut {
+    fn update(&mut self, event_handler: &mut EventHandler);
+}
+
+pub(crate) trait RenderUpdate {
+    fn update(&mut self, render_window: &mut RenderWindow);
 }
 
 #[derive(Debug, StructOpt)]
