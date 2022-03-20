@@ -8,9 +8,14 @@ use crate::{
     texture_loader::TextureLoader,
 };
 
-use super::GameLoop;
-
 const CLEAR_COLOR: Color = Color::rgb(3, 64, 59);
+
+pub struct GameLoop<'s> {
+    game_mode: GameMode<'s>,
+    event_handler: EventHandler,
+    render_window: RenderWindow,
+    fps_handler: Option<FPSHandler<'s>>,
+}
 
 impl<'s> GameLoop<'s> {
     pub fn new(

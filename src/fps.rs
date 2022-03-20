@@ -3,7 +3,10 @@ use rsfml::{
     system::{Clock, Vector2f},
 };
 
-use super::FPSHandler;
+pub struct FPSHandler<'s> {
+    fps_clock: Clock,
+    text: Text<'s>,
+}
 
 impl<'s> FPSHandler<'s> {
     pub fn new(font: &'s Font) -> FPSHandler<'s> {

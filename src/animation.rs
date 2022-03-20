@@ -1,6 +1,24 @@
 use rsfml::system::Clock;
 
-use super::{Animation, Data, PlayState};
+#[derive(Clone, Copy)]
+pub enum PlayState {
+    Play,
+    Stop,
+}
+
+struct Data {
+    start_tid: u32,
+    offset: u32,
+    texture_ids: Vec<i32>,
+    lag: f32,
+}
+
+pub struct Animation {
+    state: PlayState,
+    data: Data,
+    active_texture: u32,
+    clock: Clock,
+}
 
 impl Animation {
     pub fn new(texture_ids: &[i32], state: PlayState, lag: f32, offset: u32) -> Self {

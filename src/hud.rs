@@ -1,5 +1,3 @@
-use super::HUD;
-
 use rsfml::{
     graphics::{Color, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::{Clock, Vector2f},
@@ -9,6 +7,16 @@ use crate::{
     animation::{Animation, PlayState},
     texture_loader::TextureLoader,
 };
+
+#[allow(clippy::upper_case_acronyms)]
+pub struct HUD<'s> {
+    window_size: Vector2f,
+    background: RectangleShape<'s>,
+    face: RectangleShape<'s>,
+    face_animation: Animation,
+    texture_loader: &'s TextureLoader,
+    face_clock: Clock,
+}
 
 impl<'s> HUD<'s> {
     pub fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> HUD<'s> {

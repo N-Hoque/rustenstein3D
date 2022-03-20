@@ -10,7 +10,13 @@ use rsfml::{
 
 use crate::{map::Map, texture_loader::TextureLoader};
 
-use super::MiniMap;
+pub struct MiniMap {
+    map: Map,
+    active: bool,
+    mini_map_view: SfBox<View>,
+    player_pos: Vector2f,
+    rotation: f32,
+}
 
 impl MiniMap {
     pub fn new(map: Map, window_size: Vector2u) -> MiniMap {

@@ -9,7 +9,16 @@ use crate::{
     texture_loader::TextureLoader, weapon::Weapon,
 };
 
-use super::GameMode;
+pub struct GameMode<'s> {
+    window_size: Vector2u,
+    mini_map: MiniMap,
+    r_engine: REngine,
+    texture_loader: &'s TextureLoader,
+    hud: HUD<'s>,
+    weapon: Weapon<'s>,
+    sky: RectangleShape<'s>,
+    ground: RectangleShape<'s>,
+}
 
 static RAW_MAP: [i32; 576] = [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,

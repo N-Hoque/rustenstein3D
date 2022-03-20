@@ -1,6 +1,9 @@
-use rsfml::graphics::Texture;
+use rsfml::{graphics::Texture, SfBox};
 
-use super::TextureLoader;
+#[derive(Default)]
+pub struct TextureLoader {
+    textures: Vec<SfBox<Texture>>,
+}
 
 impl TextureLoader {
     pub fn with_textures(texture_paths: &[&str]) -> Self {

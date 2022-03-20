@@ -10,7 +10,15 @@ use crate::{
     texture_loader::TextureLoader,
 };
 
-use super::Weapon;
+pub struct Weapon<'s> {
+    weapons: RectangleShape<'s>,
+    animations: Vec<Animation>,
+    texture_loader: &'s TextureLoader,
+    shadows: RectangleShape<'s>,
+    shadows_id: Vec<i32>,
+    current_weapon: usize,
+    mouse_fire: bool,
+}
 
 impl<'s> Weapon<'s> {
     pub fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> Weapon<'s> {

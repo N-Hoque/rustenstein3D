@@ -2,8 +2,10 @@ use rsfml::{
     graphics::RenderWindow,
     window::{mouse::Button, Event, Key},
 };
-
-use super::EventHandler;
+#[derive(Default)]
+pub struct EventHandler {
+    pub events: Vec<Event>,
+}
 
 impl EventHandler {
     pub fn is_key_pressed(&self, key: Key) -> bool {
