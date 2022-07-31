@@ -11,7 +11,7 @@ pub struct FPSHandler<'s> {
 }
 
 impl<'s> FPSHandler<'s> {
-    pub fn new(font: &'s Font) -> FPSHandler<'s> {
+    pub(crate) fn new(font: &'s Font) -> FPSHandler<'s> {
         let mut text = Text::new("0", font, 20);
         text.set_position(Vector2f::new(10., 10.));
         text.set_fill_color(Color::GREEN);
@@ -24,7 +24,7 @@ impl<'s> FPSHandler<'s> {
 
 impl Render for FPSHandler<'_> {
     fn draw(&self, render_window: &mut RenderWindow) {
-        render_window.draw(&self.text)
+        render_window.draw(&self.text);
     }
 }
 

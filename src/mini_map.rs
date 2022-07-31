@@ -19,7 +19,7 @@ pub struct MiniMap {
 }
 
 impl MiniMap {
-    pub fn new(map: Map, window_size: Vector2u) -> MiniMap {
+    pub(crate) fn new(map: Map, window_size: Vector2u) -> Self {
         let mut mini_map_view = View::new(
             Vector2f::default(),
             Vector2f::new(window_size.x as f32, window_size.y as f32),
@@ -27,7 +27,7 @@ impl MiniMap {
         mini_map_view.set_viewport(&FloatRect::new(0.70, 0.05, 0.25, 0.25));
         mini_map_view.set_rotation(-90.0);
 
-        MiniMap {
+        Self {
             map,
             active: true,
             mini_map_view,
@@ -36,23 +36,25 @@ impl MiniMap {
         }
     }
 
-    pub fn toggle_active(&mut self) -> bool {
+    pub(crate) fn toggle_active(&mut self) -> bool {
         self.active = !self.active;
         self.active
     }
 
-    pub fn is_active(&self) -> bool {
+    pub(crate) const fn is_active(&self) -> bool {
         self.active
     }
 
-    pub fn update(&mut self, player_position: Vector2f, new_rotation: f32) {
+    pub(crate) fn update(&mut self, player_position: Vector2f, new_rotation: f32) {
         self.player_pos = player_position;
         let map_view = (*self.mini_map_view).borrow_mut();
         map_view.rotate(new_rotation);
         map_view.set_center(self.player_pos * 80.);
         self.rotation += new_rotation;
     }
+}
 
+impl MiniMap {
     fn create_block<'s>(
         &self,
         render_window: &mut RenderWindow,

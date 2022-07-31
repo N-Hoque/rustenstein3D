@@ -23,7 +23,7 @@ impl<'s> HUD<'s> {
     pub fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> HUD<'s> {
         let mut face = RectangleShape::with_size(Vector2f::new(43., 58.));
         face.set_position(Vector2f::new(window_size.x / 2. - 21., window_size.y - 71.));
-        let face_animation = Animation::new(&[40, 41, 42], PlayState::Play, 1., 0);
+        let face_animation = Animation::new(&[40, 41, 42], 0, 1., PlayState::Play);
 
         HUD {
             texture_loader,

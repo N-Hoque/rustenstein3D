@@ -2,7 +2,7 @@ use rsfml::system::{Vector2f, Vector2i};
 
 #[derive(Clone)]
 pub struct Map {
-    map: Vec<i32>,
+    map: Box<[i32]>,
     map_size: Vector2i,
 }
 
@@ -20,22 +20,22 @@ pub enum Orientation {
 impl From<Orientation> for Vector2i {
     fn from(o: Orientation) -> Self {
         match o {
-            Orientation::Top => Vector2i::new(-1, 0),
-            Orientation::Bottom => Vector2i::new(1, 0),
-            Orientation::Left => Vector2i::new(0, -1),
-            Orientation::Right => Vector2i::new(0, 1),
-            Orientation::TopLeft => Vector2i::new(-1, -1),
-            Orientation::TopRight => Vector2i::new(-1, 1),
-            Orientation::BottomLeft => Vector2i::new(1, -1),
-            Orientation::BottomRight => Vector2i::new(1, 1),
+            Orientation::Top => Self::new(-1, 0),
+            Orientation::Bottom => Self::new(1, 0),
+            Orientation::Left => Self::new(0, -1),
+            Orientation::Right => Self::new(0, 1),
+            Orientation::TopLeft => Self::new(-1, -1),
+            Orientation::TopRight => Self::new(-1, 1),
+            Orientation::BottomLeft => Self::new(1, -1),
+            Orientation::BottomRight => Self::new(1, 1),
         }
     }
 }
 
 impl Map {
-    pub fn new(map: &[i32], map_size: Vector2f) -> Map {
-        Map {
-            map: map.to_vec(),
+    pub(crate) fn new(map: &[i32], map_size: Vector2f) -> Self {
+        Self {
+            map: map.into(),
             map_size: Vector2i {
                 x: map_size.x as i32,
                 y: map_size.y as i32,
@@ -43,7 +43,7 @@ impl Map {
         }
     }
 
-    pub fn get_block(&self, position: Vector2i) -> Option<i32> {
+    pub(crate) const fn get_block(&self, position: Vector2i) -> Option<i32> {
         if position.x < 0
             || position.x > self.map_size.x
             || position.y < 0
@@ -55,7 +55,7 @@ impl Map {
         }
     }
 
-    pub fn get_map_size(&self) -> Vector2i {
+    pub(crate) const fn get_map_size(&self) -> Vector2i {
         self.map_size
     }
 }

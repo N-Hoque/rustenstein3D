@@ -1,5 +1,5 @@
 use rustenstein_3d::{
-    create_render_window, game::GameLoop, load_font, load_resources, set_render_window_properties,
+    create_render_window, game::MainLoop, load_font, load_resources, set_render_window_properties,
     RustensteinOptions,
 };
 use structopt::StructOpt;
@@ -26,7 +26,7 @@ fn main() {
 
     let texture_loader = load_resources();
 
-    let mut game_loop = GameLoop::new(render_window, &texture_loader, args.no_ground);
+    let mut game_loop = MainLoop::new(render_window, &texture_loader, args.no_ground);
     game_loop.enable_fps(&font);
     game_loop.run();
 }

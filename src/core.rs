@@ -2,42 +2,42 @@ use rsfml::graphics::RenderWindow;
 
 use crate::{event_handler::EventHandler, texture_loader::TextureLoader};
 
-pub(crate) trait Draw {
+pub trait Draw {
     fn draw(&self);
 }
 
-pub(crate) trait Render {
+pub trait Render {
     fn draw(&self, render_window: &mut RenderWindow);
 }
 
-pub(crate) trait TextureRender {
+pub trait TextureRender {
     fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader);
 }
 
-pub(crate) trait DrawMut {
+pub trait DrawMut {
     fn draw(&mut self);
 }
 
-pub(crate) trait RenderMut {
+pub trait RenderMut {
     fn draw(&mut self, render_window: &mut RenderWindow);
 }
 
-pub(crate) trait TextureRenderMut {
+pub trait TextureRenderMut {
     fn draw(&mut self, render_window: &mut RenderWindow, texture_loader: &TextureLoader);
 }
 
-pub(crate) trait Update {
+pub trait Update {
     fn update(&mut self);
 }
 
-pub(crate) trait EventUpdate {
+pub trait EventUpdate {
     fn update(&mut self, event_handler: &EventHandler);
 }
 
-pub(crate) trait EventUpdateMut {
+pub trait EventUpdateMut {
     fn update(&mut self, event_handler: &mut EventHandler);
 }
 
-pub(crate) trait RenderUpdate {
+pub trait RenderUpdate {
     fn update(&mut self, render_window: &mut RenderWindow);
 }

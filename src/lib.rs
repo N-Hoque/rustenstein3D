@@ -1,3 +1,5 @@
+#![warn(clippy::nursery)]
+
 extern crate rsfml;
 
 pub(crate) mod animation;
@@ -50,6 +52,7 @@ pub struct RustensteinOptions {
     pub cursor: bool,
 }
 
+#[must_use]
 pub fn load_resources() -> TextureLoader {
     TextureLoader::with_textures(&[
         "resources/ground.tga",              // 0
@@ -98,6 +101,7 @@ pub fn load_resources() -> TextureLoader {
     ])
 }
 
+#[must_use]
 pub fn load_font(font_filename: &str) -> rsfml::SfBox<Font> {
     Font::from_file(font_filename).unwrap_or_else(|| panic!("Loading font from {}", font_filename))
 }
@@ -106,11 +110,12 @@ pub fn set_render_window_properties(render_window: &mut RenderWindow, args: &Rus
     render_window.set_framerate_limit(args.fps.into());
     render_window.set_mouse_cursor_visible(args.cursor);
     render_window.set_mouse_position(Vector2i {
-        x: args.window_size[0] as i32 / 2,
-        y: args.window_size[1] as i32 / 2,
+        x: i32::from(args.window_size[0]) / 2,
+        y: i32::from(args.window_size[1]) / 2,
     });
 }
 
+#[must_use]
 pub fn create_render_window(title: &str, window_size: (u32, u32)) -> RenderWindow {
     let settings = ContextSettings::default();
     let video_mode = VideoMode::new(window_size.0, window_size.1, 32);

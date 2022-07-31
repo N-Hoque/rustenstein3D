@@ -48,7 +48,7 @@ static RAW_MAP: [i32; 576] = [
 ];
 
 impl<'s> GameMode<'s> {
-    pub fn new(
+    pub(crate) fn new(
         window_size: Vector2u,
         texture_loader: &'s TextureLoader,
         no_ground: bool,
@@ -78,20 +78,20 @@ impl<'s> GameMode<'s> {
         }
     }
 
-    pub fn get_map() -> Map {
+    pub(crate) fn get_map() -> Map {
         Map::new(&RAW_MAP, Vector2f::new(24., 24.))
     }
 }
 
 impl EventUpdate for GameMode<'_> {
     fn update(&mut self, event_handler: &EventHandler) {
-        let mut rotation: f32 = 0.;
-        if event_handler.is_key_pressed(Key::LEFT) {
-            rotation = -5.25;
-        }
-        if event_handler.is_key_pressed(Key::RIGHT) {
-            rotation = 5.25;
-        }
+        let rotation: f32 = if EventHandler::is_key_pressed(Key::LEFT) {
+            -5.25
+        } else if EventHandler::is_key_pressed(Key::RIGHT) {
+            5.25
+        } else {
+            0.0
+        };
         if event_handler.has_key_pressed_event(Key::M).is_some() {
             self.mini_map.toggle_active();
         };

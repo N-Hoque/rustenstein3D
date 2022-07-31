@@ -13,27 +13,29 @@ use crate::{
 
 pub struct Weapon<'s> {
     weapons: RectangleShape<'s>,
-    animations: Vec<Animation>,
+    animations: [Animation; 4],
     texture_loader: &'s TextureLoader,
     shadows: RectangleShape<'s>,
-    shadows_id: Vec<i32>,
+    shadows_id: [i32; 4],
     current_weapon: usize,
     mouse_fire: bool,
 }
 
 impl<'s> Weapon<'s> {
-    pub fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> Weapon<'s> {
+    pub(crate) fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> Weapon<'s> {
         Weapon {
             texture_loader,
             weapons: Weapon::initialize_weapons(window_size),
             animations: Weapon::initialize_animation(),
             shadows: Weapon::initialize_shadows(window_size),
-            shadows_id: vec![18, 25, 32, 39],
+            shadows_id: [18, 25, 32, 39],
             current_weapon: 0,
             mouse_fire: false,
         }
     }
+}
 
+impl<'s> Weapon<'s> {
     fn initialize_weapons(window_size: Vector2f) -> RectangleShape<'s> {
         let mut tmp_weapon = RectangleShape::with_size(Vector2f::new(400., 400.));
         tmp_weapon.set_position(Vector2f::new(
@@ -49,27 +51,27 @@ impl<'s> Weapon<'s> {
         tmp_shadow
     }
 
-    fn initialize_animation() -> Vec<Animation> {
-        vec![
-            Animation::new(&[12, 13, 14, 15, 16, 17], PlayState::Stop, 0.07, 3),
-            Animation::new(&[19, 20, 21, 22, 23, 24], PlayState::Stop, 0.07, 3),
-            Animation::new(&[26, 27, 28, 29, 30, 31], PlayState::Stop, 0.07, 3),
-            Animation::new(&[33, 34, 35, 36, 37, 38], PlayState::Stop, 0.07, 3),
+    fn initialize_animation() -> [Animation; 4] {
+        [
+            Animation::create_weapon_animation(&[12, 13, 14, 15, 16, 17]),
+            Animation::create_weapon_animation(&[19, 20, 21, 22, 23, 24]),
+            Animation::create_weapon_animation(&[26, 27, 28, 29, 30, 31]),
+            Animation::create_weapon_animation(&[33, 34, 35, 36, 37, 38]),
         ]
     }
 
     fn update_selected_weapon(&mut self, event_handler: &EventHandler) {
         if event_handler.has_key_pressed_event(Key::NUM1).is_some() {
-            self.current_weapon = 0
+            self.current_weapon = 0;
         };
         if event_handler.has_key_pressed_event(Key::NUM2).is_some() {
-            self.current_weapon = 1
+            self.current_weapon = 1;
         };
         if event_handler.has_key_pressed_event(Key::NUM3).is_some() {
-            self.current_weapon = 2
+            self.current_weapon = 2;
         };
         if event_handler.has_key_pressed_event(Key::NUM4).is_some() {
-            self.current_weapon = 3
+            self.current_weapon = 3;
         };
     }
 }
@@ -105,7 +107,7 @@ impl EventUpdate for Weapon<'_> {
             animation.set_state(PlayState::Play);
         }
 
-        if event_handler.is_key_pressed(Key::E) {
+        if EventHandler::is_key_pressed(Key::E) {
             animation.set_state(PlayState::Play);
         }
         animation.update();

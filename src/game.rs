@@ -13,21 +13,22 @@ use crate::{
 
 const CLEAR_COLOR: Color = Color::rgb(3, 64, 59);
 
-pub struct GameLoop<'s> {
+pub struct MainLoop<'s> {
     game_mode: GameMode<'s>,
     event_handler: EventHandler,
     render_window: RenderWindow,
     fps_handler: Option<FPSHandler<'s>>,
 }
 
-impl<'s> GameLoop<'s> {
+impl<'s> MainLoop<'s> {
+    #[must_use]
     pub fn new(
         render_window: RenderWindow,
         texture_loader: &'s TextureLoader,
         no_ground: bool,
-    ) -> GameLoop<'s> {
+    ) -> MainLoop<'s> {
         let window_size = render_window.size();
-        GameLoop {
+        MainLoop {
             render_window,
             fps_handler: None,
             event_handler: EventHandler::default(),
@@ -37,13 +38,13 @@ impl<'s> GameLoop<'s> {
 
     pub fn enable_fps(&mut self, font: &'s Font) {
         if self.fps_handler.is_none() {
-            self.fps_handler = Some(FPSHandler::new(font))
+            self.fps_handler = Some(FPSHandler::new(font));
         }
     }
 
     pub fn disable_fps(&mut self) {
         if self.fps_handler.is_some() {
-            self.fps_handler = None
+            self.fps_handler = None;
         }
     }
 
@@ -55,10 +56,10 @@ impl<'s> GameLoop<'s> {
     }
 }
 
-impl Update for GameLoop<'_> {
+impl Update for MainLoop<'_> {
     fn update(&mut self) {
         self.event_handler.update(&mut self.render_window);
-        if self.event_handler.has_closed_event() || self.event_handler.is_key_pressed(Key::ESCAPE) {
+        if self.event_handler.has_closed_event() || EventHandler::is_key_pressed(Key::ESCAPE) {
             self.render_window.close();
         }
         self.game_mode.update(&self.event_handler);
@@ -69,7 +70,7 @@ impl Update for GameLoop<'_> {
     }
 }
 
-impl DrawMut for GameLoop<'_> {
+impl DrawMut for MainLoop<'_> {
     fn draw(&mut self) {
         self.render_window.clear(CLEAR_COLOR);
         self.game_mode.draw(&mut self.render_window);
