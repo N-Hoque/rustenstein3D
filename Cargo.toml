@@ -15,5 +15,5 @@ incremental = true
 panic = "abort"
 
 [dependencies]
+clap = { version = "3.2.20", features = ["derive"] }
 rsfml = { version = "0.16.0", package = "sfml" }
-structopt = { version = "0.3.25" }

@@ -2,10 +2,11 @@ use rustenstein_3d::{
     create_render_window, game::MainLoop, load_font, load_resources, set_render_window_properties,
     RustensteinOptions,
 };
-use structopt::StructOpt;
+
+use clap::Parser;
 
 fn main() {
-    let mut args = RustensteinOptions::from_args();
+    let mut args = RustensteinOptions::parse();
 
     if args.window_size.is_empty() {
         args.window_size = vec![640, 480];

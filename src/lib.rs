@@ -23,15 +23,15 @@ use rsfml::{
 
 use texture_loader::TextureLoader;
 
-use structopt::StructOpt;
+use clap::Parser;
 
-#[derive(Debug, StructOpt)]
-#[structopt(name = "Rustenstein 3D", about = "Options for Rustenstein3D")]
+#[derive(Debug, Parser)]
+#[clap(name = "Rustenstein 3D", about = "Options for Rustenstein3D")]
 pub struct RustensteinOptions {
-    #[structopt(short, long, help = "Disables floor and sky rendering")]
+    #[clap(short, long, help = "Disables floor and sky rendering")]
     pub no_ground: bool,
 
-    #[structopt(
+    #[clap(
         short,
         long,
         help = "Sets the FPS (Frames per second)",
@@ -39,7 +39,7 @@ pub struct RustensteinOptions {
     )]
     pub fps: u8,
 
-    #[structopt(
+    #[clap(
         short,
         long,
         help = "Set the size of the window",
@@ -48,7 +48,7 @@ pub struct RustensteinOptions {
     )]
     pub window_size: Vec<u16>,
 
-    #[structopt(short, long, help = "Shows the cursor")]
+    #[clap(short, long, help = "Shows the cursor")]
     pub cursor: bool,
 }
 
