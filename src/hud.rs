@@ -10,17 +10,17 @@ use crate::{
 };
 
 #[allow(clippy::upper_case_acronyms)]
-pub struct HUD<'s> {
+pub struct HUD<'s, 'a> {
     window_size: Vector2f,
     background: RectangleShape<'s>,
     face: RectangleShape<'s>,
-    face_animation: Animation,
+    face_animation: Animation<'a>,
     texture_loader: &'s TextureLoader,
     face_clock: Clock,
 }
 
-impl<'s> HUD<'s> {
-    pub fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> HUD<'s> {
+impl<'s> HUD<'s, '_> {
+    pub fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> HUD<'s, '_> {
         let mut face = RectangleShape::with_size(Vector2f::new(43., 58.));
         face.set_position(Vector2f::new(window_size.x / 2. - 21., window_size.y - 71.));
         let face_animation = Animation::new(&[40, 41, 42], 0, 1., PlayState::Play);
@@ -36,7 +36,7 @@ impl<'s> HUD<'s> {
     }
 }
 
-impl Update for HUD<'_> {
+impl Update for HUD<'_, '_> {
     fn update(&mut self) {
         self.background
             .set_size(Vector2f::new(self.window_size.x - 21., 59.));
@@ -56,7 +56,7 @@ impl Update for HUD<'_> {
     }
 }
 
-impl RenderMut for HUD<'_> {
+impl RenderMut for HUD<'_, '_> {
     fn draw(&mut self, render_window: &mut RenderWindow) {
         render_window.draw(&self.background);
         render_window.draw(&self.face);

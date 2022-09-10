@@ -8,33 +8,33 @@ pub enum PlayState {
     Stop,
 }
 
-pub struct Animation {
+pub struct Animation<'a> {
     state: PlayState,
-    data: Data,
+    data: Data<'a>,
     active_texture: u32,
     clock: Clock,
 }
 
-struct Data {
+struct Data<'a> {
     start_tid: u32,
     offset: u32,
-    texture_ids: Box<[i32]>,
+    texture_ids: &'a [i32],
     lag: f32,
 }
 
-impl Data {
-    fn new(texture_ids: &[i32], offset: u32, lag: f32) -> Self {
+impl<'a> Data<'a> {
+    const fn new(texture_ids: &'a [i32], offset: u32, lag: f32) -> Self {
         Self {
             start_tid: 1,
             offset,
-            texture_ids: texture_ids.into(),
+            texture_ids,
             lag,
         }
     }
 }
 
-impl Animation {
-    pub(crate) fn new(texture_ids: &[i32], offset: u32, lag: f32, state: PlayState) -> Self {
+impl<'a> Animation<'a> {
+    pub(crate) fn new(texture_ids: &'a [i32], offset: u32, lag: f32, state: PlayState) -> Self {
         Self {
             state,
             data: Data::new(texture_ids, offset, lag),
@@ -43,7 +43,7 @@ impl Animation {
         }
     }
 
-    pub(crate) fn create_weapon_animation(texture_ids: &[i32]) -> Self {
+    pub(crate) fn create_weapon_animation(texture_ids: &'a [i32]) -> Self {
         Self::new(texture_ids, 3, 0.07, PlayState::Stop)
     }
 
@@ -57,7 +57,7 @@ impl Animation {
     }
 }
 
-impl Animation {
+impl Animation<'_> {
     fn set_active_texture(&mut self) {
         match self.state {
             PlayState::Stop => {
@@ -73,7 +73,7 @@ impl Animation {
     }
 }
 
-impl Update for Animation {
+impl Update for Animation<'_> {
     fn update(&mut self) {
         if let PlayState::Play = self.state {
             if self.clock.elapsed_time().as_seconds() >= self.data.lag {

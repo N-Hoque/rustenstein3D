@@ -11,9 +11,9 @@ use crate::{
     texture_loader::TextureLoader,
 };
 
-pub struct Weapon<'s> {
+pub struct Weapon<'s, 'a> {
     weapons: RectangleShape<'s>,
-    animations: [Animation; 4],
+    animations: [Animation<'a>; 4],
     texture_loader: &'s TextureLoader,
     shadows: RectangleShape<'s>,
     shadows_id: [i32; 4],
@@ -21,8 +21,8 @@ pub struct Weapon<'s> {
     mouse_fire: bool,
 }
 
-impl<'s> Weapon<'s> {
-    pub(crate) fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> Weapon<'s> {
+impl<'s> Weapon<'s, '_> {
+    pub(crate) fn new(window_size: Vector2f, texture_loader: &'s TextureLoader) -> Self {
         Weapon {
             texture_loader,
             weapons: Weapon::initialize_weapons(window_size),
@@ -35,7 +35,7 @@ impl<'s> Weapon<'s> {
     }
 }
 
-impl<'s> Weapon<'s> {
+impl<'s, 'a> Weapon<'s, 'a> {
     fn initialize_weapons(window_size: Vector2f) -> RectangleShape<'s> {
         let mut tmp_weapon = RectangleShape::with_size(Vector2f::new(400., 400.));
         tmp_weapon.set_position(Vector2f::new(
@@ -51,7 +51,7 @@ impl<'s> Weapon<'s> {
         tmp_shadow
     }
 
-    fn initialize_animation() -> [Animation; 4] {
+    fn initialize_animation() -> [Animation<'a>; 4] {
         [
             Animation::create_weapon_animation(&[12, 13, 14, 15, 16, 17]),
             Animation::create_weapon_animation(&[19, 20, 21, 22, 23, 24]),
@@ -76,7 +76,7 @@ impl<'s> Weapon<'s> {
     }
 }
 
-impl EventUpdate for Weapon<'_> {
+impl EventUpdate for Weapon<'_, '_> {
     fn update(&mut self, event_handler: &EventHandler) {
         self.update_selected_weapon(event_handler);
 
@@ -114,7 +114,7 @@ impl EventUpdate for Weapon<'_> {
     }
 }
 
-impl RenderMut for Weapon<'_> {
+impl RenderMut for Weapon<'_, '_> {
     fn draw(&mut self, render_window: &mut RenderWindow) {
         self.weapons.set_texture(
             self.texture_loader

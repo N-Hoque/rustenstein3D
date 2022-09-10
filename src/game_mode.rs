@@ -15,13 +15,13 @@ use crate::{
     weapon::Weapon,
 };
 
-pub struct GameMode<'s> {
+pub struct GameMode<'s, 'a> {
     window_size: Vector2u,
     mini_map: MiniMap,
     r_engine: REngine,
     texture_loader: &'s TextureLoader,
-    hud: HUD<'s>,
-    weapon: Weapon<'s>,
+    hud: HUD<'s, 'a>,
+    weapon: Weapon<'s, 'a>,
     sky: RectangleShape<'s>,
     ground: RectangleShape<'s>,
 }
@@ -47,12 +47,12 @@ static RAW_MAP: [i32; 576] = [
     0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 ];
 
-impl<'s> GameMode<'s> {
+impl<'s: 'a, 'a> GameMode<'s, 'a> {
     pub(crate) fn new(
         window_size: Vector2u,
         texture_loader: &'s TextureLoader,
         no_ground: bool,
-    ) -> GameMode<'s> {
+    ) -> Self {
         let map = GameMode::get_map();
         let mut sky = RectangleShape::with_size(Vector2f {
             x: window_size.x as f32,
@@ -66,7 +66,7 @@ impl<'s> GameMode<'s> {
         ground.set_fill_color(Color::rgb(109, 108, 112));
         ground.set_position(Vector2f::new(0., window_size.y as f32 / 2. - 40.));
         let window_size_f32 = Vector2f::new(window_size.x as f32, window_size.y as f32);
-        GameMode {
+        Self {
             window_size,
             texture_loader,
             sky,
@@ -83,7 +83,7 @@ impl<'s> GameMode<'s> {
     }
 }
 
-impl EventUpdate for GameMode<'_> {
+impl EventUpdate for GameMode<'_, '_> {
     fn update(&mut self, event_handler: &EventHandler) {
         let rotation: f32 = if EventHandler::is_key_pressed(Key::LEFT) {
             -5.25
@@ -105,7 +105,7 @@ impl EventUpdate for GameMode<'_> {
     }
 }
 
-impl RenderMut for GameMode<'_> {
+impl RenderMut for GameMode<'_, '_> {
     fn draw(&mut self, render_window: &mut RenderWindow) {
         render_window.draw(&self.sky);
         render_window.draw(&self.ground);
