@@ -13,14 +13,14 @@ use crate::{
 
 const CLEAR_COLOR: Color = Color::rgb(3, 64, 59);
 
-pub struct MainLoop<'s, 'a> {
-    game_mode: GameMode<'s, 'a>,
+pub struct MainLoop<'s, 'a, 'm> {
+    game_mode: GameMode<'s, 'a, 'm>,
     event_handler: EventHandler,
     render_window: RenderWindow,
     fps_handler: Option<FPSHandler<'s>>,
 }
 
-impl<'s: 'a, 'a> MainLoop<'s, 'a> {
+impl<'s: 'a, 'a> MainLoop<'s, 'a, '_> {
     #[must_use]
     pub fn new(
         render_window: RenderWindow,
@@ -56,7 +56,7 @@ impl<'s: 'a, 'a> MainLoop<'s, 'a> {
     }
 }
 
-impl Update for MainLoop<'_, '_> {
+impl Update for MainLoop<'_, '_, '_> {
     fn update(&mut self) {
         self.event_handler.update(&mut self.render_window);
         if self.event_handler.has_closed_event() || EventHandler::is_key_pressed(Key::ESCAPE) {
@@ -70,7 +70,7 @@ impl Update for MainLoop<'_, '_> {
     }
 }
 
-impl DrawMut for MainLoop<'_, '_> {
+impl DrawMut for MainLoop<'_, '_, '_> {
     fn draw(&mut self) {
         self.render_window.clear(CLEAR_COLOR);
         self.game_mode.draw(&mut self.render_window);

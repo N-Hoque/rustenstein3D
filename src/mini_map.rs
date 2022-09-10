@@ -10,16 +10,16 @@ use rsfml::{
 
 use crate::{core::TextureRender, map::Map, texture_loader::TextureLoader};
 
-pub struct MiniMap {
-    map: Map,
+pub struct MiniMap<'m> {
+    map: Map<'m>,
     active: bool,
     mini_map_view: SfBox<View>,
     player_pos: Vector2f,
     rotation: f32,
 }
 
-impl MiniMap {
-    pub(crate) fn new(map: Map, window_size: Vector2u) -> Self {
+impl<'m> MiniMap<'m> {
+    pub(crate) fn new(map: Map<'m>, window_size: Vector2u) -> Self {
         let mut mini_map_view = View::new(
             Vector2f::default(),
             Vector2f::new(window_size.x as f32, window_size.y as f32),
@@ -54,7 +54,7 @@ impl MiniMap {
     }
 }
 
-impl MiniMap {
+impl MiniMap<'_> {
     fn create_block<'s>(
         &self,
         render_window: &mut RenderWindow,
@@ -84,7 +84,7 @@ impl MiniMap {
     }
 }
 
-impl TextureRender for MiniMap {
+impl TextureRender for MiniMap<'_> {
     fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
         render_window.set_view(&self.mini_map_view);
         let drawn_block = self.create_block(render_window, self.map.get_map_size(), texture_loader);

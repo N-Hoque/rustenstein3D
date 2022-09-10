@@ -13,12 +13,12 @@ use crate::{
     texture_loader::TextureLoader,
 };
 
-pub struct REngine {
+pub struct REngine<'m> {
     window_size: Vector2f,
     textures_id: Vec<i32>,
     vertex_data: VertexData,
     player_data: PlayerData,
-    map: Map,
+    map: Map<'m>,
     no_ground: bool,
     draw_state: DrawState,
 }
@@ -46,8 +46,8 @@ struct DrawState {
     wall_x: f32,
 }
 
-impl REngine {
-    pub(crate) fn new(map: Map, window_size: Vector2f, no_ground: bool) -> Self {
+impl<'m> REngine<'m> {
+    pub(crate) fn new(map: Map<'m>, window_size: Vector2f, no_ground: bool) -> Self {
         Self {
             map,
             no_ground,
@@ -68,7 +68,7 @@ impl REngine {
     }
 }
 
-impl REngine {
+impl REngine<'_> {
     fn calculate_ground(&mut self, ray_dir: Vector2f, side: i32, width_pixel: i32) {
         if self.draw_state.draw_end < 0 {
             self.draw_state.draw_end = self.window_size.y as i32;
@@ -327,7 +327,7 @@ impl REngine {
     }
 }
 
-impl TextureRender for REngine {
+impl TextureRender for REngine<'_> {
     fn draw(&self, render_window: &mut RenderWindow, texture_loader: &TextureLoader) {
         let mut render_states = RenderStates::default();
 
@@ -348,7 +348,7 @@ impl TextureRender for REngine {
     }
 }
 
-impl EventUpdate for REngine {
+impl EventUpdate for REngine<'_> {
     fn update(&mut self, event_handler: &EventHandler) {
         self.textures_id.clear();
         for width_pixel in 0..self.window_size.x as i32 {

@@ -1,8 +1,8 @@
 use rsfml::system::{Vector2f, Vector2i};
 
 #[derive(Clone)]
-pub struct Map {
-    map: Box<[i32]>,
+pub struct Map<'m> {
+    map: &'m [i32],
     map_size: Vector2i,
 }
 
@@ -32,10 +32,10 @@ impl From<Orientation> for Vector2i {
     }
 }
 
-impl Map {
-    pub(crate) fn new(map: &[i32], map_size: Vector2f) -> Self {
+impl<'m> Map<'m> {
+    pub(crate) const fn new(map: &'m [i32], map_size: Vector2f) -> Self {
         Self {
-            map: map.into(),
+            map,
             map_size: Vector2i {
                 x: map_size.x as i32,
                 y: map_size.y as i32,
