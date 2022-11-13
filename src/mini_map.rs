@@ -68,7 +68,7 @@ impl MiniMap<'_> {
                 let block = self
                     .map
                     .get_block(pos)
-                    .unwrap_or_else(|| panic!("Getting block in minimap at position: {:?}", pos));
+                    .unwrap_or_else(|| panic!("Getting block in minimap at position: {pos:?}"));
                 rect.set_texture(texture_loader.get_texture(block), false);
                 rect.set_position(Vector2f::new(pos.x as f32, pos.y as f32) * 80.);
                 render_window.draw(&rect);

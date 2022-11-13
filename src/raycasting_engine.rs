@@ -81,13 +81,13 @@ impl REngine<'_> {
         self.vertex_data
             .ground
             .get_mut(width_pixel as usize)
-            .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
+            .unwrap_or_else(|| panic!("Getting vertices at index: {width_pixel}"))
             .clear();
 
         self.vertex_data
             .sky
             .get_mut(width_pixel as usize)
-            .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
+            .unwrap_or_else(|| panic!("Getting vertices at index: {width_pixel}"))
             .clear();
 
         let mut pos = Vector2f {
@@ -98,7 +98,7 @@ impl REngine<'_> {
         let floor = self.calculate_floor(ray_dir, side);
 
         for y in (self.draw_state.draw_end + 1)..(self.window_size.y as i32) {
-            let current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y);
+            let current_dist = self.window_size.y / 2.0f32.mul_add(y as f32, -self.window_size.y);
             let weight = current_dist / self.draw_state.perp_wall_dist;
             let current_floor = weight * floor + (1.0 - weight) * self.player_data.position;
 
@@ -114,7 +114,7 @@ impl REngine<'_> {
             self.vertex_data
                 .ground
                 .get_mut(width_pixel as usize)
-                .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
+                .unwrap_or_else(|| panic!("Getting vertices at index: {width_pixel}"))
                 .append(&vertex);
 
             pos.y = self.window_size.y - y as f32;
@@ -124,7 +124,7 @@ impl REngine<'_> {
             self.vertex_data
                 .sky
                 .get_mut(width_pixel as usize)
-                .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel))
+                .unwrap_or_else(|| panic!("Getting vertices at index: {width_pixel}"))
                 .append(&vertex);
         }
     }
@@ -216,7 +216,7 @@ impl REngine<'_> {
             .vertex_data
             .vertices
             .get_mut(width_pixel as usize)
-            .unwrap_or_else(|| panic!("Getting vertices at index: {}", width_pixel));
+            .unwrap_or_else(|| panic!("Getting vertices at index: {width_pixel}"));
 
         current_vertex_array.clear();
         current_vertex_array.append(&Vertex::new(

@@ -36,7 +36,7 @@ impl Update for FPSHandler<'_> {
     fn update(&mut self) {
         let delta = 1.0 / self.fps_clock.elapsed_time().as_seconds();
 
-        self.text.set_string(&format!("{:.0}", delta));
+        self.text.set_string(&format!("{delta:.0}"));
 
         self.fps_clock.restart();
     }

@@ -104,7 +104,7 @@ pub fn load_resources() -> TextureLoader {
 
 #[must_use]
 pub fn load_font(font_filename: &str) -> rsfml::SfBox<Font> {
-    Font::from_file(font_filename).unwrap_or_else(|| panic!("Loading font from {}", font_filename))
+    Font::from_file(font_filename).unwrap_or_else(|| panic!("Loading font from {font_filename}"))
 }
 
 pub fn set_render_window_properties(render_window: &mut RenderWindow, args: &RustensteinOptions) {
