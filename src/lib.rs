@@ -1,5 +1,3 @@
-#![warn(clippy::nursery)]
-
 extern crate rsfml;
 
 pub(crate) mod animation;

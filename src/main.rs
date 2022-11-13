@@ -27,7 +27,10 @@ fn main() {
 
     let texture_loader = load_resources();
 
-    let mut game_loop = MainLoop::new(render_window, &texture_loader, args.no_ground);
+    let mut game_loop = MainLoop::new(render_window, &texture_loader);
+    if args.no_ground {
+        game_loop.disable_ground();
+    }
     game_loop.enable_fps(&font);
     game_loop.run();
 }

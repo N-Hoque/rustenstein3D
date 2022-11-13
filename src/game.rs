@@ -22,17 +22,13 @@ pub struct MainLoop<'s, 'a, 'm> {
 
 impl<'s: 'a, 'a> MainLoop<'s, 'a, '_> {
     #[must_use]
-    pub fn new(
-        render_window: RenderWindow,
-        texture_loader: &'s TextureLoader,
-        no_ground: bool,
-    ) -> Self {
+    pub fn new(render_window: RenderWindow, texture_loader: &'s TextureLoader) -> Self {
         let window_size = render_window.size();
         Self {
             render_window,
             fps_handler: None,
             event_handler: EventHandler::default(),
-            game_mode: GameMode::new(window_size, texture_loader, no_ground),
+            game_mode: GameMode::new(window_size, texture_loader),
         }
     }
 
@@ -46,6 +42,10 @@ impl<'s: 'a, 'a> MainLoop<'s, 'a, '_> {
         if self.fps_handler.is_some() {
             self.fps_handler = None;
         }
+    }
+
+    pub fn disable_ground(&mut self) {
+        self.game_mode.disable_ground();
     }
 
     pub fn run(&mut self) {

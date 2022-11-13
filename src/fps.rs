@@ -12,14 +12,18 @@ pub struct FPSHandler<'s> {
 
 impl<'s> FPSHandler<'s> {
     pub(crate) fn new(font: &'s Font) -> FPSHandler<'s> {
-        let mut text = Text::new("0", font, 20);
-        text.set_position(Vector2f::new(10., 10.));
-        text.set_fill_color(Color::GREEN);
         FPSHandler {
-            text,
+            text: create_text(font),
             fps_clock: Clock::start(),
         }
     }
+}
+
+fn create_text(font: &Font) -> Text {
+    let mut text = Text::new("0", font, 20);
+    text.set_position(Vector2f::new(10., 10.));
+    text.set_fill_color(Color::GREEN);
+    text
 }
 
 impl Render for FPSHandler<'_> {

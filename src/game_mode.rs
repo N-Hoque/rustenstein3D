@@ -48,31 +48,16 @@ static RAW_MAP: [i32; 576] = [
 ];
 
 impl<'s: 'a, 'a, 'm> GameMode<'s, 'a, 'm> {
-    pub(crate) fn new(
-        window_size: Vector2u,
-        texture_loader: &'s TextureLoader,
-        no_ground: bool,
-    ) -> Self {
+    pub(crate) fn new(window_size: Vector2u, texture_loader: &'s TextureLoader) -> Self {
         let map = GameMode::get_map();
-        let mut sky = RectangleShape::with_size(Vector2f {
-            x: window_size.x as f32,
-            y: window_size.y as f32 / 2. - 40.,
-        });
-        sky.set_fill_color(Color::rgb(63, 48, 21));
-        let mut ground = RectangleShape::with_size(Vector2f {
-            x: window_size.x as f32,
-            y: window_size.y as f32 / 2. - 40.,
-        });
-        ground.set_fill_color(Color::rgb(109, 108, 112));
-        ground.set_position(Vector2f::new(0., window_size.y as f32 / 2. - 40.));
         let window_size_f32 = Vector2f::new(window_size.x as f32, window_size.y as f32);
         Self {
             window_size,
             texture_loader,
-            sky,
-            ground,
+            sky: create_sky(window_size),
+            ground: create_ground(window_size),
             mini_map: MiniMap::new(map.clone(), window_size),
-            r_engine: REngine::new(map, window_size_f32, no_ground),
+            r_engine: REngine::new(map, window_size_f32),
             hud: HUD::new(window_size_f32, texture_loader),
             weapon: Weapon::new(window_size_f32, texture_loader),
         }
@@ -81,6 +66,29 @@ impl<'s: 'a, 'a, 'm> GameMode<'s, 'a, 'm> {
     pub(crate) fn get_map() -> Map<'m> {
         Map::new(&RAW_MAP, Vector2f::new(24., 24.))
     }
+
+    pub(crate) fn disable_ground(&mut self) {
+        self.r_engine.disable_ground();
+    }
+}
+
+fn create_ground(window_size: Vector2u) -> RectangleShape<'static> {
+    let mut ground = RectangleShape::with_size(Vector2f {
+        x: window_size.x as f32,
+        y: window_size.y as f32 / 2. - 40.,
+    });
+    ground.set_fill_color(Color::rgb(109, 108, 112));
+    ground.set_position(Vector2f::new(0., window_size.y as f32 / 2. - 40.));
+    ground
+}
+
+fn create_sky(window_size: Vector2u) -> RectangleShape<'static> {
+    let mut sky = RectangleShape::with_size(Vector2f {
+        x: window_size.x as f32,
+        y: window_size.y as f32 / 2. - 40.,
+    });
+    sky.set_fill_color(Color::rgb(63, 48, 21));
+    sky
 }
 
 impl EventUpdate for GameMode<'_, '_, '_> {

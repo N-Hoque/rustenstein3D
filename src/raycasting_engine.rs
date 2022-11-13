@@ -47,10 +47,10 @@ struct DrawState {
 }
 
 impl<'m> REngine<'m> {
-    pub(crate) fn new(map: Map<'m>, window_size: Vector2f, no_ground: bool) -> Self {
+    pub(crate) fn new(map: Map<'m>, window_size: Vector2f) -> Self {
         Self {
             map,
-            no_ground,
+            no_ground: false,
             draw_state: DrawState::default(),
             window_size: Vector2f::new(window_size.x, window_size.y - 80.),
             textures_id: Vec::new(),
@@ -65,6 +65,10 @@ impl<'m> REngine<'m> {
                 sky: Self::create_line_array(window_size),
             },
         }
+    }
+
+    pub(crate) fn disable_ground(&mut self) {
+        self.no_ground = true;
     }
 }
 
@@ -94,7 +98,7 @@ impl REngine<'_> {
         let floor = self.calculate_floor(ray_dir, side);
 
         for y in (self.draw_state.draw_end + 1)..(self.window_size.y as i32) {
-            let current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y as f32);
+            let current_dist = self.window_size.y / (2. * y as f32 - self.window_size.y);
             let weight = current_dist / self.draw_state.perp_wall_dist;
             let current_floor = weight * floor + (1.0 - weight) * self.player_data.position;
 
