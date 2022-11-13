@@ -326,7 +326,7 @@ impl REngine<'_> {
             .collect()
     }
 
-    pub const fn get_player_pos(&self) -> Vector2f {
+    pub const fn get_player_position(&self) -> Vector2f {
         self.player_data.position
     }
 }

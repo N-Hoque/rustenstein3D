@@ -26,19 +26,22 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 #[clap(name = "Rustenstein 3D", about = "Options for Rustenstein3D")]
 pub struct RustensteinOptions {
-    #[clap(short, long, help = "Disables floor and sky rendering")]
-    pub no_ground: bool,
+    #[clap(short = 'g', long, help = "Disables ground (and sky) rendering")]
+    pub disable_ground_rendering: bool,
 
     #[clap(
-        short,
+        short = 'l',
         long,
-        help = "Sets the FPS (Frames per second)",
+        help = "Sets the FPS (Frames per second) limit",
         default_value = "30"
     )]
-    pub fps: u8,
+    pub set_fps_limit: u8,
+
+    #[clap(short = 'f', long, help = "Disables the FPS counter")]
+    pub disable_fps_counter: bool,
 
     #[clap(
-        short,
+        short = 'w',
         long,
         help = "Set the size of the window",
         number_of_values = 2,
@@ -46,8 +49,8 @@ pub struct RustensteinOptions {
     )]
     pub window_size: Vec<u16>,
 
-    #[clap(short, long, help = "Shows the cursor")]
-    pub cursor: bool,
+    #[clap(short = 'c', long, help = "Show cursor")]
+    pub show_cursor: bool,
 }
 
 #[must_use]
@@ -105,8 +108,8 @@ pub fn load_font(font_filename: &str) -> rsfml::SfBox<Font> {
 }
 
 pub fn set_render_window_properties(render_window: &mut RenderWindow, args: &RustensteinOptions) {
-    render_window.set_framerate_limit(args.fps.into());
-    render_window.set_mouse_cursor_visible(args.cursor);
+    render_window.set_framerate_limit(args.set_fps_limit.into());
+    render_window.set_mouse_cursor_visible(args.show_cursor);
     render_window.set_mouse_position(Vector2i {
         x: i32::from(args.window_size[0]) / 2,
         y: i32::from(args.window_size[1]) / 2,

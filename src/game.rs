@@ -63,10 +63,9 @@ impl Update for MainLoop<'_, '_, '_> {
             self.render_window.close();
         }
         self.game_mode.update(&self.event_handler);
-        self.fps_handler
-            .as_mut()
-            .expect("Updating FPS Handler")
-            .update();
+        if let Some(fps_handler) = self.fps_handler.as_mut() {
+            fps_handler.update();
+        }
     }
 }
 

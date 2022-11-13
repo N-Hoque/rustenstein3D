@@ -106,7 +106,7 @@ impl EventUpdate for GameMode<'_, '_, '_> {
         self.r_engine.update(event_handler);
         if self.mini_map.is_active() {
             self.mini_map
-                .update(self.r_engine.get_player_pos(), rotation);
+                .update(self.r_engine.get_player_position(), rotation);
         }
         self.hud.update();
         self.weapon.update(event_handler);
