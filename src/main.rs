@@ -6,15 +6,7 @@ use rustenstein_3d::{
 use clap::Parser;
 
 fn main() {
-    let mut args = RustensteinOptions::parse();
-
-    if args.window_size.is_empty() {
-        args.window_size = vec![640, 480];
-    } else if args.window_size[0] == 0 {
-        args.window_size[0] = 640;
-    } else if args.window_size[1] == 0 {
-        args.window_size[1] = 480;
-    }
+    let args = RustensteinOptions::parse();
 
     let mut render_window = create_render_window(
         "Rustenstein 3D",

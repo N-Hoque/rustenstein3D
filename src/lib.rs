@@ -44,7 +44,7 @@ pub struct RustensteinOptions {
         short = 'w',
         long,
         help = "Set the size of the window",
-        number_of_values = 2,
+        default_values = &["640", "480"],
         value_names = &["width", "height"],
     )]
     pub window_size: Vec<u16>,
