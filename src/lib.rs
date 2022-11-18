@@ -15,7 +15,6 @@ pub(crate) mod weapon;
 
 use rsfml::{
     graphics::{Font, RenderWindow},
-    system::Vector2i,
     window::{ContextSettings, Style, VideoMode},
 };
 
@@ -108,12 +107,16 @@ pub fn load_font(font_filename: &str) -> rsfml::SfBox<Font> {
 }
 
 pub fn set_render_window_properties(render_window: &mut RenderWindow, args: &RustensteinOptions) {
-    render_window.set_framerate_limit(args.set_fps_limit.into());
+    let position = (
+        i32::from(args.window_size[0]) / 2,
+        i32::from(args.window_size[1]) / 2,
+    )
+        .into();
+
+    render_window.set_position(position);
+    render_window.set_mouse_position(position);
     render_window.set_mouse_cursor_visible(args.show_cursor);
-    render_window.set_mouse_position(Vector2i {
-        x: i32::from(args.window_size[0]) / 2,
-        y: i32::from(args.window_size[1]) / 2,
-    });
+    render_window.set_framerate_limit(args.set_fps_limit.into());
 }
 
 #[must_use]
