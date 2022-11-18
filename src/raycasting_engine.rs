@@ -188,11 +188,11 @@ impl REngine<'_> {
         let player_position = self.player_data.position;
         let current_dist = window_height / (2. * vertex_index - window_height);
         let weight = current_dist / wall_distance;
-        let plane = (plane_normal * weight) + (player_position * (1.0 - weight));
+        let texture_coordinates = (plane_normal * weight) + (player_position * (1.0 - weight));
 
         Vector2f::new(
-            ((plane.x * 128.) as i32 % 128) as f32,
-            ((plane.y * 128.) as i32 % 128) as f32,
+            ((texture_coordinates.x * 128.) as i32 % 128) as f32,
+            ((texture_coordinates.y * 128.) as i32 % 128) as f32,
         )
     }
 

@@ -106,7 +106,16 @@ pub fn load_font(font_filename: &str) -> rsfml::SfBox<Font> {
     Font::from_file(font_filename).unwrap_or_else(|| panic!("Loading font from {}", font_filename))
 }
 
-pub fn set_render_window_properties(render_window: &mut RenderWindow, args: &RustensteinOptions) {
+#[must_use]
+pub fn create_render_window(title: &str, args: &RustensteinOptions) -> RenderWindow {
+    let settings = ContextSettings::default();
+    let video_mode = VideoMode::new(
+        u32::from(args.window_size[0]),
+        u32::from(args.window_size[1]),
+        32,
+    );
+    let mut render_window = RenderWindow::new(video_mode, title, Style::CLOSE, &settings);
+
     let position = (
         i32::from(args.window_size[0]) / 2,
         i32::from(args.window_size[1]) / 2,
@@ -117,11 +126,6 @@ pub fn set_render_window_properties(render_window: &mut RenderWindow, args: &Rus
     render_window.set_mouse_position(position);
     render_window.set_mouse_cursor_visible(args.show_cursor);
     render_window.set_framerate_limit(args.set_fps_limit.into());
-}
 
-#[must_use]
-pub fn create_render_window(title: &str, window_size: (u32, u32)) -> RenderWindow {
-    let settings = ContextSettings::default();
-    let video_mode = VideoMode::new(window_size.0, window_size.1, 32);
-    RenderWindow::new(video_mode, title, Style::CLOSE, &settings)
+    render_window
 }

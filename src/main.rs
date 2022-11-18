@@ -1,6 +1,5 @@
 use rustenstein_3d::{
-    create_render_window, game::MainLoop, load_font, load_resources, set_render_window_properties,
-    RustensteinOptions,
+    create_render_window, game::MainLoop, load_font, load_resources, RustensteinOptions,
 };
 
 use clap::Parser;
@@ -8,12 +7,7 @@ use clap::Parser;
 fn main() {
     let args = RustensteinOptions::parse();
 
-    let mut render_window = create_render_window(
-        "Rustenstein 3D",
-        (args.window_size[0] as u32, args.window_size[1] as u32),
-    );
-
-    set_render_window_properties(&mut render_window, &args);
+    let render_window = create_render_window("Rustenstein 3D", &args);
 
     let font = load_font("resources/sansation.ttf");
 
