@@ -84,34 +84,33 @@ impl REngine<'_> {
         self.player_data.position
     }
 
-    fn update_planes(&mut self, ray_dir: Vector2f, side: Side, width_pixel: i32) {
+    fn update_planes(&mut self, ray_dir: Vector2f, side: Side, pixel: i32) {
         if self.draw_state.draw_end < 0 {
             self.draw_state.draw_end = self.window_size.y as i32;
         }
 
-        let buffer_size = self.get_buffer_size();
+        self.reset_plane_buffers(pixel);
 
-        self.reset_plane_buffers(width_pixel, buffer_size);
+        let (sky, ground) = self.compute_plane_buffers(ray_dir, side, pixel);
 
-        let plane_normal = self.compute_plane_normal(ray_dir, side);
-
-        let (sky_vertices, ground_vertices) =
-            self.compute_plane_vertices(plane_normal, width_pixel as f32);
-
-        self.update_plane_buffers(width_pixel, &sky_vertices, &ground_vertices);
+        self.update_plane_buffers(pixel, &sky, &ground);
     }
 
-    fn compute_plane_vertices(
+    fn compute_plane_buffers(
         &self,
-        plane_normal: Vector2f,
-        width_pixel: f32,
+        ray_dir: Vector2f,
+        side: Side,
+        pixel: i32,
     ) -> (Vec<Vertex>, Vec<Vertex>) {
+        let pixel = pixel as f32;
+        let plane_normal = self.compute_plane_normal(ray_dir, side);
+
         let texture_data = self.compute_texture_data(plane_normal);
 
         let sky_vertices = texture_data
             .iter()
             .map(|(idx, tex)| {
-                let pos = Self::compute_plane_vertex(width_pixel, *idx, Some(self.window_size.y));
+                let pos = Self::compute_plane_vertex(pixel, *idx, Some(self.window_size.y));
                 Vertex::new(pos, Color::WHITE, *tex)
             })
             .collect();
@@ -119,7 +118,7 @@ impl REngine<'_> {
         let ground_vertices = texture_data
             .iter()
             .map(|(idx, tex)| {
-                let pos = Self::compute_plane_vertex(width_pixel, *idx, None);
+                let pos = Self::compute_plane_vertex(pixel, *idx, None);
                 Vertex::new(pos, Color::WHITE, *tex)
             })
             .collect();
@@ -139,13 +138,9 @@ impl REngine<'_> {
             .collect()
     }
 
-    fn compute_plane_vertex(
-        width_pixel: f32,
-        vertex_index: f32,
-        window_height: Option<f32>,
-    ) -> Vector2f {
+    fn compute_plane_vertex(pixel: f32, vertex_index: f32, window_height: Option<f32>) -> Vector2f {
         Vector2f {
-            x: width_pixel,
+            x: pixel,
             y: window_height.map_or(vertex_index, |h| h - vertex_index),
         }
     }
@@ -156,14 +151,14 @@ impl REngine<'_> {
 
     fn update_plane_buffers(
         &mut self,
-        width_pixel: i32,
+        pixel: i32,
         sky_vertices: &[Vertex],
         ground_vertices: &[Vertex],
     ) {
-        if let Some(sky_buffer) = self.vertex_arrays.sky.get_mut(width_pixel as usize) {
+        if let Some(sky_buffer) = self.vertex_arrays.sky.get_mut(pixel as usize) {
             Self::update_buffer(sky_buffer, sky_vertices);
         }
-        if let Some(ground_buffer) = self.vertex_arrays.ground.get_mut(width_pixel as usize) {
+        if let Some(ground_buffer) = self.vertex_arrays.ground.get_mut(pixel as usize) {
             Self::update_buffer(ground_buffer, ground_vertices);
         }
     }
@@ -172,11 +167,13 @@ impl REngine<'_> {
         buffer.update(vertices, 0);
     }
 
-    fn reset_plane_buffers(&mut self, width_pixel: i32, buffer_size: u32) {
-        if let Some(sky_buffer) = self.vertex_arrays.sky.get_mut(width_pixel as usize) {
+    fn reset_plane_buffers(&mut self, pixel: i32) {
+        let buffer_size = self.get_buffer_size();
+
+        if let Some(sky_buffer) = self.vertex_arrays.sky.get_mut(pixel as usize) {
             Self::reset_buffer(sky_buffer, buffer_size);
         }
-        if let Some(ground_buffer) = self.vertex_arrays.ground.get_mut(width_pixel as usize) {
+        if let Some(ground_buffer) = self.vertex_arrays.ground.get_mut(pixel as usize) {
             Self::reset_buffer(ground_buffer, buffer_size);
         }
     }
@@ -203,7 +200,7 @@ impl REngine<'_> {
         )
     }
 
-    fn compute_plane_normal(&mut self, ray_dir: Vector2f, side: Side) -> Vector2f {
+    fn compute_plane_normal(&self, ray_dir: Vector2f, side: Side) -> Vector2f {
         let map_pos = Vector2f::new(
             self.draw_state.map_pos.x as f32,
             self.draw_state.map_pos.y as f32,
@@ -262,15 +259,15 @@ impl REngine<'_> {
         ray_pos: Vector2f,
         ray_dir: Vector2f,
         side: Side,
-        width_pixel: i32,
+        pixel: i32,
     ) {
         self.update_wall_width(ray_pos, ray_dir, side);
 
         self.update_texture_ids(side);
 
-        let texture_x = self.compute_texture_width(ray_dir, side);
+        let texture_x = self.compute_texture_width(ray_dir, side) as f32;
 
-        self.update_main_vertex_buffer(width_pixel, texture_x);
+        self.update_main_vertex_buffer(pixel as f32, texture_x);
     }
 
     fn compute_texture_width(&mut self, ray_dir: Vector2f, side: Side) -> i32 {
@@ -293,21 +290,19 @@ impl REngine<'_> {
         }
     }
 
-    fn update_main_vertex_buffer(&mut self, width_pixel: i32, tex_x_coordinate: i32) {
-        if let Some(current_vertex_array) =
-            self.vertex_arrays.vertices.get_mut(width_pixel as usize)
-        {
+    fn update_main_vertex_buffer(&mut self, pixel: f32, tex_x_coordinate: f32) {
+        if let Some(current_vertex_array) = self.vertex_arrays.vertices.get_mut(pixel as usize) {
             current_vertex_array.update(
                 &[
                     Vertex::new(
-                        Vector2f::new(width_pixel as f32, self.draw_state.draw_start as f32),
+                        Vector2f::new(pixel, self.draw_state.draw_start as f32),
                         Color::WHITE,
-                        Vector2f::new(tex_x_coordinate as f32, 0.),
+                        Vector2f::new(tex_x_coordinate, 0.),
                     ),
                     Vertex::new(
-                        Vector2f::new(width_pixel as f32, self.draw_state.draw_end as f32),
+                        Vector2f::new(pixel, self.draw_state.draw_end as f32),
                         Color::WHITE,
-                        Vector2f::new(tex_x_coordinate as f32, 128.),
+                        Vector2f::new(tex_x_coordinate, 128.),
                     ),
                 ],
                 0,
@@ -445,9 +440,9 @@ impl TextureRender for REngine<'_> {
 impl EventUpdate for REngine<'_> {
     fn update(&mut self, event_handler: &EventHandler) {
         self.textures_id.clear();
-        for width_pixel in 0..self.window_size.x as i32 {
+        for pixel in 0..self.window_size.x as i32 {
             // compute
-            let camera_x = 2. * width_pixel as f32 / self.window_size.x - 1.;
+            let camera_x = 2. * pixel as f32 / self.window_size.x - 1.;
 
             let ray_pos = self.player_data.position;
             let ray_dir = self.player_data.direction + (self.player_data.camera_plane * camera_x);
@@ -467,10 +462,10 @@ impl EventUpdate for REngine<'_> {
 
             self.update_wall_height(ray_pos, ray_dir, side);
 
-            self.update_wall_texture(ray_pos, ray_dir, side, width_pixel);
+            self.update_wall_texture(ray_pos, ray_dir, side, pixel);
 
             if !self.no_ground {
-                self.update_planes(ray_dir, side, width_pixel);
+                self.update_planes(ray_dir, side, pixel);
             }
         }
         self.update_direction(event_handler);
