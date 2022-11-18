@@ -96,37 +96,47 @@ impl REngine<'_> {
         let plane_normal = self.compute_plane_normal(ray_dir, side);
 
         let (sky_vertices, ground_vertices) =
-            self.compute_plane_vertices(buffer_size as usize, plane_normal, width_pixel as f32);
+            self.compute_plane_vertices(plane_normal, width_pixel as f32);
 
         self.update_plane_buffers(width_pixel, &sky_vertices, &ground_vertices);
     }
 
     fn compute_plane_vertices(
         &self,
-        buffer_size: usize,
         plane_normal: Vector2f,
         width_pixel: f32,
     ) -> (Vec<Vertex>, Vec<Vertex>) {
-        let mut sky_vertices = Vec::with_capacity(buffer_size);
-        let mut ground_vertices = Vec::with_capacity(buffer_size);
-        for vertex_index in (self.draw_state.draw_end + 1)..(self.window_size.y as i32) {
-            let vertex_index = vertex_index as f32;
-            let tex_coord = Self::compute_texture_coordinate(
-                vertex_index,
-                self.window_size.y,
-                self.draw_state.perp_wall_dist,
-                plane_normal,
-                self.player_data.position,
-            );
+        let texture_data = self.compute_texture_data(plane_normal);
 
-            let pos =
-                Self::compute_plane_vertex(width_pixel, vertex_index, Some(self.window_size.y));
-            Self::update_plane_vertices(&mut sky_vertices, pos, tex_coord);
+        let sky_vertices = texture_data
+            .iter()
+            .map(|(idx, tex)| {
+                let pos = Self::compute_plane_vertex(width_pixel, *idx, Some(self.window_size.y));
+                Vertex::new(pos, Color::WHITE, *tex)
+            })
+            .collect();
 
-            let pos = Self::compute_plane_vertex(width_pixel, vertex_index, None);
-            Self::update_plane_vertices(&mut ground_vertices, pos, tex_coord);
-        }
+        let ground_vertices = texture_data
+            .iter()
+            .map(|(idx, tex)| {
+                let pos = Self::compute_plane_vertex(width_pixel, *idx, None);
+                Vertex::new(pos, Color::WHITE, *tex)
+            })
+            .collect();
+
         (sky_vertices, ground_vertices)
+    }
+
+    fn compute_texture_data(&self, plane_normal: Vector2f) -> Box<[(f32, Vector2f)]> {
+        ((self.draw_state.draw_end + 1)..(self.window_size.y as i32))
+            .map(|idx| {
+                let vertex_index = idx as f32;
+                (
+                    vertex_index,
+                    self.compute_texture_coordinate(vertex_index, plane_normal),
+                )
+            })
+            .collect()
     }
 
     fn compute_plane_vertex(
@@ -138,15 +148,6 @@ impl REngine<'_> {
             x: width_pixel,
             y: window_height.map_or(vertex_index, |h| h - vertex_index),
         }
-    }
-
-    fn update_plane_vertices(
-        vertices: &mut Vec<Vertex>,
-        position: Vector2f,
-        texture_coordinate: Vector2f,
-    ) {
-        let vertex = Vertex::new(position, Color::WHITE, texture_coordinate);
-        vertices.push(vertex);
     }
 
     fn get_buffer_size(&self) -> u32 {
@@ -188,13 +189,10 @@ impl REngine<'_> {
         );
     }
 
-    fn compute_texture_coordinate(
-        vertex_index: f32,
-        window_height: f32,
-        wall_distance: f32,
-        plane_normal: Vector2f,
-        player_position: Vector2f,
-    ) -> Vector2f {
+    fn compute_texture_coordinate(&self, vertex_index: f32, plane_normal: Vector2f) -> Vector2f {
+        let window_height = self.window_size.y;
+        let wall_distance = self.draw_state.perp_wall_dist;
+        let player_position = self.player_data.position;
         let current_dist = window_height / (2. * vertex_index - window_height);
         let weight = current_dist / wall_distance;
         let plane = (plane_normal * weight) + (player_position * (1.0 - weight));

@@ -26,18 +26,18 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 #[clap(name = "Rustenstein 3D", about = "Options for Rustenstein3D")]
 pub struct RustensteinOptions {
-    #[clap(short = 'g', long, help = "Disables ground (and sky) rendering")]
-    pub disable_ground_rendering: bool,
+    #[clap(long, help = "Disables ground (and sky) rendering")]
+    pub disable_plane_rendering: bool,
 
     #[clap(
-        short = 'l',
+        short = 'f',
         long,
         help = "Sets the FPS (Frames per second) limit",
         default_value = "30"
     )]
     pub set_fps_limit: u8,
 
-    #[clap(short = 'f', long, help = "Disables the FPS counter")]
+    #[clap(long, help = "Disables the FPS counter")]
     pub disable_fps_counter: bool,
 
     #[clap(
