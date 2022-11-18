@@ -1,12 +1,13 @@
 use rsfml::{
     graphics::{Color, Font, RenderTarget, RenderWindow, Text, Transformable},
     system::{Clock, Vector2f},
+    SfBox,
 };
 
 use crate::core::{Render, Update};
 
 pub struct FPSHandler<'s> {
-    fps_clock: Clock,
+    fps_clock: SfBox<Clock>,
     text: Text<'s>,
 }
 

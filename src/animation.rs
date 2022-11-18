@@ -1,4 +1,4 @@
-use rsfml::system::Clock;
+use rsfml::{system::Clock, SfBox};
 
 use crate::core::Update;
 
@@ -12,7 +12,7 @@ pub struct Animation<'a> {
     state: PlayState,
     data: Data<'a>,
     active_texture: u32,
-    clock: Clock,
+    clock: SfBox<Clock>,
 }
 
 struct Data<'a> {

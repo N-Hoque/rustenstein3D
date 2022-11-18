@@ -93,9 +93,9 @@ fn create_sky(window_size: Vector2u) -> RectangleShape<'static> {
 
 impl EventUpdate for GameMode<'_, '_, '_> {
     fn update(&mut self, event_handler: &EventHandler) {
-        let rotation: f32 = if EventHandler::is_key_pressed(Key::LEFT) {
+        let rotation: f32 = if EventHandler::is_key_pressed(Key::Left) {
             -5.25
-        } else if EventHandler::is_key_pressed(Key::RIGHT) {
+        } else if EventHandler::is_key_pressed(Key::Right) {
             5.25
         } else {
             0.0

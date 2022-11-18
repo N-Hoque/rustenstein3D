@@ -9,7 +9,9 @@ impl TextureLoader {
     pub(crate) fn with_textures(texture_paths: &[&str]) -> Self {
         let textures = texture_paths
             .iter()
-            .map(|t| Texture::from_file(t).unwrap_or_else(|| panic!("Loading texture from: {}", t)))
+            .map(|t| {
+                Texture::from_file(t).unwrap_or_else(|_| panic!("Loading texture from: {}", t))
+            })
             .collect();
         Self { textures }
     }

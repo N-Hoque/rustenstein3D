@@ -61,16 +61,16 @@ impl<'s, 'a> Weapon<'s, 'a> {
     }
 
     fn update_selected_weapon(&mut self, event_handler: &EventHandler) {
-        if event_handler.has_key_pressed_event(Key::NUM1).is_some() {
+        if event_handler.has_key_pressed_event(Key::Num1).is_some() {
             self.current_weapon = 0;
         };
-        if event_handler.has_key_pressed_event(Key::NUM2).is_some() {
+        if event_handler.has_key_pressed_event(Key::Num2).is_some() {
             self.current_weapon = 1;
         };
-        if event_handler.has_key_pressed_event(Key::NUM3).is_some() {
+        if event_handler.has_key_pressed_event(Key::Num3).is_some() {
             self.current_weapon = 2;
         };
-        if event_handler.has_key_pressed_event(Key::NUM4).is_some() {
+        if event_handler.has_key_pressed_event(Key::Num4).is_some() {
             self.current_weapon = 3;
         };
     }
@@ -92,14 +92,14 @@ impl EventUpdate for Weapon<'_, '_> {
 
         if !self.mouse_fire {
             if event_handler
-                .has_mouse_button_pressed_event(Button::LEFT)
+                .has_mouse_button_pressed_event(Button::Left)
                 .is_some()
             {
                 animation.set_state(PlayState::Play);
                 self.mouse_fire = true;
             }
         } else if event_handler
-            .has_mouse_button_released_event(Button::LEFT)
+            .has_mouse_button_released_event(Button::Left)
             .is_some()
         {
             self.mouse_fire = false;

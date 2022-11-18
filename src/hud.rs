@@ -1,6 +1,7 @@
 use rsfml::{
     graphics::{Color, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::{Clock, Vector2f},
+    SfBox,
 };
 
 use crate::{
@@ -16,7 +17,7 @@ pub struct HUD<'s, 'a> {
     face: RectangleShape<'s>,
     face_animation: Animation<'a>,
     texture_loader: &'s TextureLoader,
-    face_clock: Clock,
+    face_clock: SfBox<Clock>,
 }
 
 impl<'s> HUD<'s, '_> {

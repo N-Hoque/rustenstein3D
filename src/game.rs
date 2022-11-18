@@ -59,7 +59,7 @@ impl<'s: 'a, 'a> MainLoop<'s, 'a, '_> {
 impl Update for MainLoop<'_, '_, '_> {
     fn update(&mut self) {
         self.event_handler.update(&mut self.render_window);
-        if self.event_handler.has_closed_event() || EventHandler::is_key_pressed(Key::ESCAPE) {
+        if self.event_handler.has_closed_event() || EventHandler::is_key_pressed(Key::Escape) {
             self.render_window.close();
         }
         self.game_mode.update(&self.event_handler);
