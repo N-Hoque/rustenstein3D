@@ -44,8 +44,8 @@ impl<'s: 'a, 'a> MainLoop<'s, 'a, '_> {
         }
     }
 
-    pub fn disable_ground(&mut self) {
-        self.game_mode.disable_ground();
+    pub fn disable_planes(&mut self) {
+        self.game_mode.disable_planes();
     }
 
     pub fn run(&mut self) {

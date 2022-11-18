@@ -67,8 +67,8 @@ impl<'s: 'a, 'a, 'm> GameMode<'s, 'a, 'm> {
         Map::new(&RAW_MAP, Vector2f::new(24., 24.))
     }
 
-    pub(crate) fn disable_ground(&mut self) {
-        self.r_engine.disable_ground();
+    pub(crate) fn disable_planes(&mut self) {
+        self.r_engine.disable_planes();
     }
 }
 

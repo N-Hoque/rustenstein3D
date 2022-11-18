@@ -29,7 +29,7 @@ fn main() {
 
     let mut game_loop = MainLoop::new(render_window, &texture_loader);
     if args.disable_plane_rendering {
-        game_loop.disable_ground();
+        game_loop.disable_planes();
     }
     game_loop.enable_fps(&font);
     if args.disable_fps_counter {

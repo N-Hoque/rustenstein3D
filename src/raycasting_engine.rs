@@ -20,7 +20,7 @@ pub struct REngine<'m> {
     vertex_arrays: VertexData,
     player_data: PlayerData,
     map: Map<'m>,
-    no_ground: bool,
+    disable_planes: bool,
     draw_state: DrawState,
 }
 
@@ -57,7 +57,7 @@ impl<'m> REngine<'m> {
     pub(crate) fn new(map: Map<'m>, window_size: Vector2f) -> Self {
         Self {
             map,
-            no_ground: false,
+            disable_planes: false,
             draw_state: DrawState::default(),
             window_size: Vector2f::new(window_size.x, window_size.y - 80.),
             textures_id: Vec::new(),
@@ -74,8 +74,8 @@ impl<'m> REngine<'m> {
         }
     }
 
-    pub(crate) fn disable_ground(&mut self) {
-        self.no_ground = true;
+    pub(crate) fn disable_planes(&mut self) {
+        self.disable_planes = true;
     }
 }
 
@@ -91,16 +91,16 @@ impl REngine<'_> {
 
         self.reset_plane_buffers(pixel);
 
-        let (sky, ground) = self.compute_plane_buffers(ray_dir, side, pixel);
+        let (sky, ground) = self.compute_plane_buffers(pixel, ray_dir, side);
 
         self.update_plane_buffers(pixel, &sky, &ground);
     }
 
     fn compute_plane_buffers(
         &self,
+        pixel: i32,
         ray_dir: Vector2f,
         side: Side,
-        pixel: i32,
     ) -> (Vec<Vertex>, Vec<Vertex>) {
         let pixel = pixel as f32;
         let plane_normal = self.compute_plane_normal(ray_dir, side);
@@ -156,34 +156,30 @@ impl REngine<'_> {
         ground_vertices: &[Vertex],
     ) {
         if let Some(sky_buffer) = self.vertex_arrays.sky.get_mut(pixel as usize) {
-            Self::update_buffer(sky_buffer, sky_vertices);
+            sky_buffer.update(sky_vertices, 0);
         }
         if let Some(ground_buffer) = self.vertex_arrays.ground.get_mut(pixel as usize) {
-            Self::update_buffer(ground_buffer, ground_vertices);
+            ground_buffer.update(ground_vertices, 0);
         }
-    }
-
-    fn update_buffer(buffer: &mut VertexBuffer, vertices: &[Vertex]) {
-        buffer.update(vertices, 0);
     }
 
     fn reset_plane_buffers(&mut self, pixel: i32) {
         let buffer_size = self.get_buffer_size();
 
         if let Some(sky_buffer) = self.vertex_arrays.sky.get_mut(pixel as usize) {
-            Self::reset_buffer(sky_buffer, buffer_size);
+            *sky_buffer = Self::create_new_vertex_buffer(buffer_size);
         }
         if let Some(ground_buffer) = self.vertex_arrays.ground.get_mut(pixel as usize) {
-            Self::reset_buffer(ground_buffer, buffer_size);
+            *ground_buffer = Self::create_new_vertex_buffer(buffer_size);
         }
     }
 
-    fn reset_buffer(buffer: &mut VertexBuffer, buffer_size: u32) {
-        *buffer = VertexBuffer::new(
+    fn create_new_vertex_buffer(buffer_size: u32) -> VertexBuffer {
+        VertexBuffer::new(
             PrimitiveType::POINTS,
             buffer_size,
             VertexBufferUsage::STREAM,
-        );
+        )
     }
 
     fn compute_texture_coordinate(&self, vertex_index: f32, plane_normal: Vector2f) -> Vector2f {
@@ -207,25 +203,29 @@ impl REngine<'_> {
         );
 
         match side {
-            Side::Left if ray_dir.x >= 0.0 => (map_pos.x, map_pos.y + self.draw_state.wall_x),
-            Side::Left => (map_pos.x + 1., map_pos.y + self.draw_state.wall_x),
-            Side::Right if ray_dir.y >= 0.0 => (map_pos.x + self.draw_state.wall_x, map_pos.y),
-            Side::Right => (map_pos.x + self.draw_state.wall_x, map_pos.y + 1.),
+            Side::Left => (
+                map_pos.x + if ray_dir.x < 0. { 1. } else { 0. },
+                map_pos.y + self.draw_state.wall_x,
+            ),
+            Side::Right => (
+                map_pos.x + self.draw_state.wall_x,
+                map_pos.y + if ray_dir.y < 0. { 1. } else { 0. },
+            ),
         }
         .into()
     }
 
     fn update_wall_width(&mut self, ray_pos: Vector2f, ray_dir: Vector2f, side: Side) {
-        self.draw_state.wall_x = if side == Side::Right {
-            ((self.draw_state.map_pos.y as f32 - ray_pos.y
-                + (1. - self.draw_state.step.y as f32) / 2.)
-                / ray_dir.y)
-                .mul_add(ray_dir.x, ray_pos.x)
-        } else {
+        self.draw_state.wall_x = if side == Side::Left {
             ((self.draw_state.map_pos.x as f32 - ray_pos.x
                 + (1. - self.draw_state.step.x as f32) / 2.)
                 / ray_dir.x)
                 .mul_add(ray_dir.y, ray_pos.y)
+        } else {
+            ((self.draw_state.map_pos.y as f32 - ray_pos.y
+                + (1. - self.draw_state.step.y as f32) / 2.)
+                / ray_dir.y)
+                .mul_add(ray_dir.x, ray_pos.x)
         };
         self.draw_state.wall_x -= self.draw_state.wall_x.floor();
     }
@@ -336,7 +336,7 @@ impl REngine<'_> {
         };
     }
 
-    fn update_wall_side(&mut self, side: &mut Side, delta_dist: Vector2f) {
+    fn update_side(&mut self, side: &mut Side, delta_dist: Vector2f) {
         while matches!(self.map.get_block(self.draw_state.map_pos), Some(0)) {
             if self.draw_state.side_dist.x < self.draw_state.side_dist.y {
                 self.draw_state.side_dist.x += delta_dist.x;
@@ -414,6 +414,35 @@ impl REngine<'_> {
     fn update_map_position(&mut self, ray_pos: Vector2f) {
         self.draw_state.map_pos = Vector2i::new(ray_pos.x as i32, ray_pos.y as i32);
     }
+
+    fn compute_events(&mut self, pixel: i32) -> (Vector2f, Vector2f, Vector2f) {
+        let camera_x = 2. * pixel as f32 / self.window_size.x - 1.;
+        let ray_pos = self.player_data.position;
+        let ray_dir = self.player_data.direction + (self.player_data.camera_plane * camera_x);
+        let delta_dist = Vector2f::new(
+            (1. + (ray_dir.y * ray_dir.y) / (ray_dir.x * ray_dir.x)).sqrt(),
+            (1. + (ray_dir.x * ray_dir.x) / (ray_dir.y * ray_dir.y)).sqrt(),
+        );
+        (ray_pos, ray_dir, delta_dist)
+    }
+
+    fn update_events(
+        &mut self,
+        ray_pos: Vector2f,
+        ray_dir: Vector2f,
+        delta_dist: Vector2f,
+        pixel: i32,
+    ) {
+        self.update_map_position(ray_pos);
+        self.update_step(ray_pos, ray_dir, delta_dist);
+        let mut side = Side::Left;
+        self.update_side(&mut side, delta_dist);
+        self.update_wall_height(ray_pos, ray_dir, side);
+        self.update_wall_texture(ray_pos, ray_dir, side, pixel);
+        if !self.disable_planes {
+            self.update_planes(ray_dir, side, pixel);
+        }
+    }
 }
 
 impl TextureRender for REngine<'_> {
@@ -441,32 +470,9 @@ impl EventUpdate for REngine<'_> {
     fn update(&mut self, event_handler: &EventHandler) {
         self.textures_id.clear();
         for pixel in 0..self.window_size.x as i32 {
-            // compute
-            let camera_x = 2. * pixel as f32 / self.window_size.x - 1.;
+            let (ray_pos, ray_dir, delta_dist) = self.compute_events(pixel);
 
-            let ray_pos = self.player_data.position;
-            let ray_dir = self.player_data.direction + (self.player_data.camera_plane * camera_x);
-
-            let delta_dist = Vector2f::new(
-                (1. + (ray_dir.y * ray_dir.y) / (ray_dir.x * ray_dir.x)).sqrt(),
-                (1. + (ray_dir.x * ray_dir.x) / (ray_dir.y * ray_dir.y)).sqrt(),
-            );
-
-            // update
-            self.update_map_position(ray_pos);
-
-            self.update_step(ray_pos, ray_dir, delta_dist);
-
-            let mut side = Side::Left;
-            self.update_wall_side(&mut side, delta_dist);
-
-            self.update_wall_height(ray_pos, ray_dir, side);
-
-            self.update_wall_texture(ray_pos, ray_dir, side, pixel);
-
-            if !self.no_ground {
-                self.update_planes(ray_dir, side, pixel);
-            }
+            self.update_events(ray_pos, ray_dir, delta_dist, pixel);
         }
         self.update_direction(event_handler);
         self.update_position();
